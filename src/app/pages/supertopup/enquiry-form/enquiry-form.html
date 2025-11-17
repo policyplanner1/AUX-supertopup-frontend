@@ -1,0 +1,264 @@
+<div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+
+  <!-- ====================== HEADER / STEPS ========================== -->
+  <div class="flex items-center justify-center mb-10 w-full">
+    <div class="flex items-center gap-6 sm:gap-12">
+
+      <!-- STEP 1 -->
+      <div class="flex flex-col items-center">
+        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white font-semibold"
+             [ngClass]="step===1 ? 'bg-[#006D8D]' : 'bg-gray-300 text-gray-700'">
+          1
+        </div>
+        <span class="text-xs sm:text-sm mt-2 text-gray-600">Select Members</span>
+      </div>
+
+      <div class="h-0.5 w-10 sm:w-16"
+           [ngClass]="step>1 ? 'bg-[#006D8D]' : 'bg-gray-300'"></div>
+
+      <!-- STEP 2 -->
+      <div class="flex flex-col items-center">
+        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white font-semibold"
+             [ngClass]="step===2 ? 'bg-[#006D8D]' : 'bg-gray-300 text-gray-700'">
+          2
+        </div>
+        <span class="text-xs sm:text-sm mt-2 text-gray-600">Select Age</span>
+      </div>
+
+      <div class="h-0.5 w-10 sm:w-16"
+           [ngClass]="step>2 ? 'bg-[#006D8D]' : 'bg-gray-300'"></div>
+
+      <!-- STEP 3 -->
+      <div class="flex flex-col items-center">
+        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white font-semibold"
+             [ngClass]="step===3 ? 'bg-[#006D8D]' : 'bg-gray-300 text-gray-700'">
+          3
+        </div>
+        <span class="text-xs sm:text-sm mt-2 text-gray-600">Basic Details</span>
+      </div>
+
+    </div>
+  </div>
+
+
+
+  <!-- =========================== STEP 1 ============================== -->
+  <div *ngIf="step === 1" class="space-y-8">
+
+    <h2 class="text-center text-xl text-gray-700">Select your gender</h2>
+
+    <!-- Gender Toggle -->
+    <div class="mx-auto w-[260px] sm:w-[308px] h-[40px] rounded-full border border-gray-200 flex overflow-hidden shadow-sm">
+      <button type="button"
+              (click)="setGender('Male')"
+              class="flex-1 text-sm sm:text-base font-medium"
+              [ngClass]="gender==='Male' ? 'bg-[#006D8D] text-white' : 'bg-white text-[#006D8D]'">
+        Male
+      </button>
+
+      <button type="button"
+              (click)="setGender('Female')"
+              class="flex-1 text-sm sm:text-base font-medium"
+              [ngClass]="gender==='Female' ? 'bg-[#006D8D] text-white' : 'bg-white text-[#006D8D]'">
+        Female
+      </button>
+    </div>
+
+    <h3 class="text-center text-lg text-gray-700">Select members you want to insure</h3>
+
+    <!-- Member Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 justify-center">
+
+      <ng-container *ngFor="let m of members">
+
+        <div
+          (click)="toggleMember(m.key)"
+          class="relative bg-white rounded-xl p-5 border-2 flex flex-col items-center cursor-pointer transition hover:-translate-y-1"
+          [ngClass]="m.selected ? 'gradient-border shadow-card' : 'border-gray-200 shadow-sm'">
+
+          <img [src]="m.iconPath" class="w-16 h-16 object-contain" />
+
+          <p class="mt-3 text-sm font-semibold text-gray-700">{{ m.label }}</p>
+
+          <!-- Counters INSIDE card for children -->
+          <div *ngIf="m.key === 'son' || m.key === 'daughter'"
+               class="mt-3 flex items-center justify-center gap-3">
+
+            <button (click)="decrementChild(m.key); $event.stopPropagation()"
+                    class="w-7 h-7 rounded-full border flex items-center justify-center text-[#006D8D]"
+                    [disabled]="m.count === 0">
+              –
+            </button>
+
+            <span class="text-sm font-semibold">{{ m.count }}</span>
+
+            <button (click)="incrementChild(m.key); $event.stopPropagation()"
+                    class="w-7 h-7 rounded-full border flex items-center justify-center text-[#006D8D]"
+                    [disabled]="getTotalChildren() >= maxChildren">
+              +
+            </button>
+
+          </div>
+
+        </div>
+
+      </ng-container>
+
+    </div>
+
+    <!-- NEXT Button -->
+    <div class="flex justify-center mt-8">
+      <button (click)="next()"
+              class="w-[180px] sm:w-[193px] h-[44px] rounded-[20px] bg-[#006D8D] text-white shadow-button flex items-center justify-center">
+        Next
+      </button>
+    </div>
+
+  </div>
+
+
+
+<!-- =========================== STEP 2 ============================== -->
+<div *ngIf="step === 2" class="space-y-12">
+
+  <h2 class="text-center text-xl sm:text-2xl font-medium text-gray-700 tracking-wide">
+    Tell us the age of your family members
+  </h2>
+
+  <!-- Age Rows -->
+  <div class="w-full max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-y-14 lg:gap-y-16 gap-x-20 mobile-grid-tight">
+
+    <ng-container *ngFor="let id of getFlatMemberList()">
+      <div class="flex items-center md:items-start gap-6 mobile-gap">
+
+        <!-- Card -->
+        <div class="w-[140px] h-[140px] sm:w-[150px] sm:h-[150px] rounded-xl border-2 border-gray-200 shadow-card flex items-center justify-center card-animate">
+          <img [src]="getIconForId(id)" class="w-20 h-20 object-contain" />
+        </div>
+
+        <!-- Select Age -->
+        <div class="flex flex-col justify-center w-[170px]">
+          <label class="text-gray-500 text-sm mb-2">Select Age</label>
+
+          <select
+            class="w-full input-underline bg-transparent text-gray-700 pb-1 focus:outline-none select-arrow"
+            [(ngModel)]="selectedAges[id]"
+            (ngModelChange)="setAge(id, $event)"
+          >
+            <option value="">Select Age</option>
+
+            <option *ngIf="id.startsWith('son') || id.startsWith('daughter')" value="0.4">
+              91 Days
+            </option>
+
+            <option *ngFor="let a of (id.startsWith('son') || id.startsWith('daughter') ? childAges : adultAges)"
+                    [value]="a">
+              {{ a }} Years
+            </option>
+          </select>
+        </div>
+
+      </div>
+    </ng-container>
+
+  </div>
+
+  <!-- Navigation Buttons -->
+  <div class="flex justify-between mt-6">
+    <button (click)="prev()"
+            class="px-6 py-3 rounded border border-gray-300 text-gray-700 hover:bg-gray-100">
+      Previous
+    </button>
+
+    <button (click)="next()"
+            class="px-8 py-3 rounded-[20px] bg-[#006D8D] text-white shadow-next hover:bg-[#005B75]">
+      Next
+    </button>
+  </div>
+
+</div>
+
+<!-- =========================== STEP 3 ============================== -->
+<div *ngIf="step === 3" class="space-y-12">
+
+  <h2 class="text-center text-xl sm:text-2xl font-medium text-gray-700 tracking-wide">
+    Tell us more about yourself
+  </h2>
+
+  <form [formGroup]="basicForm"
+        class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-12 gap-y-12 mobile-gap">
+
+    <!-- First Name -->
+    <div>
+      <label class="text-[#006D8D] text-sm font-semibold">*Enter First Name</label>
+      <input formControlName="firstName"
+             class="w-full input-underline py-2 focus:border-[#006D8D] text-gray-700 mobile-input"
+             placeholder="First Name">
+    </div>
+
+    <!-- Middle Name -->
+    <!-- <div>
+      <label class="text-[#006D8D] text-sm font-semibold">*Enter Middle Name</label>
+      <input formControlName="middleName"
+             class="w-full input-underline py-2 focus:border-[#006D8D] text-gray-700 mobile-input"
+             placeholder="Middle Name">
+    </div> -->
+
+    <!-- Last Name -->
+    <div>
+      <label class="text-[#006D8D] text-sm font-semibold">*Enter Last Name</label>
+      <input formControlName="lastName"
+             class="w-full input-underline py-2 focus:border-[#006D8D] text-gray-700 mobile-input"
+             placeholder="Last Name">
+    </div>
+
+    <!-- Mobile -->
+    <div>
+      <label class="text-[#006D8D] text-sm font-semibold">*Enter Mobile Number</label>
+      <input formControlName="mobile"
+             class="w-full input-underline py-2 focus:border-[#006D8D] text-gray-700 mobile-input"
+             placeholder="Mobile Number">
+    </div>
+
+    <!-- Pincode -->
+    <div>
+      <label class="text-[#006D8D] text-sm font-semibold">*Enter City Pincode</label>
+      <input formControlName="pincode"
+             class="w-full input-underline py-2 focus:border-[#006D8D] text-gray-700 mobile-input"
+             placeholder="Pincode">
+    </div>
+
+    <!-- Cover Amount -->
+    <div>
+      <label class="text-[#006D8D] text-sm font-semibold">*Cover Amount</label>
+      <select formControlName="coverAmount"
+              class="w-full input-underline bg-transparent py-2 text-gray-700 appearance-none select-arrow mobile-input">
+        <option value="">Select Cover</option>
+        <option value="200000">2 L</option>
+        <option value="500000">5 L</option>
+        <option value="1000000">10 L</option>
+        <option value="2500000">25 L</option>
+      </select>
+    </div>
+
+  </form>
+
+  <!-- Final Button -->
+ <div class="flex justify-between mt-6">
+  <button class="px-5 py-3 rounded border border-gray-300 text-gray-700 hover:bg-gray-100"
+          (click)="prev()">
+    Previous
+  </button>
+
+  <button class="px-10 py-3 rounded-[20px] bg-[#006D8D] text-white shadow-next hover:bg-[#005B75]"
+          (click)="next()">
+    Get Quotes
+  </button>
+</div>
+
+
+</div>
+
+
+
+</div>

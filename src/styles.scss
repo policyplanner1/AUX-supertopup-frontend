@@ -1,0 +1,19 @@
+@use "tailwindcss";
+
+/* Gradient border for selected cards */
+.gradient-border {
+  border-width: 2px;
+  border-style: solid;
+  border-image: linear-gradient(180deg, #FF5500 30.9%, #006D8D 100%) 1;
+  border-radius: 0.75rem; /* ~16px */
+}
+
+
+/* Shadow used in Figma */
+.shadow-card {
+  box-shadow: 0px 8.333px 16.667px 0.833px rgba(0, 109, 141, 0.25);
+}
+
+.shadow-button {
+  box-shadow: 0px 10px 20px 1px rgba(0, 109, 141, 0.25);
+}

@@ -1,0 +1,140 @@
+<div class="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6">
+
+  <!-- Breadcrumb -->
+  <div class="text-sm text-gray-500 flex items-center gap-2 mb-3">
+    <span>Health Insurance</span>
+    <span>›</span>
+    <span>Personal Details</span>
+    <span>›</span>
+    <span class="font-semibold text-gray-700">List of Quotes</span>
+  </div>
+
+  <!-- Quick Filters -->
+  <div class="w-full bg-white border rounded-xl p-4 flex items-center flex-wrap gap-3">
+    <span class="font-medium text-gray-700">Quick Filters</span>
+
+    <button class="filter-btn">Coverage Amt ⌄</button>
+    <button class="filter-btn">Deductible ⌄</button>
+    <button class="filter-btn">Insurer ⌄</button>
+    <button class="filter-btn">Policy Benefit ⌄</button>
+    <button class="filter-btn">All Filters ⌄</button>
+
+    <div class="ml-auto text-gray-600 text-sm">
+      Self: <b>22 years</b> | Pincode: <b>411000</b>
+    </div>
+
+    <button class="text-[#006D8D] underline ml-2">Edit</button>
+  </div>
+
+  <!-- Quote Count -->
+  <p class="mt-6 text-gray-600 text-lg">
+    Here are <span class="text-[#006D8D] font-semibold">6 plans</span> made just for you
+  </p>
+
+  <!-- Main Content -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+
+    <!-- Left: Plans -->
+    <div class="col-span-2 space-y-6">
+
+      <ng-container *ngFor="let p of plans">
+
+        <div class="plan-card">
+
+          <!-- Logo & Compare -->
+          <div class="flex justify-between items-center mb-4">
+            <img [src]="p.logo" class="h-12" />
+            <button class="text-xs px-2 py-1 border rounded text-gray-600 hover:bg-gray-100">
+              Add To Compare
+            </button>
+          </div>
+
+          <h3 class="text-lg font-semibold text-gray-700">{{ p.name }}</h3>
+
+          <ul class="feature-list mt-2 space-y-1">
+            <li *ngFor="let f of p.features">✔ {{ f }}</li>
+          </ul>
+
+          <span class="inline-block mt-3 text-sm bg-orange-100 text-orange-600 px-3 py-1 rounded-full">
+            {{ p.tag }}
+          </span>
+
+          <div class="flex justify-between items-center mt-4">
+            <div>
+              <p class="text-sm text-gray-500">Cover Amount</p>
+              <p class="font-medium">{{ p.cover }}</p>
+            </div>
+
+            <div>
+              <p class="text-sm text-gray-500">Deductible</p>
+              <p class="font-medium">{{ p.deductible }}</p>
+            </div>
+
+            <button class="buy-btn">Buy Now {{ p.price }}</button>
+          </div>
+
+          <button class="text-sm text-[#006D8D] underline mt-3">Download Brochure</button>
+
+        </div>
+
+      </ng-container>
+
+    </div>
+
+    <!-- Right Side Section -->
+    <div class="space-y-6">
+
+      <!-- Call Me Box -->
+      <div class="rounded-xl border bg-green-50 p-5 text-center shadow-sm">
+        <img src="assets/quotes/avatar.png" class="w-16 h-16 mx-auto rounded-full border-2 border-white shadow" />
+
+        <p class="font-semibold text-lg mt-3">Ready to get insured?</p>
+        <p class="text-gray-600 text-sm mt-1">
+          Our experts will call you, explain the options, and help you buy the right policy
+        </p>
+
+        <div class="flex items-center mt-4 gap-3">
+          <input value="+91 82398 89392"
+                 class="flex-1 px-3 py-2 border rounded-lg" />
+
+          <button class="bg-yellow-400 px-4 py-2 rounded-lg font-medium hover:bg-yellow-500">
+            Call Me
+          </button>
+        </div>
+      </div>
+
+      <!-- Info Tiles -->
+      <div class="flex justify-between text-center gap-4">
+        <div>
+          <img src="assets/quotes/irda.svg" class="mx-auto h-10" />
+          <p class="text-sm mt-2">IRDAI Registered</p>
+        </div>
+
+        <div>
+          <img src="assets/quotes/fast.svg" class="mx-auto h-10" />
+          <p class="text-sm mt-2">Fast Claim process</p>
+        </div>
+
+        <div>
+          <img src="assets/quotes/expert.svg" class="mx-auto h-10" />
+          <p class="text-sm mt-2">Expert Guidance</p>
+        </div>
+      </div>
+
+      <!-- CSR Box -->
+      <div class="rounded-xl border p-6 shadow-sm bg-white">
+        <img src="assets/quotes/csr.svg" class="h-14 mb-3" />
+
+        <p class="font-semibold text-gray-700 text-lg">
+          High CSR = higher peace of mind
+        </p>
+        <p class="text-gray-600 text-sm mt-2">
+          A higher Claim Settlement Ratio (ideally 95%+) means more claims get paid.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
