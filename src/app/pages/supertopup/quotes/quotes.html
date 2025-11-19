@@ -46,9 +46,9 @@
 
       <!-- Age & Pincode Text -->
       <div class="flex items-center text-gray-700 text-sm">
-        Self: <span class="font-semibold ml-1">22 years</span>
+        Self: <span class="font-semibold ml-1">{{ age }} years</span>
         <span class="mx-2 text-gray-400">|</span>
-        Pincode: <span class="font-semibold ml-1">411000</span>
+        Pincode: <span class="font-semibold ml-1">{{ pincode }}</span>
       </div>
 
     </div>
@@ -58,10 +58,9 @@
 
   </div>
 
-
   <!-- Quote Count -->
   <p class="mt-6 text-gray-600 text-lg">
-    Here are <span class="text-[#006D8D] font-semibold">6 plans</span> made just for you, Aftab
+    Here are <span class="text-[#006D8D] font-semibold">{{plans().length}} plans</span> made just for you, Aftab
     <img class="w-10 h-10 inline-block" src="assets/heading-arrow.gif" alt="gif">
   </p>
 
@@ -70,7 +69,7 @@
 
     <!-- Left: Plans -->
     <div class="flex-1 space-y-6">
-      <ng-container *ngFor="let p of plans">
+      <ng-container *ngFor="let p of plans()">
 
         <div class="w-full bg-white rounded-xl overflow-hidden shadow-sm">
 
@@ -93,10 +92,8 @@
             <div class="w-[32%] p-6">
               <!-- Logo -->
               <img [src]="p.logo" class="h-12 mb-3" />
-
               <!-- Plan Name -->
               <h3 class="text-lg font-semibold text-gray-800">{{ p.name }}</h3>
-
               <!-- Tag -->
               <div class="mt-3">
                 <span
@@ -131,7 +128,7 @@
               <div class="flex justify-between mb-4">
                 <div>
                   <p class="text-gray-600 text-xs flex items-center gap-1">
-                    Cover Amount
+                    Cover Amt
                     <span class="text-gray-400 text-[12px]">ⓘ</span>
                   </p>
                   <p class="font-semibold mt-1">{{ p.cover }}</p>
@@ -139,7 +136,7 @@
 
                 <div>
                   <p class="text-gray-600 text-xs flex items-center gap-1">
-                    Deductible
+                    Deductible Amt
                     <span class="text-gray-400 text-[12px]">ⓘ</span>
                   </p>
                   <p class="font-semibold mt-1">{{ p.deductible }}</p>
@@ -147,7 +144,8 @@
               </div>
 
               <!-- Buy Now -->
-              <button  (click)="goToProposal(p)" class="bg-[#007AAA] hover:bg-[#006988] text-white font-semibold py-2 rounded-md shadow text-sm">
+              <button (click)="goToProposal(p)"
+                class="bg-[#007AAA] hover:bg-[#006988] text-white font-semibold py-2 rounded-md shadow text-sm">
                 Buy Now {{ p.price }}
               </button>
 
@@ -183,7 +181,7 @@
 
         <!-- Input + Button -->
         <div class="flex items-center mt-4 gap-3 bg-white/70 p-1 rounded-xl shadow-sm backdrop-blur">
-          <input value="+91 82339 89392" class="flex-1 px-3 py-2 text-sm rounded-lg bg-transparent outline-none" />
+          <input value="+91 9876543210" class="flex-1 px-3 py-2 text-sm rounded-lg bg-transparent outline-none" />
 
           <button
             class="bg-[#FED66A] text-black px-4 py-2 rounded-lg font-medium text-sm shadow hover:bg-[#ffcd47] transition">

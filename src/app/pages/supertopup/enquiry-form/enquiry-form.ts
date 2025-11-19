@@ -26,7 +26,7 @@ interface Member {
 
 export class EnquiryForm {
   step = 1;
-gender: 'Male' | 'Female' = 'Male';
+  gender: 'Male' | 'Female' = 'Male';
   maxChildren = 4;
 
   // base icons (male/female generic) used for swapping
@@ -48,15 +48,15 @@ gender: 'Male' | 'Female' = 'Male';
 
   basicForm: FormGroup;
 
-  constructor( private fb: FormBuilder,
-  private router: Router) {
+  constructor(private fb: FormBuilder,
+    private router: Router) {
     this.basicForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.maxLength(20)]],
       lastName: ['', [Validators.required, Validators.maxLength(20)]],
       mobile: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
       pincode: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
       city: ['', Validators.required],
-      zone: [{ value: '', disabled: true }],
+      // zone: [{ value: '', disabled: true }],
       coverAmount: ['', Validators.required],
     });
   }
@@ -73,10 +73,10 @@ gender: 'Male' | 'Female' = 'Male';
     const you = this.members.find(m => m.key === 'you')!;
     you.selected = true;
     this.updateSelectedAges();
-    this.basicForm.get('pincode')?.valueChanges.subscribe(() => this.updateZone());
-  this.basicForm.get('city')?.valueChanges.subscribe(() => this.updateZone());
+    // this.basicForm.get('pincode')?.valueChanges.subscribe(() => this.updateZone());
+    // this.basicForm.get('city')?.valueChanges.subscribe(() => this.updateZone());
   }
-    getAgeTitle(id: string): string {
+  getAgeTitle(id: string): string {
     if (id === 'you') {
       return 'Self';
     }
@@ -98,58 +98,58 @@ gender: 'Male' | 'Female' = 'Male';
   }
 
   /* ---------- STEP NAV ---------- */
-  private updateZone(): void {
-  const pincode: string = this.basicForm.get('pincode')?.value || '';
-  const city: string = (this.basicForm.get('city')?.value || '').toLowerCase();
+  // private updateZone(): void {
+  //   const pincode: string = this.basicForm.get('pincode')?.value || '';
+  //   const city: string = (this.basicForm.get('city')?.value || '').toLowerCase();
 
-  let zone = '';
+    // let zone = '';
 
-  // 🔹 Example logic – adjust to your real business rules
-  if (!pincode && !city) {
-    zone = '';
-  } else if (city.includes('mumbai') || /^4[0-9]{5}$/.test(pincode)) {
-    zone = 'Zone 1';
-  } else if (/^5[0-9]{5}$/.test(pincode)) {
-    zone = 'Zone 2';
-  } else {
-    zone = 'Zone 3';
-  }
+    // 🔹 Example logic – adjust to your real business rules
+  //   if (!pincode && !city) {
+  //     zone = '';
+  //   } else if (city.includes('mumbai') || /^4[0-9]{5}$/.test(pincode)) {
+  //     zone = '1';
+  //   } else if (/^5[0-9]{5}$/.test(pincode)) {
+  //     zone = '2';
+  //   } else {
+  //     zone = '3';
+  //   }
 
-  this.basicForm.patchValue({ zone }, { emitEvent: false });
-}
+  //   this.basicForm.patchValue({ zone }, { emitEvent: false });
+  // }
 
   getIconForId(id: string): string {
-  if (id === 'you') return this.members.find(m => m.key === 'you')!.iconPath;
-  if (id === 'spouse') return this.members.find(m => m.key === 'spouse')!.iconPath;
+    if (id === 'you') return this.members.find(m => m.key === 'you')!.iconPath;
+    if (id === 'spouse') return this.members.find(m => m.key === 'spouse')!.iconPath;
 
-  if (id.startsWith('son')) return 'assets/son.svg';
-  if (id.startsWith('daughter')) return 'assets/daughter.svg';
+    if (id.startsWith('son')) return 'assets/son.svg';
+    if (id.startsWith('daughter')) return 'assets/daughter.svg';
 
-  return '';
-}
-getSonMember(): Member {
-  return this.members.find(m => m.key === 'son')!;
-}
+    return '';
+  }
+  getSonMember(): Member {
+    return this.members.find(m => m.key === 'son')!;
+  }
 
-getDaughterMember(): Member {
-  return this.members.find(m => m.key === 'daughter')!;
-}
+  getDaughterMember(): Member {
+    return this.members.find(m => m.key === 'daughter')!;
+  }
 
-getSonCount(): number {
-  return this.getSonMember()?.count ?? 0;
-}
+  getSonCount(): number {
+    return this.getSonMember()?.count ?? 0;
+  }
 
-getDaughterCount(): number {
-  return this.getDaughterMember()?.count ?? 0;
-}
+  getDaughterCount(): number {
+    return this.getDaughterMember()?.count ?? 0;
+  }
 
-isDaughterDecrementDisabled(): boolean {
-  return this.getDaughterCount() === 0;
-}
+  isDaughterDecrementDisabled(): boolean {
+    return this.getDaughterCount() === 0;
+  }
 
-isSonDecrementDisabled(): boolean {
-  return this.getSonCount() === 0;
-}
+  isSonDecrementDisabled(): boolean {
+    return this.getSonCount() === 0;
+  }
 
 
   anyMemberSelected(): boolean {
@@ -160,17 +160,17 @@ isSonDecrementDisabled(): boolean {
     });
   }
 
-canProceedToStep2(): boolean {
-  return this.anyMemberSelected();
-}
+  canProceedToStep2(): boolean {
+    return this.anyMemberSelected();
+  }
 
 
   next() {
     if (this.step === 1) {
-    if (!this.anyMemberSelected()) {
-  alert('Please select at least one member.');
-  return;
-}
+      if (!this.anyMemberSelected()) {
+        alert('Please select at least one member.');
+        return;
+      }
 
       this.updateSelectedAges();
       this.step = 2;
@@ -184,18 +184,20 @@ canProceedToStep2(): boolean {
       this.step = 3;
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (this.step === 3) {
-  if (this.basicForm.invalid) {
-    this.basicForm.markAllAsTouched();
-    alert('Please fill required fields correctly.');
-    return;
-  }
+      if (this.basicForm.invalid) {
+        this.basicForm.markAllAsTouched();
+        alert('Please fill required fields correctly.');
+        return;
+      }
 
-  const payload = this.buildPayload();
-  console.log('SUBMIT payload', payload);
+      const payload = this.buildPayload();
+      console.log('SUBMIT payload', payload);
+      localStorage.setItem('supertopup_enquiry', JSON.stringify(payload));
 
-  // ⭐ Navigate to Quotes Screen
-  this.router.navigate(['/supertopup/quotes']);
-}
+
+      // ⭐ Navigate to Quotes Screen
+      this.router.navigate(['/supertopup/quotes']);
+    }
 
   }
 
@@ -321,9 +323,8 @@ canProceedToStep2(): boolean {
 
   buildPayload() {
     return {
-      gender: this.gender,
       members: this.getFlatMemberList().map(id => ({ id, age: this.selectedAges[id] || null })),
-      details: this.basicForm.value
+      details: { ...this.basicForm.getRawValue(), gender: this.gender }
     };
   }
 
