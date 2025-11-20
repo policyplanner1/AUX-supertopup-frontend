@@ -1,0 +1,143 @@
+@use "tailwindcss";
+
+/* Gradient border for selected cards */
+.gradient-border {
+  border-width: 2px;
+  border-style: solid;
+  border-image: linear-gradient(180deg, #FF5500 30.9%, #006D8D 100%) 1;
+  border-radius: 0.75rem; /* ~16px */
+}
+
+
+/* Shadow used in Figma */
+.shadow-card {
+  box-shadow: 0px 8.333px 16.667px 0.833px rgba(0, 109, 141, 0.25);
+}
+
+.shadow-button {
+  box-shadow: 0px 10px 20px 1px rgba(0, 109, 141, 0.25);
+}
+
+/* -----------------------------------------------------------
+   Global Input + Label Styles
+----------------------------------------------------------- */
+
+.label {
+  @apply block text-gray-600 text-sm font-medium mb-1;
+}
+
+.input {
+  @apply w-full px-3 py-2 text-sm rounded-lg border border-gray-300 bg-white outline-none transition;
+}
+
+.input:focus {
+  @apply border-[#007AAA] ring-1 ring-[#007AAA];
+}
+
+/* -----------------------------------------------------------
+   Section Background (Blue Cards)
+----------------------------------------------------------- */
+
+.section-blue {
+  @apply bg-[#F0FAFF] p-6 rounded-xl border border-[#D7ECF9] shadow-sm;
+}
+
+/* -----------------------------------------------------------
+   Orange Yes / No Toggle Buttons
+----------------------------------------------------------- */
+
+.yesno {
+  @apply px-6 py-2 rounded-md border border-gray-300 bg-white 
+         text-gray-700 text-sm cursor-pointer transition;
+}
+
+.yesno:hover {
+  @apply bg-gray-100;
+}
+
+.yesno-active {
+  @apply bg-[#F37435] text-white border-[#F37435] shadow-sm;
+}
+
+/* -----------------------------------------------------------
+   Orange Toggle Buttons (Tenure, SI Range)
+----------------------------------------------------------- */
+
+.toggle {
+  @apply px-4 py-2 rounded-md border border-gray-300 bg-white text-sm cursor-pointer transition;
+}
+
+.toggle:hover {
+  @apply bg-gray-100;
+}
+
+.toggle.active {
+  @apply bg-[#F37435] text-white border-[#F37435] shadow-sm;
+}
+
+/* For fixed-size tenure numbers (1, 2, 3, 4, 5) */
+.toggle.w-10 {
+  @apply w-10 text-center;
+}
+
+/* -----------------------------------------------------------
+   Adult/Child Counter Buttons (+ / -)
+----------------------------------------------------------- */
+
+.icon-btn {
+  @apply w-8 h-8 rounded-full bg-[#007AAA] text-white 
+         flex items-center justify-center cursor-pointer text-lg shadow 
+         transition;
+}
+
+.icon-btn:hover {
+  @apply bg-[#006988];
+}
+
+/* -----------------------------------------------------------
+   Blue Header Numbers in Stepper (for future steps)
+----------------------------------------------------------- */
+
+.step-circle {
+  @apply w-8 h-8 rounded-full flex items-center justify-center text-sm 
+         font-semibold border border-gray-400 text-gray-500;
+}
+
+.step-circle.active {
+  @apply bg-[#007AAA] text-white border-none;
+}
+
+.step-label {
+  @apply text-sm mt-1 text-gray-500;
+}
+
+.step-label.active {
+  @apply text-[#007AAA] font-semibold;
+}
+
+/* -----------------------------------------------------------
+   Form Buttons
+----------------------------------------------------------- */
+
+.btn-primary {
+  @apply bg-[#007AAA] text-white px-6 py-2 rounded-lg shadow 
+         hover:bg-[#006988] transition font-medium;
+}
+
+.btn-secondary {
+  @apply bg-gray-200 text-gray-700 px-6 py-2 rounded-lg shadow 
+         hover:bg-gray-300 transition;
+}
+
+/* -----------------------------------------------------------
+   Utility — Remove number field arrows
+----------------------------------------------------------- */
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  @apply appearance-none m-0;
+}
+
+input[type="number"] {
+  @apply appearance-none;
+}

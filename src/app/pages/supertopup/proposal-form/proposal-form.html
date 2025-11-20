@@ -1,0 +1,385 @@
+<div class="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6">
+    <div class="w-full border-b pb-4 mb-6 flex items-center gap-2">
+
+    <button class="flex items-center gap-2" (click)="prev()" [disabled]="step === 1">
+        <!-- <img src="assets/arrow-left.svg" class="w-5 cursor-pointer" /> -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-chevron-left w-5 cursor-pointer" viewBox="0 0 16 16">
+            <path fill-rule="evenodd"
+                d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
+        </svg><span class="font-semibold text-lg">Proposal Form</span>
+    </button>
+
+    
+
+    <div class="flex items-center gap-10 mx-auto">
+
+        <!-- Step 1 -->
+        <div class="flex flex-col items-center">
+            <div class="w-8 h-8 flex items-center justify-center rounded-full"
+                [ngClass]="step >= 1 ? 'bg-[#007AAA] text-white' : 'border border-gray-400 text-gray-400'">
+                1
+            </div>
+            <span class="text-sm mt-1">Quote</span>
+        </div>
+
+        <div class="h-[1px] w-24 bg-gray-300"></div>
+
+        <!-- Step 2 -->
+        <div class="flex flex-col items-center">
+            <div class="w-8 h-8 flex items-center justify-center rounded-full"
+                [ngClass]="step >= 2 ? 'bg-[#007AAA] text-white' : 'border border-gray-400 text-gray-400'">
+                2
+            </div>
+            <span class="text-sm mt-1">Insured</span>
+        </div>
+
+        <div class="h-[1px] w-24 bg-gray-200"></div>
+
+        <!-- Step 3 -->
+        <div class="flex flex-col items-center">
+            <div class="w-8 h-8 flex items-center justify-center rounded-full"
+                [ngClass]="step === 3 ? 'bg-[#007AAA] text-white' : 'border border-gray-400 text-gray-400'">
+                3
+            </div>
+            <span class="text-sm mt-1">Summary</span>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- STEP 1 -->
+<div *ngIf="step === 1" class="space-y-6">
+
+    <!-- PRODUCT DETAILS -->
+    <div class="section-blue">
+
+        <h2 class="font-semibold text-lg mb-4">Product Details</h2>
+
+        <div class="grid grid-cols-4 gap-6">
+
+            <!-- Product Name -->
+            <div>
+                <label class="label">Product Name</label>
+                <input class="input" [(ngModel)]="form.productName" placeholder="ICICI Lombard Elevate" />
+            </div>
+
+            <!-- New Badge -->
+            <div>
+                <label class="label">&nbsp;</label>
+                <span class="bg-[#F37435] text-white px-5 py-1 rounded-md text-sm font-semibold mt-2 inline-block">
+                    New
+                </span>
+            </div>
+
+            <!-- Portability -->
+            <div>
+                <label class="label">Portability</label>
+                <select class="input">
+                    <option>Portability</option>
+                </select>
+            </div>
+
+            <!-- Pincode -->
+            <div>
+                <label class="label">Pincode</label>
+                <input class="input" [(ngModel)]="form.pincode" placeholder="411000" />
+            </div>
+
+            <!-- City & State -->
+            <div class="col-span-2">
+                <label class="label">City & State</label>
+                <input class="input" [(ngModel)]="form.cityState" placeholder="Pune, Maharashtra" />
+            </div>
+
+            <!-- Zone -->
+            <div>
+                <label class="label">Zone</label>
+                <input class="input" [(ngModel)]="form.zone" placeholder="Zone 1" />
+            </div>
+
+            <!-- Upgrade Zone -->
+            <div>
+                <label class="label">Do you want to upgrade zone</label>
+                <div class="flex gap-3 mt-2">
+                    <button class="yesno" [ngClass]="form.upgradeZone === 'Yes' ? 'yesno-active' : ''"
+                        (click)="form.upgradeZone='Yes'">Yes</button>
+
+                    <button class="yesno" [ngClass]="form.upgradeZone === 'No' ? 'yesno-active' : ''"
+                        (click)="form.upgradeZone='No'">No</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- PROPOSER DETAILS -->
+    <div class="section-blue">
+        <h2 class="font-semibold text-lg mb-4">Proposer Details</h2>
+        <!-- Adult/Child Counter -->
+        <div class="flex items-center gap-6 mb-6">
+            <!-- Adult -->
+            <div class="flex items-center gap-3">
+                <span class="font-semibold">Adult</span>
+                <button class="icon-btn">−</button>
+                <span class="font-semibold">{{ form.adult }}</span>
+                <button class="icon-btn">+</button>
+            </div>
+            <!-- Child -->
+            <div class="flex items-center gap-3">
+                <span class="font-semibold">Child</span>
+                <button class="icon-btn">−</button>
+                <span class="font-semibold">{{ form.child }}</span>
+                <button class="icon-btn">+</button>
+            </div>
+        </div>
+
+        <!-- Form Fields -->
+        <div class="grid grid-cols-4 gap-6">
+            <!-- Name -->
+            <div>
+                <label class="label">Name</label>
+                <input class="input" [(ngModel)]="form.fullName" placeholder="Name" />
+            </div>
+            <!-- DOB -->
+            <div>
+                <label class="label">DOB</label>
+                <input class="input" [(ngModel)]="form.dob" placeholder="DD/MM/YYYY" />
+            </div>
+            <!-- Gender -->
+            <div>
+                <label class="label">Gender</label>
+                <select class="input" [(ngModel)]="form.gender">
+                    <option>Female</option>
+                    <option>Male</option>
+                </select>
+            </div>
+            <!-- Email -->
+            <div>
+                <label class="label">Email ID</label>
+                <input class="input" [(ngModel)]="form.email" placeholder="example@email.com" />
+            </div>
+            <!-- Phone -->
+            <div>
+                <label class="label">Phone Number</label>
+                <input class="input" [(ngModel)]="form.phone" placeholder="9876543210" />
+            </div>
+            <!-- Sum Insured -->
+            <div>
+                <label class="label">Sum Insured</label>
+                <select class="input" [(ngModel)]="form.sumInsured">
+                    <option>₹10L</option>
+                    <option>₹20L</option>
+                    <option>₹50L</option>
+                </select>
+            </div>
+            <!-- Policy Tenure -->
+            <div>
+                <label class="label">Policy Tenure (in years)</label>
+                <div class="flex gap-2 mt-2">
+                    <button *ngFor="let y of [1,2,3,4,5]" class="toggle w-10"
+                        [ngClass]="form.tenure === y ? 'active' : ''" (click)="form.tenure=y">{{ y }}</button>
+                </div>
+            </div>
+
+            <!-- SI Range -->
+            <div>
+                <label class="label">SI range</label>
+                <div class="flex gap-3 mt-2">
+
+                    <button class="toggle" [ngClass]="form.siRange==='SL-50L' ? 'active' : ''"
+                        (click)="form.siRange='SL-50L'">SL - 50L</button>
+
+                    <button class="toggle" [ngClass]="form.siRange==='1Cr-Unlimited' ? 'active' : ''"
+                        (click)="form.siRange='1Cr-Unlimited'">1Cr - Unlimited</button>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="section-blue">
+        <h2 class="font-semibold text-lg mb-4">Additional Details</h2>
+        <div class="grid grid-cols-4 gap-6">
+            <!-- Annual Income -->
+            <div>
+                <label class="label">Applicant Annual Income</label>
+                <select class="input" [(ngModel)]="form.income">
+                    <option>₹5,00,000 - 10,00,000</option>
+                    <option>₹10,00,000 - 20,00,000</option>
+                </select>
+            </div>
+
+            <!-- NRI Discount -->
+            <div>
+                <label class="label">Do any want to opt for a NRI discount?</label>
+                <div class="flex gap-3 mt-2">
+                    <button class="yesno" [ngClass]="form.nri=='Yes'?'yesno-active':''"
+                        (click)="form.nri='Yes'">Yes</button>
+
+                    <button class="yesno" [ngClass]="form.nri=='No'?'yesno-active':''"
+                        (click)="form.nri='No'">No</button>
+                </div>
+            </div>
+
+            <!-- Include yourself -->
+            <div>
+                <label class="label">Do you wish to include yourself in the insurance plan?</label>
+                <div class="flex gap-3 mt-2">
+                    <button class="yesno" [ngClass]="form.include=='Yes'?'yesno-active':''"
+                        (click)="form.include='Yes'">Yes</button>
+
+                    <button class="yesno" [ngClass]="form.include=='No'?'yesno-active':''"
+                        (click)="form.include='No'">No</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bureau Score -->
+        <div class="mt-6">
+            <label class="label">Do you want to opt for a discount based on your bureau score?</label>
+            <div class="flex gap-3 mt-2">
+                <button class="yesno" [ngClass]="form.bureau=='Yes'?'yesno-active':''"
+                    (click)="form.bureau='Yes'">Yes</button>
+                <button class="yesno" [ngClass]="form.bureau=='No'?'yesno-active':''"
+                    (click)="form.bureau='No'">No</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="section-blue">
+        <h2 class="font-semibold text-lg mb-4">Additional Details</h2>
+        <div class="grid grid-cols-4 gap-6">
+            <!-- Annual Income -->
+            <div>
+                <label class="label">Applicant Annual Income</label>
+                <select class="input" [(ngModel)]="form.income">
+                    <option>₹5,00,000 - 10,00,000</option>
+                    <option>₹10,00,000 - 20,00,000</option>
+                </select>
+            </div>
+
+            <!-- NRI Discount -->
+            <div>
+                <label class="label">Do any want to opt for a NRI discount?</label>
+                <div class="flex gap-3 mt-2">
+                    <button class="yesno" [ngClass]="form.nri=='Yes'?'yesno-active':''"
+                        (click)="form.nri='Yes'">Yes</button>
+
+                    <button class="yesno" [ngClass]="form.nri=='No'?'yesno-active':''"
+                        (click)="form.nri='No'">No</button>
+                </div>
+            </div>
+
+            <!-- Include yourself -->
+            <div>
+                <label class="label">Do you wish to include yourself in the insurance plan?</label>
+                <div class="flex gap-3 mt-2">
+                    <button class="yesno" [ngClass]="form.include=='Yes'?'yesno-active':''"
+                        (click)="form.include='Yes'">Yes</button>
+
+                    <button class="yesno" [ngClass]="form.include=='No'?'yesno-active':''"
+                        (click)="form.include='No'">No</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bureau Score -->
+        <div class="mt-6">
+            <label class="label">Do you want to opt for a discount based on your bureau score?</label>
+            <div class="flex gap-3 mt-2">
+                <button class="yesno" [ngClass]="form.bureau=='Yes'?'yesno-active':''"
+                    (click)="form.bureau='Yes'">Yes</button>
+                <button class="yesno" [ngClass]="form.bureau=='No'?'yesno-active':''"
+                    (click)="form.bureau='No'">No</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="section-blue">
+        <h2 class="font-semibold text-lg mb-4">KYC Details</h2>
+        <div class="grid grid-cols-2 gap-6">
+            <div>
+                <label class="label">Aadhar Card Number</label>
+                <input class="input" [(ngModel)]="form.aadhar" placeholder="Enter Aadhar Card Number" />
+            </div>
+            <div>
+                <label class="label">PAN Card</label>
+                <input class="input" [(ngModel)]="form.pan" placeholder="Enter PAN Card Number" />
+            </div>
+        </div>
+    </div>
+    <button (click)="next()" class="btn-primary float-right">Next</button>
+</div>
+
+
+<!-- STEP 2 -->
+<div *ngIf="step === 2" class="space-y-6">
+
+    <div class="bg-white p-6 rounded-xl shadow-sm" *ngFor="let person of form.insured; let i = index">
+        <h2 class="font-semibold text-lg mb-4">Adult {{ i + 1 }} (Insured)</h2>
+
+        <div class="grid grid-cols-3 gap-4">
+            <select class="input" [(ngModel)]="person.relation">
+                <option>Self</option>
+                <option>Spouse</option>
+            </select>
+
+            <input class="input" placeholder="Enter Full Name" [(ngModel)]="person.fullName" />
+            <input class="input" placeholder="DOB" [(ngModel)]="person.dob" />
+
+            <input class="input" placeholder="Height (inches)" [(ngModel)]="person.height" />
+            <input class="input" placeholder="Weight (kg)" [(ngModel)]="person.weight" />
+            <input class="input" placeholder="ABHA ID" [(ngModel)]="person.abhaId" />
+        </div>
+
+        <div class="mt-3">
+            <label class="font-medium">Any pre-existing disease?</label>
+            <div class="flex gap-3 mt-1">
+                <button class="toggle" [ngClass]="person.existingDisease === 'Yes' ? 'active' : ''"
+                    (click)="person.existingDisease='Yes'">Yes</button>
+
+                <button class="toggle" [ngClass]="person.existingDisease === 'No' ? 'active' : ''"
+                    (click)="person.existingDisease='No'">No</button>
+            </div>
+        </div>
+    </div>
+
+    <button (click)="prev()" class="btn-secondary">Back</button>
+    <button (click)="next()" class="btn-primary float-right">Next</button>
+</div>
+
+
+<!-- STEP 3 -->
+<div *ngIf="step === 3" class="space-y-6">
+
+    <div class="bg-white p-6 rounded-xl shadow-sm">
+        <h2 class="font-semibold text-lg mb-3">Product Details</h2>
+        <p><b>Product:</b> {{ form.productName }}</p>
+        <p><b>Pincode:</b> {{ form.pincode }}</p>
+        <p><b>City:</b> {{ form.cityState }}</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow-sm">
+        <h2 class="font-semibold text-lg mb-3">Insured Details</h2>
+
+        <div *ngFor="let p of form.insured">
+            <p><b>Name:</b> {{ p.fullName }}</p>
+            <p><b>DOB:</b> {{ p.dob }}</p>
+            <p><b>Disease:</b> {{ p.existingDisease }}</p>
+            <hr class="my-3" />
+        </div>
+    </div>
+
+    <button (click)="prev()" class="btn-secondary">Back</button>
+    <button (click)="submit()" class="btn-primary float-right">Submit Details</button>
+</div>
+</div>

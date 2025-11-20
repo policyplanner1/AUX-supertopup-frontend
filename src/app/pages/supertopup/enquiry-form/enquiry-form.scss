@@ -1,0 +1,29 @@
+:host {
+  display: block;
+}
+/* Smooth micro-animations */
+* {
+  transition: all 0.25s ease;
+}
+/* Only the pieces that Tailwind cannot easily do */
+.gradient-border {
+  border-width: 2px;
+  border-style: solid;
+  border-image: linear-gradient(180deg, #FF5500 30.9%, #006D8D 100%) 1;
+  border-radius: 18px;
+}
+
+.shadow-card {
+  box-shadow: 0px 8px 16px 0.83px rgba(0, 109, 141, 0.18);
+}
+
+.shadow-button {
+  box-shadow: 0px 10px 20px 1px rgba(0, 109, 141, 0.25);
+}
+
+.shadow-next {
+  box-shadow: 0px 10px 20px 1px rgba(0, 109, 141, 0.25);
+}
+.shadow-wizard {
+  box-shadow: 0 18px 45px rgba(0, 109, 141, 0.1);
+}
