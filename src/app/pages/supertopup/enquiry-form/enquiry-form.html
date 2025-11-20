@@ -45,7 +45,6 @@
             >
               1
             </div>
-            <!-- hide labels on small screens, show on md+ (to match mobile Figma) -->
             <span
               class="mt-1 text-[11px] text-gray-600 hidden md:block whitespace-nowrap"
             >
@@ -53,7 +52,6 @@
             </span>
           </div>
 
-          <!-- connector line -->
           <div class="h-px w-8 sm:w-12 bg-gray-300"></div>
 
           <!-- STEP 2 -->
@@ -103,7 +101,6 @@
 
     <!-- ======================= STEP 1 ======================= -->
     <div *ngIf="step === 1" class="space-y-6 sm:space-y-8">
-      <!-- Heading -->
       <h2 class="text-center text-base sm:text-xl font-medium text-gray-700">
         Select your gender
       </h2>
@@ -138,12 +135,10 @@
         </button>
       </div>
 
-      <!-- Subheading -->
       <h3 class="text-center text-sm sm:text-xl font-semibold text-gray-700">
         Select members you want to insure
       </h3>
 
-      <!-- Member Cards (2 columns on mobile, 4 on md+) -->
       <div
         class="w-full max-w-md sm:max-w-3xl mx-auto grid grid-cols-2 md:grid-cols-4
                gap-4 sm:gap-6 justify-items-center"
@@ -158,13 +153,11 @@
                    shadow-card transition-transform duration-200 hover:-translate-y-1"
             [ngClass]="m.selected ? 'gradient-border' : 'border-[#E6EEF5]'"
           >
-            <!-- icon -->
             <img
               [src]="m.iconPath"
               class="mt-5 sm:mt-6 w-14 h-14 sm:w-16 sm:h-16 object-contain"
             />
 
-            <!-- label -->
             <p
               class="mt-3 sm:mt-4 text-xs sm:text-sm font-semibold text-gray-700"
             >
@@ -204,33 +197,6 @@
         </ng-container>
       </div>
 
-      <!-- Global children counter row like Figma (optional – keep if you use it) -->
-      <!-- <div
-        *ngIf="getTotalChildren() > 0"
-        class="flex items-center justify-center space-x-6 pt-1 sm:pt-2"
-      >
-        <button
-          (click)="decrementChild('son')"
-          class="w-5 h-5 rounded-full border border-[#006D8D]
-                 flex items-center justify-center text-[#006D8D] text-xs"
-          [disabled]="getTotalChildren() === 0"
-        >
-          –
-        </button>
-        <span class="text-sm font-semibold text-gray-700">
-          {{ getTotalChildren() }}
-        </span>
-        <button
-          (click)="incrementChild('son')"
-          class="w-5 h-5 rounded-full border border-[#006D8D]
-                 flex items-center justify-center text-[#006D8D] text-xs"
-          [disabled]="getTotalChildren() >= maxChildren"
-        >
-          +
-        </button>
-      </div> -->
-
-      <!-- Next Button -->
       <div class="flex justify-center mt-4 sm:mt-8">
         <button
           (click)="next()"
@@ -267,35 +233,41 @@
             </p>
 
             <div class="mt-5 sm:mt-6 w-full px-6 sm:px-8">
-              <div class="relative inline-block w-full">
-                <select
-                  class="w-full border-0 border-b border-gray-400 bg-transparent
-                         text-xs sm:text-sm text-gray-700 pb-1 pr-5
-                         focus:outline-none focus:border-[#006D8D] appearance-none"
-                  [(ngModel)]="selectedAges[id]"
-                  (ngModelChange)="setAge(id, $event)"
+              <!-- CUSTOM DROPDOWN (always opens downwards) -->
+              <div class="age-dropdown">
+                <div
+                  class="age-dropdown__control"
+                  (click)="toggleAgeDropdown(id); $event.stopPropagation()"
                 >
-                  <option value="">Select Age</option>
-                  <option
-                    *ngIf="id.startsWith('son') || id.startsWith('daughter')"
-                    value="0.4"
-                  >
-                    91 Days
-                  </option>
-                  <option
-                    *ngFor="let a of (id.startsWith('son') || id.startsWith('daughter') ? childAges : adultAges)"
-                    [value]="a"
-                  >
-                    {{ a }} Years
-                  </option>
-                </select>
+                  <span class="age-dropdown__value">
+                    {{
+                      selectedAges[id]
+                        ? getAgeLabelForId(id, selectedAges[id])
+                        : 'Select Age'
+                    }}
+                  </span>
+                  <span class="age-dropdown__arrow">▾</span>
+                </div>
 
-                <span
-                  class="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2
-                         text-[#006D8D] text-[10px] sm:text-xs"
+                <div
+                  class="age-dropdown__menu"
+                  *ngIf="openAgeDropdownId === id"
+                  (click)="$event.stopPropagation()"
                 >
-                  ▾
-                </span>
+                  <div
+                    class="age-dropdown__option age-dropdown__option--placeholder"
+                    (click)="selectAge(id, null)"
+                  >
+                    Select Age
+                  </div>
+                  <div
+                    class="age-dropdown__option"
+                    *ngFor="let opt of getAgeOptionsForId(id)"
+                    (click)="selectAge(id, opt.value)"
+                  >
+                    {{ opt.label }}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -330,43 +302,107 @@
         Tell us more about yourself
       </h2>
 
-      <form [formGroup]="basicForm" class="max-w-5xl mx-auto space-y-8 sm:space-y-12">
+      <!-- Soft banner instead of browser alert -->
+      <div
+        *ngIf="basicFormSubmitAttempted && basicForm.invalid"
+        class="mt-2 mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-2
+               flex items-center gap-2 text-xs sm:text-sm text-red-700 justify-center"
+      >
+        <span
+          class="inline-flex w-4 h-4 rounded-full bg-red-500 text-white
+                 text-[10px] items-center justify-center font-bold"
+          >!</span
+        >
+        <span>Please check the highlighted fields and fill your basic details correctly.</span>
+      </div>
+
+      <form
+        [formGroup]="basicForm"
+        class="max-w-5xl mx-auto space-y-8 sm:space-y-12"
+        novalidate
+      >
         <!-- Row 1: 3 fields -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-x-10 sm:gap-x-16 gap-y-6">
           <div>
             <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
-              Enter First Name
+              First Name <span class="text-red-500">*</span>
             </label>
             <input
+              type="text"
               formControlName="firstName"
               class="w-full border-0 border-b border-gray-400 bg-transparent py-2
                      text-gray-700 text-sm focus:outline-none focus:border-[#006D8D]"
-              placeholder="First Name"
+              [ngClass]="{ 'invalid-field': isInvalid('firstName') }"
+              placeholder="Enter your first name"
+              (keypress)="allowOnlyLetters($event)"
+              (input)="onNameInput('firstName')"
+              autocomplete="given-name"
             />
+            <div *ngIf="isInvalid('firstName')" class="form-error">
+              <span *ngIf="f['firstName'].errors?.['required']">
+                First name is required.
+              </span>
+              <span *ngIf="f['firstName'].errors?.['pattern']">
+                Only alphabets and spaces are allowed.
+              </span>
+              <span *ngIf="f['firstName'].errors?.['maxlength']">
+                Maximum 20 characters allowed.
+              </span>
+            </div>
           </div>
 
           <div>
             <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
-              Enter Last Name
+              Last Name <span class="text-red-500">*</span>
             </label>
             <input
+              type="text"
               formControlName="lastName"
               class="w-full border-0 border-b border-gray-400 bg-transparent py-2
                      text-gray-700 text-sm focus:outline-none focus:border-[#006D8D]"
-              placeholder="Last Name"
+              [ngClass]="{ 'invalid-field': isInvalid('lastName') }"
+              placeholder="Enter your last name"
+              (keypress)="allowOnlyLetters($event)"
+              (input)="onNameInput('lastName')"
+              autocomplete="family-name"
             />
+            <div *ngIf="isInvalid('lastName')" class="form-error">
+              <span *ngIf="f['lastName'].errors?.['required']">
+                Last name is required.
+              </span>
+              <span *ngIf="f['lastName'].errors?.['pattern']">
+                Only alphabets and spaces are allowed.
+              </span>
+              <span *ngIf="f['lastName'].errors?.['maxlength']">
+                Maximum 20 characters allowed.
+              </span>
+            </div>
           </div>
 
           <div>
             <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
-              Enter Mobile Number
+              Mobile Number <span class="text-red-500">*</span>
             </label>
             <input
+              type="tel"
               formControlName="mobile"
+              maxlength="10"
               class="w-full border-0 border-b border-gray-400 bg-transparent py-2
                      text-gray-700 text-sm focus:outline-none focus:border-[#006D8D]"
-              placeholder="Mobile Number"
+              [ngClass]="{ 'invalid-field': isInvalid('mobile') }"
+              placeholder="Enter 10-digit mobile number"
+              (keypress)="allowOnlyDigits($event)"
+              (input)="onNumberInput('mobile', 10)"
+              autocomplete="tel"
             />
+            <div *ngIf="isInvalid('mobile')" class="form-error">
+              <span *ngIf="f['mobile'].errors?.['required']">
+                Mobile number is required.
+              </span>
+              <span *ngIf="f['mobile'].errors?.['pattern']">
+                Enter a valid 10-digit mobile number (starting from 6–9).
+              </span>
+            </div>
           </div>
         </div>
 
@@ -374,66 +410,96 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-x-10 sm:gap-x-16 gap-y-6">
           <div>
             <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
-              Enter Pincode
+              Pincode <span class="text-red-500">*</span>
             </label>
             <input
+              type="tel"
               formControlName="pincode"
+              maxlength="6"
               class="w-full border-0 border-b border-gray-400 bg-transparent py-2
                      text-gray-700 text-sm focus:outline-none focus:border-[#006D8D]"
-              placeholder="Pincode"
+              [ngClass]="{ 'invalid-field': isInvalid('pincode') }"
+              placeholder="Enter 6-digit pincode"
+              (keypress)="allowOnlyDigits($event)"
+              (input)="onNumberInput('pincode', 6)"
+              autocomplete="postal-code"
             />
+            <div *ngIf="isInvalid('pincode')" class="form-error">
+              <span *ngIf="f['pincode'].errors?.['required']">
+                Pincode is required.
+              </span>
+              <span *ngIf="f['pincode'].errors?.['pattern']">
+                Enter a valid 6-digit pincode.
+              </span>
+            </div>
           </div>
 
           <div>
             <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
-              Enter or select City
+              City <span class="text-red-500">*</span>
             </label>
             <input
+              type="text"
               formControlName="city"
               class="w-full border-0 border-b border-gray-400 bg-transparent py-2
                      text-gray-700 text-sm focus:outline-none focus:border-[#006D8D]"
-              placeholder="City"
+              [ngClass]="{ 'invalid-field': isInvalid('city') }"
+              placeholder="Enter your city"
+              (keypress)="allowOnlyLetters($event)"
+              (input)="onNameInput('city')"
+              autocomplete="address-level2"
             />
+            <div *ngIf="isInvalid('city')" class="form-error">
+              <span *ngIf="f['city'].errors?.['required']">
+                City is required.
+              </span>
+              <span *ngIf="f['city'].errors?.['minlength']">
+                City name should be at least 3 characters.
+              </span>
+              <span *ngIf="f['city'].errors?.['pattern']">
+                Only alphabets and spaces are allowed.
+              </span>
+            </div>
           </div>
 
-          <!-- <div>
+          <div class="md:col-span-2">
             <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
-              Zone
+              Cover Amount <span class="text-red-500">*</span>
             </label>
-            <input
-              formControlName="zone"
-              readonly
-              class="w-full border-0 border-b border-gray-400 bg-transparent py-2
-                     text-gray-700 text-sm focus:outline-none cursor-default"
-            />
-          </div> -->
-
-          <div>
-            <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
-              Cover Amount
-            </label>
-            <select
-              formControlName="coverAmount"
-              class="w-full border-0 border-b border-gray-400 bg-transparent py-2
-                     text-gray-700 text-sm focus:outline-none focus:border-[#006D8D] appearance-none"
-            >
-              <option value="">Cover Amount</option>
-              <option value="300000">3 Lakh</option>
-              <option value="500000">5 Lakh</option>
-              <option value="600000">6 Lakh</option>
-              <option value="700000">7 Lakh</option>
-              <option value="800000">8 Lakh</option>
-              <option value="1000000">10 Lakh</option>
-              <option value="1100000">11 Lakh</option>
-              <option value="1200000">12 Lakh</option>
-              <option value="1500000">15 Lakh</option>
-              <option value="1600000">16 Lakh</option>
-              <option value="2000000">20 Lakh</option>
-              <option value="2500000">25 Lakh</option>
-              <option value="5000000">50 Lakh</option>
-              <option value="10000000">1 Crore</option>
-              <option value="30000000">3 Crore</option>
-            </select>
+            <div class="relative w-full">
+              <select
+                formControlName="coverAmount"
+                class="w-full border-0 border-b border-gray-400 bg-transparent py-2
+                       text-gray-700 text-sm focus:outline-none focus:border-[#006D8D] appearance-none"
+                [ngClass]="{ 'invalid-field': isInvalid('coverAmount') }"
+              >
+                <option value="">Select cover amount</option>
+                <option value="300000">3 Lakh</option>
+                <option value="500000">5 Lakh</option>
+                <option value="600000">6 Lakh</option>
+                <option value="700000">7 Lakh</option>
+                <option value="800000">8 Lakh</option>
+                <option value="1000000">10 Lakh</option>
+                <option value="1100000">11 Lakh</option>
+                <option value="1200000">12 Lakh</option>
+                <option value="1500000">15 Lakh</option>
+                <option value="1600000">16 Lakh</option>
+                <option value="2000000">20 Lakh</option>
+                <option value="2500000">25 Lakh</option>
+                <option value="5000000">50 Lakh</option>
+                <option value="10000000">1 Crore</option>
+                <option value="30000000">3 Crore</option>
+              </select>
+              <span
+                class="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2
+                       text-[#006D8D] text-[10px] sm:text-xs"
+              >
+                ▾
+              </span>
+            </div>
+            <div *ngIf="isInvalid('coverAmount')" class="form-error">
+              <span>Cover amount is required.</span>
+            </div>
           </div>
         </div>
       </form>
@@ -444,6 +510,7 @@
           class="w-full sm:w-auto px-6 py-2.5 rounded border border-gray-300
                  text-gray-700 text-sm hover:bg-gray-100"
           (click)="prev()"
+          type="button"
         >
           Previous
         </button>
@@ -451,6 +518,7 @@
         <button
           class="w-full sm:w-auto px-10 py-2.5 rounded-[20px] bg-[#006D8D] text-white
                  text-sm shadow-next hover:bg-[#005B75]"
+          type="button"
           (click)="next()"
         >
           Submit

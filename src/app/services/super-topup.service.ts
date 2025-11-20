@@ -8,8 +8,8 @@ import { catchError, timeout } from 'rxjs/operators';
 })
 export class SuperTopupService {
 
-  private baseUrl = 'http://localhost:1202';  // your backend base URL
-// private baseUrl = 'https://policyplanner.com/health-insurance/';
+  // private baseUrl = 'http://localhost:1202';  // your backend base URL
+private baseUrl = 'https://policyplanner.com/health-insurance/';
 
 
   constructor(private http: HttpClient) {}
@@ -32,6 +32,10 @@ export class SuperTopupService {
     );
         return forkJoin(requests);
 
+  }
+
+   saveHealthProposal(payload: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/proposals/save`, payload);
   }
 
 }

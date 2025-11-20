@@ -1,143 +1,424 @@
 @use "tailwindcss";
 
-/* Gradient border for selected cards */
-.gradient-border {
-  border-width: 2px;
-  border-style: solid;
-  border-image: linear-gradient(180deg, #FF5500 30.9%, #006D8D 100%) 1;
-  border-radius: 0.75rem; /* ~16px */
+/* ============================================
+   WRAPPER + CARD SHADOW
+============================================ */
+.tw-stepper-container {
+  @apply w-full bg-white rounded-xl p-5 shadow-[0_6px_16px_rgba(0,0,0,0.06)]
+         flex flex-col gap-3;
+}
+
+/* ============================================
+   HEADER LEFT (Back + Title)
+============================================ */
+.tw-header-left {
+  @apply flex items-center gap-3;
+}
+.tw-back-btn {
+  @apply p-2 bg-transparent border-none cursor-pointer;
+}
+.tw-stepper-title {
+  @apply text-[22px] font-bold text-[#0f2430] whitespace-nowrap;
+}
+
+/* ============================================
+   STEPPER CENTER
+============================================ */
+.tw-header-center {
+  @apply flex justify-center w-full;
+}
+
+.tw-step-indicators {
+  @apply flex items-center justify-center gap-[45px] relative;
+}
+
+/* ============================================
+   STEP (circle + label)
+============================================ */
+.tw-step {
+  @apply flex flex-col items-center relative;
+}
+
+/* Circle */
+.tw-step-number {
+  @apply w-[34px] h-[34px] rounded-full bg-[#f6f7f8]
+         border-2 border-[#d3d9de] flex items-center justify-center
+         text-[#7d8a94] font-bold text-[14px] z-10;
+}
+
+/* Active */
+.tw-step.active .tw-step-number {
+  @apply bg-[#0b6a7e] border-[#0b6a7e] text-white;
+}
+
+/* Completed */
+.tw-step.completed .tw-step-number {
+  @apply bg-[#eafff0] border-[#6ad58b] text-transparent relative;
+}
+.tw-step.completed .tw-step-number::before {
+  content: "✔";
+  color: #34b66f;
+  font-size: 14px;
+  font-weight: 700;
+  position: absolute;
+}
+
+/* Label */
+.tw-step-label {
+  @apply mt-1 text-[13px] text-[#7d8a94];
+}
+.tw-step.active .tw-step-label {
+  @apply text-[#0b6a7e] font-semibold;
+}
+
+/* ============================================
+   LINES BETWEEN STEPS
+============================================ */
+.tw-step:nth-child(1)::after,
+.tw-step:nth-child(2)::after {
+  content: "";
+  position: absolute;
+  top: 17px;
+  left: 25px;
+  width: 75px;
+  height: 2px;
+  background: #d3d9de;
+  z-index: 1;
+}
+
+/* Completed Line Colors */
+.tw-step.completed:nth-child(1)::after,
+.tw-step.completed:nth-child(2)::after {
+  background: #9de7f0 !important;
+}
+
+/* When Step 3 active */
+.tw-step.active:nth-child(3) ~ .tw-step:nth-child(2)::after,
+.tw-step.active:nth-child(3) ~ .tw-step:nth-child(1)::after {
+  background: #9de7f0 !important;
+}
+
+/* ============================================
+   STEP CONTENT WRAPPER
+============================================ */
+.tw-step-content {
+  @apply bg-white p-6 rounded-xl shadow-[0_6px_18px_rgba(0,0,0,0.05)] mb-5;
+}
+
+/* ============================================
+   SECTION CARD
+============================================ */
+.tw-section-card {
+  @apply bg-[#f2fbff] border border-[#dbeff7] rounded-lg p-5 mb-5;
+}
+
+.tw-section-title {
+  @apply text-[16px] font-semibold text-[#0b6a7e] mb-4;
+}
+
+/* ============================================
+   4-COLUMN GRID
+============================================ */
+.tw-row-4 {
+  @apply grid grid-cols-4 gap-5 mb-4;
+
+  @media (max-width: 992px) {
+    @apply grid-cols-2;
+  }
+  @media (max-width: 600px) {
+    @apply grid-cols-1;
+  }
 }
 
 
-/* Shadow used in Figma */
-.shadow-card {
-  box-shadow: 0px 8.333px 16.667px 0.833px rgba(0, 109, 141, 0.25);
+/* ============================================
+   FIELD GROUP
+============================================ */
+.tw-field {
+  @apply flex flex-col gap-1 relative;
+}
+.tw-field label {
+  @apply text-[13px] font-semibold text-[#24343c];
 }
 
-.shadow-button {
-  box-shadow: 0px 10px 20px 1px rgba(0, 109, 141, 0.25);
+/* Inputs + Dropdown */
+.tw-input {
+  @apply h-10 border border-[#d3dbdf] rounded-lg px-3 text-[14px]
+         focus:outline-none focus:border-[#0b6a7e] transition-colors
+         focus:shadow-[0_0_0_3px_rgba(11,106,126,0.15)];
 }
 
-/* -----------------------------------------------------------
-   Global Input + Label Styles
------------------------------------------------------------ */
-
-.label {
-  @apply block text-gray-600 text-sm font-medium mb-1;
+.tw-input::placeholder {
+  @apply text-gray-400 opacity-75 transition-opacity;
 }
 
-.input {
-  @apply w-full px-3 py-2 text-sm rounded-lg border border-gray-300 bg-white outline-none transition;
+.tw-input:focus::placeholder {
+  @apply opacity-50;
 }
 
-.input:focus {
-  @apply border-[#007AAA] ring-1 ring-[#007AAA];
+/* Valid Icon */
+.tw-valid-icon {
+  @apply absolute right-3 top-8 text-green-600 font-bold text-sm;
 }
 
-/* -----------------------------------------------------------
-   Section Background (Blue Cards)
------------------------------------------------------------ */
-
-.section-blue {
-  @apply bg-[#F0FAFF] p-6 rounded-xl border border-[#D7ECF9] shadow-sm;
+/* Error Text */
+.tw-error {
+  @apply text-[12px] text-red-600 -mt-1;
 }
 
-/* -----------------------------------------------------------
-   Orange Yes / No Toggle Buttons
------------------------------------------------------------ */
-
-.yesno {
-  @apply px-6 py-2 rounded-md border border-gray-300 bg-white 
-         text-gray-700 text-sm cursor-pointer transition;
+/* ============================================
+   RADIO ROW
+============================================ */
+.tw-radio-row {
+  @apply flex items-center gap-4 flex-wrap;
+}
+.tw-radio-label {
+  @apply flex items-center gap-2;
 }
 
-.yesno:hover {
-  @apply bg-gray-100;
+/* ============================================
+   COUNTERS
+============================================ */
+.tw-counter {
+  @apply h-10 bg-[#e9f7ff] border border-[#ccecff] rounded-lg
+         px-3 flex items-center justify-between;
+}
+.tw-counter-left {
+  @apply flex items-center gap-2;
+}
+.tw-counter-title {
+  @apply text-[14px] font-semibold;
+}
+.tw-counter-controls {
+  @apply flex items-center bg-white border border-[#d3dbdf] rounded-full px-2 gap-2;
+}
+.tw-counter-btn {
+  @apply w-6 h-6 border border-[#0b6a7e] text-[#0b6a7e] rounded flex items-center justify-center cursor-pointer;
+}
+.tw-counter-value {
+  @apply font-bold text-[#0b6a7e];
 }
 
-.yesno-active {
-  @apply bg-[#F37435] text-white border-[#F37435] shadow-sm;
+/* ============================================
+   BUTTONS
+============================================ */
+.tw-nav-btns {
+  @apply flex justify-between gap-3 mt-4 flex-wrap;
 }
 
-/* -----------------------------------------------------------
-   Orange Toggle Buttons (Tenure, SI Range)
------------------------------------------------------------ */
-
-.toggle {
-  @apply px-4 py-2 rounded-md border border-gray-300 bg-white text-sm cursor-pointer transition;
+.tw-btn-primary {
+  @apply min-w-[160px] h-11 bg-[#0b6a7e] text-white font-bold rounded-lg
+         flex items-center justify-center transition-colors
+         hover:bg-[#094d5c] focus:outline-none focus:ring-2 focus:ring-[#0b6a7e] focus:ring-offset-2;
+}
+.tw-btn-secondary {
+  @apply min-w-[160px] h-11 bg-[#e0e0e0] text-[#333] font-bold rounded-lg
+         flex items-center justify-center transition-colors
+         hover:bg-[#d0d0d0] focus:outline-none focus:ring-2 focus:ring-[#b0b0b0] focus:ring-offset-2;
 }
 
-.toggle:hover {
-  @apply bg-gray-100;
+/* ============================================
+   MULTI SELECT BOX
+============================================ */
+.tw-multi-box {
+  @apply h-10 border border-[#d3dbdf] rounded-lg px-3
+         flex items-center justify-between cursor-pointer
+         text-[14px] bg-white transition-colors hover:border-[#0b6a7e];
+}
+.tw-multi-dropdown {
+  @apply mt-2 border border-[#d3dbdf] bg-white rounded-lg p-3
+         max-h-[200px] overflow-y-auto shadow-lg z-10 relative;
 }
 
-.toggle.active {
-  @apply bg-[#F37435] text-white border-[#F37435] shadow-sm;
+.tw-multi-option {
+  @apply flex items-center gap-2 py-1 text-[14px] cursor-pointer
+         transition-colors hover:bg-blue-50 rounded px-2;
 }
 
-/* For fixed-size tenure numbers (1, 2, 3, 4, 5) */
-.toggle.w-10 {
-  @apply w-10 text-center;
+.tw-none-option span {
+  @apply font-semibold text-[#0b6a7e];
 }
 
-/* -----------------------------------------------------------
-   Adult/Child Counter Buttons (+ / -)
------------------------------------------------------------ */
-
-.icon-btn {
-  @apply w-8 h-8 rounded-full bg-[#007AAA] text-white 
-         flex items-center justify-center cursor-pointer text-lg shadow 
-         transition;
+/* Rotate icon */
+.rotate {
+  transform: rotate(180deg);
+  transition: transform 0.2s ease;
 }
 
-.icon-btn:hover {
-  @apply bg-[#006988];
+/* Scrollbar styling */
+.tw-multi-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+.tw-multi-dropdown::-webkit-scrollbar-thumb {
+  background: #c1d9e6;
+  border-radius: 4px;
+}
+/* parent must be relative so dropdown can float */
+.tw-multi-field {
+  position: relative;
 }
 
-/* -----------------------------------------------------------
-   Blue Header Numbers in Stepper (for future steps)
------------------------------------------------------------ */
-
-.step-circle {
-  @apply w-8 h-8 rounded-full flex items-center justify-center text-sm 
-         font-semibold border border-gray-400 text-gray-500;
+/* existing .tw-multi-box stays as is, just add disabled style */
+.tw-multi-box--disabled {
+  @apply bg-gray-100 text-gray-500 border-[#d3dbdf];
+  pointer-events: none;
 }
 
-.step-circle.active {
-  @apply bg-[#007AAA] text-white border-none;
+.tw-multi-box--disabled svg {
+  opacity: 0.4;
 }
 
-.step-label {
-  @apply text-sm mt-1 text-gray-500;
+/* make dropdown float over the form instead of pushing it down */
+.tw-multi-dropdown {
+  @apply border border-[#d3dbdf] bg-white rounded-lg p-3
+         max-h-[200px] overflow-y-auto shadow-lg z-10;
+
+  position: absolute;
+  top: calc(100% + 4px); /* just below box */
+  left: 0;
+  width: 100%;
 }
 
-.step-label.active {
-  @apply text-[#007AAA] font-semibold;
+/* ============================================================
+   SUMMARY CARDS
+============================================================ */
+.tw-summary-card {
+  @apply bg-white border border-[#d8e6ef] rounded-lg p-3 shadow-sm flex flex-col gap-1;
+}
+.tw-summary-card label {
+  @apply text-[13px] text-[#55626f] font-medium;
+}
+.tw-summary-card p {
+  @apply text-[15px] font-semibold text-[#0b6a7e];
 }
 
-/* -----------------------------------------------------------
-   Form Buttons
------------------------------------------------------------ */
-
-.btn-primary {
-  @apply bg-[#007AAA] text-white px-6 py-2 rounded-lg shadow 
-         hover:bg-[#006988] transition font-medium;
+/* ============================================================
+   INSURED CARD (Adult/Child)
+============================================================ */
+.tw-insured-card {
+  @apply bg-white border border-[#d8e6ef] rounded-xl p-4 shadow-sm;
+}
+.tw-insured-title {
+  @apply text-[15px] font-semibold text-[#0b6a7e] mb-3 pb-2 border-b border-[#e8f1f7];
+}
+.tw-insured-item {
+  @apply flex flex-col mb-3;
+}
+.tw-insured-item label {
+  @apply text-[12px] text-[#6d7b86] font-medium;
+}
+.tw-insured-item p {
+  @apply text-[15px] font-semibold text-[#1e3a4b];
 }
 
-.btn-secondary {
-  @apply bg-gray-200 text-gray-700 px-6 py-2 rounded-lg shadow 
-         hover:bg-gray-300 transition;
+/* ============================================================
+   POPUP OVERLAY
+============================================================ */
+/* ============================================================
+   POPUP OVERLAY
+============================================================ */
+.tw-popup-overlay {
+  @apply fixed inset-0 bg-[rgba(0,0,0,0.55)] flex items-center justify-center z-[9999];
 }
 
-/* -----------------------------------------------------------
-   Utility — Remove number field arrows
------------------------------------------------------------ */
-
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  @apply appearance-none m-0;
+/* KYC popup box */
+.tw-popup-card {
+  @apply bg-white w-[90%] max-w-[420px] rounded-xl shadow-lg p-6
+         text-center relative;
 }
 
-input[type="number"] {
-  @apply appearance-none;
+/* KYC image */
+.tw-popup-img {
+  @apply w-24 h-24 mx-auto mb-4;
+}
+
+// .tw-popup-card {
+//   @apply bg-white w-[90%] max-w-[500px] rounded-xl shadow-lg p-6 relative animate-fadeIn;
+// }
+
+/* Header */
+.tw-popup-header {
+  @apply flex justify-between items-center mb-4 pb-3 border-b border-gray-200;
+}
+.tw-popup-header h3 {
+  @apply text-[18px] font-bold text-[#0b6a7e];
+}
+.tw-popup-close {
+  @apply text-[18px] font-bold text-gray-700 cursor-pointer
+         hover:text-red-600 transition-colors;
+}
+
+/* Body */
+.tw-popup-body {
+  @apply text-[15px] text-[#3a4a53] leading-6 mb-6;
+}
+
+/* Footer */
+.tw-popup-footer {
+  @apply flex justify-end gap-3 pt-4 border-t border-gray-200;
+}
+
+.tw-label-valid {
+  @apply text-green-600 font-semibold;
+}
+
+/* Fade animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out;
+}
+
+/* ============================================
+   ALERT STYLES
+============================================ */
+.alert-success {
+  @apply bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded shadow-lg;
+}
+
+.alert-error {
+  @apply bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded shadow-lg;
+}
+
+/* ============================================
+   MOBILE RESPONSIVE
+============================================ */
+@media (max-width: 600px) {
+  .tw-step-indicators {
+    @apply gap-[22px];
+  }
+  .tw-step-number {
+    @apply w-[28px] h-[28px] text-[12px];
+  }
+  .tw-step-label {
+    @apply text-[10px];
+  }
+
+  .tw-step:nth-child(1)::after,
+  .tw-step:nth-child(2)::after {
+    width: 50px;
+    left: 16px;
+  }
+
+  .tw-popup-card {
+    @apply w-[95%] p-4;
+  }
+
+  .tw-popup-footer {
+    @apply flex-col gap-2;
+  }
+
+  .tw-btn-primary, .tw-btn-secondary {
+    @apply min-w-full;
+  }
+}
+
+/* Blur effect for placeholders */
+input:focus::placeholder,
+select:focus::placeholder,
+textarea:focus::placeholder {
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
 }

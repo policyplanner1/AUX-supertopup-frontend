@@ -1,15 +1,17 @@
 :host {
   display: block;
 }
+
 /* Smooth micro-animations */
 * {
   transition: all 0.25s ease;
 }
+
 /* Only the pieces that Tailwind cannot easily do */
 .gradient-border {
   border-width: 2px;
   border-style: solid;
-  border-image: linear-gradient(180deg, #FF5500 30.9%, #006D8D 100%) 1;
+  border-image: linear-gradient(180deg, #ff5500 30.9%, #006d8d 100%) 1;
   border-radius: 18px;
 }
 
@@ -24,6 +26,98 @@
 .shadow-next {
   box-shadow: 0px 10px 20px 1px rgba(0, 109, 141, 0.25);
 }
+
 .shadow-wizard {
   box-shadow: 0 18px 45px rgba(0, 109, 141, 0.1);
+}
+
+/* Error styles */
+.form-error {
+  color: #dc2626;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.invalid-field {
+  border-color: #dc2626 !important;
+}
+
+/* Age dropdown - custom, always opens DOWN */
+.age-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.age-dropdown__control {
+  border-bottom: 1px solid #9ca3af; /* gray-400 */
+  padding: 4px 20px 4px 0;
+  font-size: 0.875rem; /* text-sm */
+  color: #374151; /* gray-700 */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.age-dropdown__control:hover,
+.age-dropdown__control:focus-within {
+  border-color: #006d8d;
+}
+
+.age-dropdown__value {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.age-dropdown__arrow {
+  font-size: 0.7rem;
+  color: #006d8d;
+}
+
+.age-dropdown__menu {
+  position: absolute;
+  top: 100%; /* always below control */
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  max-height: 180px;
+  overflow-y: auto;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.18); /* slate-900-ish */
+  z-index: 20;
+}
+
+.age-dropdown__option {
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  color: #374151;
+  cursor: pointer;
+}
+
+.age-dropdown__option:hover {
+  background-color: #f3f4f6; /* gray-100 */
+}
+
+.age-dropdown__option--placeholder {
+  font-weight: 500;
+  border-bottom: 1px solid #e5e7eb; /* gray-200 */
+}
+
+/* Native selects (like cover amount) */
+select {
+  background-color: transparent;
+  cursor: pointer;
+}
+
+select:focus {
+  position: relative;
+  z-index: 10;
+}
+
+/* Disabled buttons */
+button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

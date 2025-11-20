@@ -62,7 +62,7 @@ export class Quotes implements OnInit {
     //     "on",
     //   sonCount:
     //     "0",
-     
+
     // }
 
     // localStorage.setItem('healthFormData', JSON.stringify(raw));
@@ -208,7 +208,8 @@ export class Quotes implements OnInit {
 
 
   goToProposal(plan: any) {
-    this.router.navigate(['supertopup/proposal-form']);
+    console.log("plan",plan);
+    this.router.navigate(['supertopup/proposal-form'], { state: { selectedPlan: plan } });
   }
 
   slides = [
