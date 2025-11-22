@@ -1,3 +1,4 @@
+<!-- MAIN QUOTES CONTAINER -->
 <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6">
 
   <!-- Top Bar -->
@@ -20,7 +21,7 @@
         <path
           d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.6 17.6 0 0 0 4.168 6.608 17.6 17.6 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.68.68 0 0 0-.58-.122l-2.19.547a1.75 1.75 0 0 1-1.657-.459L5.482 8.062a1.75 1.75 0 0 1-.46-1.657l.548-2.19a.68.68 0 0 0-.122-.58z" />
       </svg>
-      <span>+91 9876543210</span>
+      <span>+91 7798612243</span>
     </div>
 
     <div class="absolute bottom-0 left-0 right-0 h-[1px] bg-gray-200 -mx-4 sm:-mx-6"></div>
@@ -35,7 +36,7 @@
 
     <!-- Filter Buttons -->
     <div class="dropdown filter-btn w-full sm:w-auto">
-      <select (change)="onCoverageAmountChange($event)" class="w-full sm:w-auto">
+      <select (change)="onCoverageAmountChange($event)" class="w-full sm:w-auto bg-transparent outline-none">
         <option value="">Coverage Amt</option>
         <option value="300000">3 Lakh</option>
         <option value="500000">5 Lakh</option>
@@ -57,7 +58,7 @@
 
     <!-- Deductible Dropdown -->
     <div class="dropdown filter-btn w-full sm:w-auto">
-      <select (change)="onDeductibleChange($event)" class="w-full sm:w-auto">
+      <select (change)="onDeductibleChange($event)" class="w-full sm:w-auto bg-transparent outline-none">
         <option value="">All Deductibles</option>
         <option *ngFor="let d of deductibleList()" [value]="d">
           {{ formatIndianCurrency(d) }}
@@ -67,7 +68,7 @@
 
     <!-- Insurer Dropdown -->
     <div class="dropdown filter-btn w-full sm:w-auto">
-      <select (change)="onInsurerChange($event)" class="w-full sm:w-auto">
+      <select (change)="onInsurerChange($event)" class="w-full sm:w-auto bg-transparent outline-none">
         <option value="">All Insurers</option>
         <option *ngFor="let i of insurerList()" [value]="i">
           {{ i }}
@@ -77,7 +78,7 @@
 
     <!-- Sort By Dropdown -->
     <div class="dropdown filter-btn w-full sm:w-auto">
-      <select (change)="onSortChange($event)" class="w-full sm:w-auto">
+      <select (change)="onSortChange($event)" class="w-full sm:w-auto bg-transparent outline-none">
         <option value="">Sort By</option>
         <option value="low">Price: Low to High</option>
         <option value="high">Price: High to Low</option>
@@ -86,7 +87,7 @@
 
     <!-- Right Side User Info -->
     <div
-      class="w-full sm:ml-auto sm:w-auto flex items-center bg-[#F8FDFF] border-[#E8F3FF] rounded-full px-5 py-2 shadow-sm gap-3">
+      class="w-full sm:ml-auto sm:w-auto flex items-center bg-[#F8FDFF] border border-[#E8F3FF] rounded-full px-5 py-2 shadow-sm gap-3">
       <div class="flex items-center text-gray-700 text-sm">
         Self: <span class="font-semibold ml-1">{{ age }} years</span>
         <span class="mx-2 text-gray-400">|</span>
@@ -115,11 +116,17 @@
           <!-- Top Bar -->
           <div class="bg-[#005F7F] text-white text-xs py-2 px-4 flex justify-between items-center">
             <span></span>
-            <label class="flex items-center gap-2 cursor-pointer opacity-90 hover:opacity-100">
-              Add To Compare
-              <input type="checkbox" class="checkbox-custom h-4 w-4 rounded border-white/50 bg-transparent 
-     checked:bg-white checked:border-white cursor-pointer" />
-            </label>
+           <label class="flex items-center gap-2 cursor-pointer opacity-90 hover:opacity-100">
+  Add To Compare
+  <input
+    type="checkbox"
+    [checked]="isSelected(p)"
+    (change)="onCompareToggle(p, $event)"
+    class="checkbox-custom h-4 w-4 rounded border-white/50 bg-transparent
+           checked:bg-white checked:border-white cursor-pointer"
+  />
+</label>
+
           </div>
 
           <!-- Content -->
@@ -187,11 +194,9 @@
                 <img class="w-4 h-4" src="assets/quote/download.svg" alt="" />
               </button>
 
-
             </div>
           </div>
         </div>
-
 
       </ng-container>
     </div>
@@ -215,9 +220,9 @@
 
         <div class="flex items-center mt-4 gap-3 bg-white/70 p-1 rounded-xl shadow-sm backdrop-blur">
 
-          <input value="+91 9876543210" class="flex-1 px-3 py-2 text-sm rounded-lg bg-transparent outline-none" />
+          <input value="+91 7798612243" class="flex-1 px-3 py-2 text-sm rounded-lg bg-transparent outline-none" />
 
-          <a href="tel:9876543210">
+          <a href="tel:+91-7798612243">
             <button
               class="bg-[#FED66A] text-black px-4 py-2 rounded-lg font-medium text-sm shadow hover:bg-[#ffcd47] transition">
               Call Me
@@ -246,7 +251,7 @@
 
       <!-- CSR BOX -->
       <div
-        class="rounded-2xl bg-white p-6 border-1 border-gray-200 shadow-sm relative overflow-hidden flex flex-col justify-center items-center text-center">
+        class="rounded-2xl bg-white p-6 border border-gray-200 shadow-sm relative overflow-hidden flex flex-col justify-center items-center text-center">
 
         <img src="assets/quote/slide_img1.png" class="h-16 mb-4" />
 
@@ -266,4 +271,250 @@
 
   </div>
 
+</div>
+
+<!-- ===========================
+     BOTTOM COMPARE BAR
+=========================== -->
+<div
+  *ngIf="compare.length > 0 && !isCompareOpen"
+  class="fixed left-0 right-0 bottom-0 bg-white border-t-2 border-[#0b5cff] z-[1000] py-4 shadow-[0_-4px_20px_rgba(0,0,0,0.15)]"
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-5">
+    <!-- Chips -->
+    <div class="flex gap-3 items-center flex-1 overflow-x-auto py-1 no-scrollbar">
+      <!-- Selected plans -->
+      <div
+        class="flex items-center gap-3 px-4 py-3 border-2 border-slate-200 rounded-xl bg-white flex-shrink-0 min-w-[180px] hover:border-[#0b5cff] hover:shadow"
+        *ngFor="let p of compare; trackBy: trackByPlanId"
+      >
+        <img [src]="p.logo" [alt]="p.insurerName" class="w-8 h-8 object-contain rounded-md" />
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold text-slate-900 truncate">{{ p.insurerName }}</p>
+          <p class="text-xs text-slate-500 truncate">{{ p.productName }}</p>
+        </div>
+        <button
+          type="button"
+          class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-100 rounded"
+          (click)="removeFromCompare(p)"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- Empty slots -->
+      <div
+        class="flex items-center justify-center px-4 py-3 border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 flex-shrink-0 min-w-[120px] text-sm font-medium text-slate-400"
+        *ngFor="let n of emptySlots"
+      >
+        Add Plan
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-3 flex-shrink-0 whitespace-nowrap">
+      <button
+        type="button"
+        class="h-11 px-4 rounded-lg border-2 border-slate-200 text-sm font-semibold text-slate-500 hover:bg-red-100 hover:border-red-300 hover:text-red-600"
+        (click)="clearCompare()"
+      >
+        Clear
+      </button>
+      <button
+        type="button"
+        class="h-11 px-6 rounded-lg bg-[#0b5cff] text-white text-sm font-semibold shadow hover:bg-[#0848c7] disabled:opacity-50 disabled:cursor-not-allowed"
+        [disabled]="compare.length < 2"
+        (click)="compareNow()"
+      >
+        Compare ({{ compare.length }})
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===========================
+     FULL-SCREEN COMPARISON
+=========================== -->
+<div
+  *ngIf="isCompareOpen"
+  id="compareWrapper"
+  class="fixed inset-0 z-[1400] flex flex-col bg-white overflow-hidden"
+>
+  <!-- HEADER -->
+  <div
+    class="cmp-screen__header flex items-center bg-white border-b border-slate-200 px-4 py-3 flex-shrink-0"
+  >
+    <button
+      type="button"
+      class="bg-transparent border-0 text-[#006d8d] font-semibold text-[15px] cursor-pointer"
+      (click)="closeCompare()"
+    >
+      ← Back to list
+    </button>
+
+    <div class="flex-1 text-center font-bold text-[16px] text-[#222]">
+      Compare Plans
+    </div>
+
+    <div class="ml-auto flex items-center">
+      <button
+        type="button"
+        class="cmp-download-btn inline-flex items-center justify-center gap-1 rounded bg-[#006D8D] text-white text-[13px] font-semibold px-4 py-2 shadow min-w-[140px]"
+        (click)="downloadPDF()"
+      >
+        <i class="bi bi-download text-[14px]"></i>
+        Download PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- USER STRIP -->
+  <div
+    class="cmp-user-strip px-4 py-2 border-b border-slate-200 bg-[#f9fafc] flex-shrink-0"
+    *ngIf="name || familyCount"
+  >
+    <div
+      class="cmp-user-pill inline-flex items-center gap-[6px] px-[10px] py-[4px] rounded-full bg-[rgba(7,78,101,0.06)] border border-[rgba(7,78,101,0.14)] text-[12px] text-[#064851]"
+    >
+      <span
+        *ngIf="name"
+        class="cmp-user-name font-semibold text-[#043d4a] max-w-[200px] truncate"
+      >
+        {{ name }}
+      </span>
+      <span
+        *ngIf="name && familyCount"
+        class="cmp-user-sep opacity-60 font-semibold"
+      >
+        •
+      </span>
+      <span
+        *ngIf="familyCount"
+        class="cmp-family font-medium text-[#0b6a7e]"
+      >
+        Family: {{ familyCount }}
+        <span *ngIf="adultCount !== null || childCount !== null">
+          ( Adults {{ adultCount || 0 }}, Children {{ childCount || 0 }} )
+        </span>
+      </span>
+    </div>
+  </div>
+
+  <!-- TABLE AREA -->
+  <div class="flex-1 flex flex-col bg-white min-h-0 cmp-pdf-root">
+    <div class="flex-1 flex flex-col bg-white min-h-0 cmp-pdf-area">
+      <div class="flex-1 flex flex-col w-full bg-white overflow-x-auto overflow-y-auto min-h-0 cmp-table-wrapper">
+        <!-- HEADER GRID -->
+        <div
+          class="cmp-top grid min-h-[194px] border-b border-slate-200 bg-[#f9fafc] w-full flex-shrink-0"
+          [ngStyle]="{ 'grid-template-columns': getGridTemplateColumns() }"
+        >
+          <!-- Left features col -->
+          <div
+            class="cmp-features-col bg-[#f1f7fb] border-r border-slate-200 px-4 flex items-center justify-center text-center"
+          >
+            <div class="cmp-heart-feature flex flex-col items-center gap-3">
+              <img
+                src="assets/quote/heartIns.png"
+                alt="Features"
+                class="cmp-heart-icon w-[100px] h-[100px] object-contain block"
+              />
+              <div
+                class="cmp-features-title text-[16px] font-bold text-[#005e76] uppercase m-0 text-center"
+              >
+                COMPARISON SUMMARY
+              </div>
+            </div>
+          </div>
+
+          <!-- Plan Columns -->
+          <div
+            class="cmp-plan-col bg-white border-r border-[#eef2f5] px-4 py-4 flex flex-col gap-4 min-h-[194px] relative"
+            *ngFor="let p of compare; trackBy: trackByPlanId"
+          >
+            <button
+              type="button"
+              class="cmp-remove-round absolute top-[10px] right-[10px] w-[18px] h-[18px] rounded-full border border-[#757575] bg-transparent text-[#757575] text-[10px] flex items-center justify-center cursor-pointer"
+              (click)="removeFromCompare2(p)"
+            >
+              ✕
+            </button>
+
+            <div class="cmp-logo-name-row flex items-center gap-3 w-full">
+              <div class="cmp-logo-wrapper flex-shrink-0">
+                <img
+                  [src]="p.logo"
+                  [alt]="p.insurerName"
+                  class="cmp-company-logo w-[60px] h-[60px] object-contain"
+                />
+              </div>
+              <div class="cmp-name-wrapper flex-1">
+                <div
+                  class="cmp-company-name font-semibold text-[16px] text-[#222] leading-[1.2] mb-1"
+                >
+                  {{ p.productName }}
+                </div>
+                <div
+                  class="cmp-product-name text-[14px] text-[#666] leading-[1.2]"
+                >
+                  {{ p.insurerName }}
+                </div>
+              </div>
+            </div>
+
+            <div class="cmp-cover-section text-center w-full py-1">
+              <div
+                class="cmp-cover-label text-[14px] text-[#667085] mb-2"
+              >
+                Cover Amount
+              </div>
+              <div
+                class="cmp-cover-value font-semibold text-[18px] text-[#222]"
+              >
+                ₹ {{ p.coverAmount | number : '1.0-0' : 'en-IN' }}
+              </div>
+            </div>
+
+            <button
+              type="button"
+              class="cmp-buy-now-btn bg-[#006D8D] text-white border-0 px-3 py-2 rounded text-[13px] font-semibold mt-auto min-w-[140px] min-h-[32px] flex items-center justify-center self-center shadow hover:bg-[#005a75]"
+              (click)="goToProposal(p.sourcePlan || p)"
+            >
+              Buy now for ₹{{ p.monthlyPrice | number : '1.0-0' : 'en-IN' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- BODY ROWS -->
+        <div class="cmp-table flex flex-col w-full">
+          <div class="cmp-table-body flex flex-col w-full">
+            <div
+              class="cmp-row grid border-b border-[#f0f2f5] w-full"
+              *ngFor="let detail of getDetailsKeys()"
+              [ngStyle]="{ 'grid-template-columns': getGridTemplateColumns() }"
+            >
+              <!-- Left feature name -->
+              <div
+                class="cmp-feature-col bg-[#f8fafc] px-4 py-[14px] flex items-center gap-2 font-semibold text-[15px] text-[#006d8d] border-r border-[#e8e8e8] min-h-[52px]"
+              >
+                <span
+                  class="cmp-bullet inline-block w-2 h-2 border-r-2 border-b-2 border-[#0b5cff] -rotate-45"
+                ></span>
+                <span class="cmp-feature-name flex-1">{{ detail }}</span>
+              </div>
+
+              <!-- Plan data -->
+              <div
+                class="cmp-data-col px-4 py-[14px] flex items-center justify-center text-[14px] text-[#222] text-center border-r border-[#eef2f5] min-h-[52px]"
+                *ngFor="let p of compare"
+              >
+                {{ p.otherDetails?.[detail] || '—' }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div> <!-- /cmp-table-wrapper -->
+    </div> <!-- /cmp-pdf-area -->
+  </div> <!-- /cmp-pdf-root -->
 </div>

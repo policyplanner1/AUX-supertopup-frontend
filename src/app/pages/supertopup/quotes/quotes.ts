@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { SuperTopupService } from '../../../services/super-topup.service';
-import { signal } from '@angular/core';
+import { toPng } from "html-to-image";
+import jsPDF from 'jspdf';
 
 // Define the payload type OUTSIDE the class
 type PlanPayload = {
@@ -15,16 +16,15 @@ type PlanPayload = {
   c4age: number | null;
 };
 
-
 @Component({
   selector: 'app-quotes',
+  standalone: true,   // <-- ADD THIS
+
   imports: [CommonModule],
   templateUrl: './quotes.html',
   styleUrl: './quotes.scss',
 })
-
 export class Quotes implements OnInit {
-
   results: any[] = [];
   age: number | null = null;
   pincode = '';
@@ -38,45 +38,24 @@ export class Quotes implements OnInit {
 
   selectedSort: string | null = null;
 
-
-
   selectedCoverageAmt: number | null = null;
   basePayload: PlanPayload | null = null;
+
+  // Flat plan list used in UI
   plans = signal<any[]>([]);
 
-  constructor(private router: Router, private api: SuperTopupService) { }
+  // Compare + summary strip
+  maxCompare = 3;
+  isCompareOpen = false;
+  compare: any[] = [];
+
+  familyCount: number | null = null;
+  adultCount: number | null = null;
+  childCount: number | null = null;
+
+  constructor(private router: Router, private api: SuperTopupService) {}
 
   ngOnInit(): void {
-    // 1) Prefer localStorage
-
-    // const raw = {
-    //   Age: "39",
-    //   cover_amount:
-    //     "1000000",
-    //   cover_for:
-    //     "1000",
-    //   cust_Pincode:
-    //     "416404",
-    //   cust_city:
-    //     "Cupidatat quis in si",
-    //   cust_fname:
-    //     "LEVI",
-    //   cust_lname:
-    //     "HALEY",
-    //   cust_mobile:
-    //     "9898989898",
-    //   daughterCount:
-    //     "2",
-    //   gender:
-    //     "Male",
-    //   self:
-    //     "on",
-    //   sonCount:
-    //     "0",
-
-    // }
-
-    // localStorage.setItem('healthFormData', JSON.stringify(raw));
     const savedData = localStorage.getItem('supertopup_enquiry');
 
     if (savedData) {
@@ -85,46 +64,28 @@ export class Quotes implements OnInit {
         const payload = this.buildPayloadFromLocal(parsed);
         this.basePayload = payload;
 
+        const enquiry = parsed?.details ?? {};
+        const members = parsed?.members ?? [];
+
         this.age = payload.age ?? null;
-        this.pincode = parsed.details.pincode ?? '';
-        this.name = parsed.details.firstName ?? '';
+        this.pincode = enquiry.pincode ?? '';
+        this.name = enquiry.firstName ?? '';
+
+        // compute family counts (for compare summary strip)
+        this.computeFamilyCounts(members);
 
         this.fetchAllPlans(payload);
         return;
       } catch (e) {
-        console.warn('Failed to parse localStorage healthFormData, falling back to query params.', e);
+        console.warn(
+          'Failed to parse localStorage supertopup_enquiry, falling back.',
+          e
+        );
       }
     }
-
   }
 
-  // private buildPayloadFromLocal(ls: any): PlanPayload {
-  //   const childAges: Array<number | null> = [];
-
-  //   const sonCount = Number(ls?.sonCount) || 0;
-  //   for (let i = 1; i <= sonCount; i++) {
-  //     childAges.push(this.numOrNull(ls?.[`son${i}Age`]));
-  //   }
-
-  //   const daughterCount = Number(ls?.daughterCount) || 0;
-  //   for (let i = 1; i <= daughterCount; i++) {
-  //     childAges.push(this.numOrNull(ls?.[`daughter${i}Age`]));
-  //   }
-
-  //   while (childAges.length < 4) childAges.push(null);
-  //   if (childAges.length > 4) childAges.length = 4;
-
-  //   return {
-  //     coverAmount: this.toNum(ls?.cover_amount, 0),
-  //     deductibleAmount: this.toNum(ls?.deductibleAmount, 0),
-  //     age: this.toNum(ls?.Age, 0),
-  //     sage: this.numOrNull(ls?.SAge),
-  //     c1age: childAges[0],
-  //     c2age: childAges[1],
-  //     c3age: childAges[2],
-  //     c4age: childAges[3],
-  //   };
-  // }
+  /* -------------------- build payload from localStorage -------------------- */
 
   private buildPayloadFromLocal(ls: any): PlanPayload {
     const enquiry = ls?.details ?? [];
@@ -138,7 +99,7 @@ export class Quotes implements OnInit {
     const childAges: Array<number | null> = [];
 
     members.forEach((m: any) => {
-      if (m.id.startsWith("son") || m.id.startsWith("daughter")) {
+      if (m.id?.startsWith('son') || m.id?.startsWith('daughter')) {
         childAges.push(this.numOrNull(m.age));
       }
     });
@@ -150,7 +111,7 @@ export class Quotes implements OnInit {
     return {
       coverAmount: this.toNum(enquiry.coverAmount, 0),
 
-      age: this.toNum(you?.age, 0),      // YOU age
+      age: this.toNum(you?.age, 0), // YOU age
       sage: this.numOrNull(spouse?.age), // Spouse age or null
 
       c1age: childAges[0],
@@ -159,6 +120,33 @@ export class Quotes implements OnInit {
       c4age: childAges[3],
     };
   }
+
+  private computeFamilyCounts(members: any[]): void {
+    if (!Array.isArray(members)) {
+      this.familyCount = null;
+      this.adultCount = null;
+      this.childCount = null;
+      return;
+    }
+
+    let adults = 0;
+    let kids = 0;
+
+    members.forEach((m: any) => {
+      const id = (m?.id || '').toString();
+      if (id.startsWith('son') || id.startsWith('daughter') || m?.type === 'child') {
+        kids++;
+      } else {
+        adults++;
+      }
+    });
+
+    this.adultCount = adults;
+    this.childCount = kids;
+    this.familyCount = adults + kids;
+  }
+
+  /* -------------------- Filters handlers -------------------- */
 
   onCoverageAmountChange(event: any) {
     const newValue = Number(event.target.value);
@@ -170,6 +158,52 @@ export class Quotes implements OnInit {
     this.fetchAllPlans(this.basePayload);
   }
 
+  onSortChange(event: any) {
+    const value = event.target.value;
+
+    if (value === '') {
+      this.selectedSort = null;
+    } else {
+      this.selectedSort = value; // "low" or "high"
+    }
+
+    if (this.basePayload) {
+      this.fetchAllPlans(this.basePayload);
+    }
+  }
+
+  onInsurerChange(event: any) {
+    const value = event.target.value;
+
+    this.selectedInsurer = value === '' ? null : value;
+
+    if (this.basePayload) {
+      this.fetchAllPlans(this.basePayload);
+    }
+  }
+
+  onDeductibleChange(event: any) {
+    const value = event.target.value;
+
+    if (value === '') {
+      this.selectedDeductible = null;
+    } else {
+      this.selectedDeductible = Number(value);
+    }
+
+    if (this.basePayload) {
+      (this.basePayload as any).deductibleAmount =
+        this.selectedDeductible ?? null;
+
+      this.fetchAllPlans(this.basePayload);
+    }
+  }
+buildPlanKey(plan: any): string {
+  return plan.uniqueId;
+}
+
+
+  /* -------------------- Fetch + Map all plans -------------------- */
 
   fetchAllPlans(payload: any) {
     this.api.getHealthPlanEndpoints().subscribe({
@@ -178,31 +212,18 @@ export class Quotes implements OnInit {
 
         this.api.callAllPremiumApis(apiList, payload).subscribe({
           next: (resArray) => {
-
-
-            // -----------------------------------
             // 1️⃣ Extract insurer names
-            // -----------------------------------
             const insurerNames: string[] = [];
-
             resArray.forEach((res: any) => {
               if (res?.companyName) {
                 insurerNames.push(res.companyName.trim());
               }
             });
-
-            // Unique + sorted
             const uniqueInsurers = Array.from(new Set(insurerNames)).sort();
-
-            // Update signal
             this.insurerList.set(uniqueInsurers);
 
-
-            // ------------------------
-            // 1️⃣ Extract all deductibles
-            // ------------------------
+            // 2️⃣ Extract all deductibles
             const allDeductibles: number[] = [];
-
             resArray.forEach((res: any) => {
               if (res?.premiums) {
                 res.premiums.forEach((pm: any) => {
@@ -211,120 +232,219 @@ export class Quotes implements OnInit {
                 });
               }
             });
-
-            // Unique + sorted
-            const uniqueSorted = Array.from(new Set(allDeductibles)).sort((a, b) => a - b);
-
-            // Set dropdown values
+            const uniqueSorted = Array.from(new Set(allDeductibles)).sort(
+              (a, b) => a - b
+            );
             this.deductibleList.set(uniqueSorted);
 
-
-
-            // 2️⃣ Filter and Map Plans
+            // 3️⃣ Filter + Map Plans
             const mappedPlans = resArray
               .filter((res: any) => res && res.planName)
               .flatMap((p: any) => {
                 let premiums = p.premiums || [];
 
-                // Apply deductible filter
+                // deductible filter
                 if (this.selectedDeductible !== null) {
-                  premiums = premiums.filter((pm: any) =>
-                    Number(pm.deductible) === this.selectedDeductible
+                  premiums = premiums.filter(
+                    (pm: any) =>
+                      Number(pm.deductible) === this.selectedDeductible
                   );
                 }
 
-                // Apply insurer filter
+                // insurer filter
                 if (this.selectedInsurer !== null) {
                   if (p.companyName !== this.selectedInsurer) return [];
                 }
 
+                const coverAmountNum = Number(p.coverAmount) || 0;
 
-                return premiums.map((pm: any) => ({
-                  logo: `assets/quote/${p.logoUrl}`,
-                  name: p.planName,
-                  tag: p.companyName,
-                  cover: `₹ ${this.formatIndianCurrency(p.coverAmount)}`,
-                  deductible: `₹ ${this.formatIndianCurrency(Number(pm.deductible))}`,
-                  price: `₹ ${this.formatIndianCurrency(pm.premium)}`,
-                  features: p.features?.length ? p.features : ["No Key Features Available"],
-                  brochure: pm.brochureUrl || p.brochureUrl || null,
-                }));
+                return premiums.map((pm: any) => {
+                  const premiumNum = Number(pm.premium) || 0;
+                  const dedNum = Number(pm.deductible) || 0;
+
+                  return {
+                    uniqueId: crypto.randomUUID(),
+
+                    // UI fields
+                    logo: `assets/quote/${p.logoUrl}`,
+                    name: p.planName,
+                    tag: p.companyName,
+                    cover: `₹ ${this.formatIndianCurrency(coverAmountNum)}`,
+                    deductible: `₹ ${this.formatIndianCurrency(dedNum)}`,
+                    price: `₹ ${this.formatIndianCurrency(premiumNum)}`,
+                    features: p.features?.length
+                      ? p.features
+                      : ['No Key Features Available'],
+                    brochure: pm.brochureUrl || p.brochureUrl || null,
+
+                    // Compare needs – keep numeric/raw
+                    planId:
+                    pm.planId ||
+                    p.planId ||
+                   `${p.planName}-${dedNum}-${premiumNum}`,
+                    coverAmountNumber: coverAmountNum,
+                    deductibleNumber: dedNum,
+                    priceNumber: premiumNum,
+                    insurerName: p.companyName,
+                    otherDetails: this.buildOtherDetails(p, pm),
+                    rawPlan: p,
+                    rawPremium: pm,
+                  };
+                });
               });
 
-            // -----------------------------------
-            // 3️⃣ Apply Sorting
-            // -----------------------------------
-            if (this.selectedSort === "low") {
-              mappedPlans.sort((a: any, b: any) =>
-                Number(a.price.replace(/\D/g, "")) - Number(b.price.replace(/\D/g, ""))
+            // 4️⃣ Sorting
+            if (this.selectedSort === 'low') {
+              mappedPlans.sort(
+                (a: any, b: any) => a.priceNumber - b.priceNumber
+              );
+            } else if (this.selectedSort === 'high') {
+              mappedPlans.sort(
+                (a: any, b: any) => b.priceNumber - a.priceNumber
               );
             }
-
-            if (this.selectedSort === "high") {
-              mappedPlans.sort((a: any, b: any) =>
-                Number(b.price.replace(/\D/g, "")) - Number(a.price.replace(/\D/g, ""))
-              );
-            }
-
 
             this.plans.set(mappedPlans);
           },
           error: (err) => {
             console.error('Error calling premium APIs:', err);
-          }
+          },
         });
       },
       error: (err) => {
         console.error('Error fetching endpoints:', err);
-      }
+      },
     });
   }
 
-  onSortChange(event: any) {
-    const value = event.target.value;
+  private buildOtherDetails(p: any, pm: any): Record<string, string> {
+    const details: Record<string, string> = {};
 
-    if (value === "") {
-      this.selectedSort = null;
+    if (p.companyName) details['Insurer'] = p.companyName;
+    if (p.planName) details['Plan Name'] = p.planName;
+    if (p.coverAmount) {
+      const num = Number(p.coverAmount) || 0;
+      details['Cover Amount'] = '₹ ' + this.formatIndianCurrency(num);
+    }
+    if (pm.deductible != null) {
+      const d = Number(pm.deductible) || 0;
+      details['Deductible Amount'] = '₹ ' + this.formatIndianCurrency(d);
+    }
+    if (pm.premium != null) {
+      const pr = Number(pm.premium) || 0;
+      details['Monthly Premium'] = '₹ ' + this.formatIndianCurrency(pr);
+    }
+    if (p.roomType) details['Room Category'] = p.roomType;
+    if (p.tenure) details['Policy Tenure'] = String(p.tenure);
+
+    // if backend sends structured otherDetails JSON, merge it
+    try {
+      const extra =
+        p.otherDetails ||
+        (p.plan?.other_details
+          ? JSON.parse(p.plan.other_details)
+          : undefined);
+      if (extra && typeof extra === 'object') {
+        Object.keys(extra).forEach((k) => {
+          if (extra[k] != null && extra[k] !== '') {
+            details[k] = String(extra[k]);
+          }
+        });
+      }
+    } catch {
+      // ignore parse errors
+    }
+
+    return details;
+  }
+
+  /* -------------------- Compare logic -------------------- */
+  allowAadhaarInput(event: any) {
+  const allowed = /^[0-9]$/;
+
+  // BLOCK ALL ALPHABETS, SYMBOLS IN ANDROID ALSO
+  if (!allowed.test(event.key)) {
+    event.preventDefault();
+  }
+}
+
+  get emptySlots(): number[] {
+    const remaining = this.maxCompare - this.compare.length;
+    return remaining > 0 ? Array(remaining).fill(0) : [];
+  }
+
+isSelected(plan: any): boolean {
+  return this.compare.some((p) => p.key === plan.uniqueId);
+}
+
+  onCompareToggle(plan: any, event: any) {
+  const checked = event.target.checked;
+  const key = plan.uniqueId;
+
+
+  if (checked) {
+    if (this.compare.length >= this.maxCompare) {
+      alert(`You can compare up to ${this.maxCompare} plans.`);
+      event.target.checked = false;
+      return;
+    }
+
+    if (!this.isSelected(plan)) {
+      this.compare.push({
+        key: plan.uniqueId,
+        planId: plan.planId,
+        insurerName: plan.insurerName || plan.tag,
+        productName: plan.name,
+        logo: plan.logo,
+        coverAmount: plan.coverAmountNumber,
+        monthlyPrice: plan.priceNumber,
+        deductible: plan.deductibleNumber,
+        otherDetails: plan.otherDetails || {},
+        sourcePlan: plan,
+      });
+    }
+  } else {
+    this.compare = this.compare.filter((p) => p.key !== key);
+  }
+}
+
+  callNow() {
+  window.location.href = "tel:+917798612243"; // replace with your number
+}
+
+  getDetailsKeys(): string[] {
+    return Object.keys(this.compare[0]?.otherDetails || {});
+  }
+
+  removeFromCompare(plan: any) {
+    this.compare = this.compare.filter((p) => p.planId !== plan.planId);
+  }
+
+  removeFromCompare2(plan: any) {
+    this.removeFromCompare(plan);
+  }
+
+  clearCompare() {
+    this.compare = [];
+  }
+
+  compareNow() {
+    if (this.compare.length >= 2) {
+      this.isCompareOpen = true;
     } else {
-      this.selectedSort = value; // "low" or "high"
-    }
-
-    if (this.basePayload) {
-      // Re-apply filters + sorting
-      this.fetchAllPlans(this.basePayload);
+      alert('Select at least 2 plans to compare.');
     }
   }
 
-
-  onInsurerChange(event: any) {
-    const value = event.target.value;
-
-    this.selectedInsurer = value === "" ? null : value;
-
-    if (this.basePayload) {
-      this.fetchAllPlans(this.basePayload);
-    }
+  closeCompare() {
+    this.isCompareOpen = false;
   }
 
-
-  onDeductibleChange(event: any) {
-    const value = event.target.value;
-
-    // If empty, remove filter
-    if (value === "") {
-      this.selectedDeductible = null;
-    } else {
-      this.selectedDeductible = Number(value);
-    }
-
-    if (this.basePayload) {
-      // Optional: API only if required
-      (this.basePayload as any).deductibleAmount = this.selectedDeductible ?? null;
-
-      this.fetchAllPlans(this.basePayload);
-    }
+  trackByPlanId(index: number, plan: any) {
+    return plan.planId || index;
   }
 
+  /* -------------------- Helpers -------------------- */
 
   // ---- helpers ----
   private toNum(v: any, d = 0): number {
@@ -339,11 +459,15 @@ export class Quotes implements OnInit {
 
   formatIndianCurrency(num: number): string {
     if (num >= 10000000) {
-      return (num / 10000000).toFixed(2).replace(/\.00$/, '') + ' Cr';
+      return (
+        (num / 10000000).toFixed(2).replace(/\.00$/, '') + ' Cr'
+      );
     } else if (num >= 100000) {
-      return (num / 100000).toFixed(2).replace(/\.00$/, '') + ' Lakh';
+      return (
+        (num / 100000).toFixed(2).replace(/\.00$/, '') + ' Lakh'
+      );
     } else {
-      return num.toLocaleString('en-IN'); // normal formatting
+      return num.toLocaleString('en-IN');
     }
   }
 
@@ -352,27 +476,39 @@ export class Quotes implements OnInit {
   }
 
   goToProposal(plan: any) {
-    console.log("plan",plan);
-    this.router.navigate(['supertopup/proposal-form'], { state: { selectedPlan: plan } });
+    this.router.navigate(['supertopup/proposal-form'], {
+      state: { selectedPlan: plan },
+    });
   }
 
-  slides = [
-    {
-      imgSrc: 'assets/quote/slide_img1.png',
-      title: 'High CSR = higher peace of mind',
-      text: 'A higher Claim Settlement Ratio (ideally 95%+) means more claims get paid.'
-    },
-    {
-      imgSrc: 'assets/quote/slide_img2.png',
-      title: 'Fast Claim Processing',
-      text: 'Get your claims settled quickly with our efficient service.'
-    },
-    {
-      imgSrc: 'assets/quote/slide_img3.png',
-      title: 'Expert Guidance',
-      text: 'Our experts will help you choose the best insurance plan.'
-    }
-  ];
+  /* -------------------- PDF Download (same logic) -------------------- */
+
+ downloadPDF() {
+  const element = document.getElementById("compareWrapper");
+  if (!element) return;
+
+  toPng(element, { cacheBust: true })
+    .then((dataUrl) => {
+      const pdf = new jsPDF("p", "mm", "a4");
+      const imgProps = pdf.getImageProperties(dataUrl);
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save("comparison.pdf");
+    })
+    .catch((error) => {
+      console.error("PDF export error:", error);
+      alert("Unable to export PDF due to browser color incompatibility.");
+    });
+}
 
 
+  /* -------------------- Grid template for compare table -------------------- */
+
+  getGridTemplateColumns(): string {
+    const planCount = this.compare?.length || 0;
+    return `300px repeat(${planCount || 1}, 1fr)`;
+  }
 }

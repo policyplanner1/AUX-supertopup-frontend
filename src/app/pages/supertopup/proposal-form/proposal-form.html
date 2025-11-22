@@ -1,11 +1,11 @@
 <!-- ============================
      BUY-NOW STEPPER WRAPPER
-============================= -->
+============================== -->
 <div class="max-w-[1200px] mx-auto mt-5 px-4">
 
   <!-- ============================
        HEADER + STEPPER
-  ============================= -->
+  ============================== -->
   <div class="tw-stepper-container">
 
     <!-- Row 1: Back & Title -->
@@ -22,26 +22,17 @@
     <div class="tw-header-center">
       <div class="tw-step-indicators">
 
-        <!-- Step 1 -->
-        <div class="tw-step"
-             [class.active]="currentStep >= 1"
-             [class.completed]="currentStep > 1">
+        <div class="tw-step" [class.active]="currentStep >= 1" [class.completed]="currentStep > 1">
           <div class="tw-step-number">1</div>
           <span class="tw-step-label">Quote</span>
         </div>
 
-        <!-- Step 2 -->
-        <div class="tw-step"
-             [class.active]="currentStep >= 2"
-             [class.completed]="currentStep > 2">
+        <div class="tw-step" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">
           <div class="tw-step-number">2</div>
           <span class="tw-step-label">Insured</span>
         </div>
 
-        <!-- Step 3 -->
-        <div class="tw-step"
-             [class.active]="currentStep >= 3"
-             [class.completed]="currentStep > 3">
+        <div class="tw-step" [class.active]="currentStep >= 3" [class.completed]="currentStep > 3">
           <div class="tw-step-number">3</div>
           <span class="tw-step-label">Summary</span>
         </div>
@@ -52,93 +43,87 @@
   </div>
 
   <!-- ============================================================
-       STEP 1 : PRODUCT + PROPOSER + ADDITIONAL + KYC
+       STEP 1 : PRODUCT + PROPOSER
   ============================================================ -->
   <div *ngIf="currentStep === 1" class="tw-step-content">
 
     <!-- PRODUCT DETAILS -->
     <div class="tw-section-card">
       <h4 class="tw-section-title">Product Details</h4>
+
       <div class="tw-row-4">
+
+        <!-- Product Name -->
         <div class="tw-field">
-          <label [class.tw-label-valid]="isValid('productName')">
-            Product Name <span class="text-red-600">*</span>
-          </label>
+          <label>Product Name <span class="text-red-600">*</span></label>
           <input class="tw-input bg-gray-100" [value]="proposalData.productName" readonly />
-          <div class="tw-valid-icon" *ngIf="isValid('productName')">✓</div>
-        </div>
-<!-- In Step 1 - Product Details section -->
-<div class="tw-field">
-  <label [class.tw-label-valid]="isValid('selectedProductType')">
-    Product Type <span class="text-red-600">*</span>
-  </label>
-  <div class="tw-radio-row">
-    <label class="tw-radio-label">
-      <input type="radio" value="new" name="ptype" [(ngModel)]="proposalData.selectedProductType" />
-      New
-    </label>
-    <label class="tw-radio-label">
-      <input type="radio" value="portability" name="ptype" [(ngModel)]="proposalData.selectedProductType" />
-      Portability
-    </label>
-  </div>
-  <!-- Remove this line as it's not needed for radio buttons -->
-  <!-- <div class="tw-valid-icon" *ngIf="isValid('selectedProductType')">✓</div> -->
-</div>
-
-        <div class="tw-field">
-          <label [class.tw-label-valid]="isValid('pincode')">
-            Pincode <span class="text-red-600">*</span>
-          </label>
-          <input class="tw-input bg-gray-100" maxlength="6" [(ngModel)]="proposalData.pincode" readonly />
-          <div class="tw-error" *ngIf="fieldErrors.pincode">{{ fieldErrors.pincode }}</div>
-          <div class="tw-valid-icon" *ngIf="isValid('pincode')">✓</div>
         </div>
 
+        <!-- Product Type -->
         <div class="tw-field">
-          <label [class.tw-label-valid]="isValid('cityState')">
-            City & State <span class="text-red-600">*</span>
-          </label>
+          <label>Product Type <span class="text-red-600">*</span></label>
+          <div class="tw-radio-row">
+            <label class="tw-radio-label">
+              <input type="radio" value="new" name="ptype"
+                [(ngModel)]="proposalData.selectedProductType" />
+              New
+            </label>
+
+            <label class="tw-radio-label">
+              <input type="radio" value="portability" name="ptype"
+                [(ngModel)]="proposalData.selectedProductType" />
+              Portability
+            </label>
+          </div>
+        </div>
+
+        <!-- Pincode -->
+        <div class="tw-field">
+          <label>Pincode <span class="text-red-600">*</span></label>
+          <input class="tw-input bg-gray-100" maxlength="6"
+            [(ngModel)]="proposalData.pincode" readonly />
+        </div>
+
+        <!-- City State -->
+        <div class="tw-field">
+          <label>City & State <span class="text-red-600">*</span></label>
           <input class="tw-input bg-gray-100" [value]="proposalData.cityState" readonly />
-          <div class="tw-valid-icon" *ngIf="isValid('cityState')">✓</div>
         </div>
+
       </div>
     </div>
 
-    <!-- PROPOSER DETAILS -->
+    <!-- ============================================================
+         PROPOSER DETAILS
+    ============================================================ -->
     <div class="tw-section-card">
       <h4 class="tw-section-title">Proposer Details</h4>
 
       <!-- Row 1 -->
       <div class="tw-row-4">
+
+        <!-- Proposer Name -->
         <div class="tw-field">
-          <label [class.tw-label-valid]="isValid('proposerName')">
-            Proposer Name <span class="text-red-600">*</span>
-          </label>
+          <label>Proposer Name <span class="text-red-600">*</span></label>
           <input class="tw-input bg-gray-100" [(ngModel)]="proposalData.proposerName" readonly />
-          <div class="tw-error" *ngIf="fieldErrors.proposerName">{{ fieldErrors.proposerName }}</div>
-          <div class="tw-valid-icon" *ngIf="isValid('proposerName')">✓</div>
         </div>
 
+        <!-- Tenure -->
         <div class="tw-field">
-          <label [class.tw-label-valid]="isValid('selectedTenure')">
-            Policy Tenure <span class="text-red-600">*</span>
-          </label>
+          <label>Policy Tenure <span class="text-red-600">*</span></label>
           <select class="tw-input bg-gray-100" [(ngModel)]="proposalData.selectedTenure" readonly>
             <option value="1">1 Year</option>
             <option value="2">2 Years</option>
             <option value="3">3 Years</option>
-            <option value="3">4 Year</option>
-            <option value="3">5 Year</option>
           </select>
-          <div class="tw-valid-icon" *ngIf="isValid('selectedTenure')">✓</div>
         </div>
 
+        <!-- Adult Counter -->
         <div class="tw-field">
           <label>Adult</label>
           <div class="tw-counter">
             <div class="tw-counter-left">
-              <img src="../../../assets/adult.png" class="w-5 h-5" alt="">
+              <img src="../../../assets/adult.png" class="w-5 h-5" />
               <span class="tw-counter-title">Adult</span>
             </div>
             <div class="tw-counter-controls">
@@ -149,11 +134,12 @@
           </div>
         </div>
 
+        <!-- Child Counter -->
         <div class="tw-field">
           <label>Child</label>
           <div class="tw-counter bg-[#e9f7ff]">
             <div class="tw-counter-left">
-              <img src="../../../assets/child.png" class="w-5 h-5" alt="">
+              <img src="../../../assets/child.png" class="w-5 h-5" />
               <span class="tw-counter-title">Child</span>
             </div>
             <div class="tw-counter-controls">
@@ -163,84 +149,113 @@
             </div>
           </div>
         </div>
+
       </div>
 
       <!-- Row 2 -->
       <div class="tw-row-4">
-        <div class="tw-field">
-          <label [class.tw-label-valid]="isValid('proposerDOB')">
-            DOB <span class="text-red-600">*</span>
-          </label>
-          <input type="date" class="tw-input" [(ngModel)]="proposalData.proposerDOB" [max]="today"
-                 placeholder="Select date" (blur)="validateDOB()" />
-          <div class="tw-error" *ngIf="fieldErrors.proposerDOB">{{ fieldErrors.proposerDOB }}</div>
-          <div class="tw-valid-icon" *ngIf="isValid('proposerDOB')">✓</div>
-        </div>
 
-        <div class="tw-field">
-          <label [class.tw-label-valid]="isValid('proposerGender')">
-            Gender <span class="text-red-600">*</span>
-          </label>
+<!-- DOB -->
+<div class="tw-field"
+     [ngClass]="{'tw-valid': isDobValid, 'tw-invalid': isDobInvalid}">
+
+  <label>Date of Birth *</label>
+
+  <input
+    type="date"
+    class="tw-input"
+    [(ngModel)]="proposalData.proposerDOB"
+    [max]="today"
+    [min]="minAdultDate"
+    (change)="validateDOB()"
+  />
+
+  <div *ngIf="fieldErrors.proposerDOB" class="tw-error">
+    {{ fieldErrors.proposerDOB }}
+  </div>
+
+</div>
+
+
+        <!-- Gender -->
+        <div class="tw-field" [ngClass]="{ 'tw-invalid': fieldErrors.proposerGender }">
+          <label>Gender <span class="text-red-600">*</span></label>
+
           <div class="tw-radio-row">
-            <label><input type="radio" name="g1" value="Male" [(ngModel)]="proposalData.proposerGender" /> Male</label>
-            <label><input type="radio" name="g1" value="Female" [(ngModel)]="proposalData.proposerGender" /> Female</label>
-            <label><input type="radio" name="g1" value="Others" [(ngModel)]="proposalData.proposerGender" /> Others</label>
+            <label><input type="radio" name="g1" value="Male"
+                [(ngModel)]="proposalData.proposerGender" /> Male</label>
+
+            <label><input type="radio" name="g1" value="Female"
+                [(ngModel)]="proposalData.proposerGender" /> Female</label>
+
+            <label><input type="radio" name="g1" value="Others"
+                [(ngModel)]="proposalData.proposerGender" /> Others</label>
           </div>
-          <div class="tw-error" *ngIf="fieldErrors.proposerGender">{{ fieldErrors.proposerGender }}</div>
-          <div class="tw-valid-icon" *ngIf="isValid('proposerGender')">✓</div>
+
+          <div class="tw-error" *ngIf="fieldErrors.proposerGender">
+            {{ fieldErrors.proposerGender }}
+          </div>
         </div>
 
+        <!-- Phone -->
         <div class="tw-field">
-          <label [class.tw-label-valid]="isValid('proposerPhone')">
-            Phone <span class="text-red-600">*</span>
-          </label>
-          <input maxlength="10" class="tw-input bg-gray-100" [(ngModel)]="proposalData.proposerPhone" readonly />
-          <div class="tw-error" *ngIf="fieldErrors.proposerPhone">{{ fieldErrors.proposerPhone }}</div>
-          <div class="tw-valid-icon" *ngIf="isValid('proposerPhone')">✓</div>
+          <label>Phone <span class="text-red-600">*</span></label>
+          <input maxlength="10" class="tw-input bg-gray-100"
+            [(ngModel)]="proposalData.proposerPhone" readonly />
         </div>
 
-        <div class="tw-field">
-          <label [class.tw-label-valid]="isValid('proposerEmail')">
-            Email ID <span class="text-red-600">*</span>
-          </label>
-          <input class="tw-input" type="email" maxlength="50" placeholder="example@domain.com"
-                 [(ngModel)]="proposalData.proposerEmail" (blur)="validateEmail()" />
-          <div class="tw-error" *ngIf="fieldErrors.proposerEmail">{{ fieldErrors.proposerEmail }}</div>
-          <div class="tw-valid-icon" *ngIf="isValid('proposerEmail')">✓</div>
+        <!-- Email -->
+        <div class="tw-field"
+          [ngClass]="{ 'tw-valid': isValid('proposerEmail'), 'tw-invalid': fieldErrors.proposerEmail }">
+
+          <label>Email ID <span class="text-red-600">*</span></label>
+
+          <input class="tw-input"
+            type="email"
+            maxlength="50"
+            placeholder="example@domain.com"
+            [(ngModel)]="proposalData.proposerEmail"
+            (input)="validateEmail()"
+            (blur)="validateEmail()" />
+
+          <div class="tw-error" *ngIf="fieldErrors.proposerEmail">
+            {{ fieldErrors.proposerEmail }}
+          </div>
         </div>
+
       </div>
 
       <!-- Row 3 -->
       <div class="tw-row-4">
+
+        <!-- Sum Insured -->
         <div class="tw-field">
-          <label [class.tw-label-valid]="isValid('sumInsured')">
-            Sum Insured <span class="text-red-600">*</span>
-          </label>
+          <label>Sum Insured <span class="text-red-600">*</span></label>
           <select class="tw-input bg-gray-100" [(ngModel)]="proposalData.sumInsured" readonly>
             <option value="">Select Sum</option>
             <option value="200000">₹2 Lakh</option>
             <option value="300000">₹3 Lakh</option>
-            <option value="400000">₹4 Lakh</option>
             <option value="500000">₹5 Lakh</option>
-            <option value="700000">₹7 Lakh</option>
             <option value="1000000">₹10 Lakh</option>
-            <option value="1500000">₹15 Lakh</option>
-            <option value="2000000">₹20 Lakh</option>
-            <option value="2500000">₹25 Lakh</option>
-            <option value="5000000">₹50 Lakh</option>
-            <option value="10000000">₹1 Crore</option>
           </select>
-          <div class="tw-error" *ngIf="fieldErrors.sumInsured">{{ fieldErrors.sumInsured }}</div>
-          <div class="tw-valid-icon" *ngIf="isValid('sumInsured')">✓</div>
         </div>
+
         <div></div><div></div><div></div>
+
       </div>
+
     </div>
 
-    <!-- ADDITIONAL DETAILS -->
+
+    <!-- ============================================================
+         ADDITIONAL DETAILS
+    ============================================================ -->
     <div class="tw-section-card">
       <h4 class="tw-section-title">Additional Details</h4>
+
       <div class="tw-row-4">
+
+        <!-- Income -->
         <div class="tw-field">
           <label>Applicant Annual Income</label>
           <select class="tw-input" [(ngModel)]="proposalData.annualIncome">
@@ -254,6 +269,7 @@
           </select>
         </div>
 
+        <!-- NRI Discount -->
         <div class="tw-field">
           <label>Opt for NRI Discount?</label>
           <div class="tw-radio-row">
@@ -262,6 +278,7 @@
           </div>
         </div>
 
+        <!-- Include self -->
         <div class="tw-field">
           <label>Include Yourself?</label>
           <div class="tw-radio-row">
@@ -270,6 +287,7 @@
           </div>
         </div>
 
+        <!-- Bureau discount -->
         <div class="tw-field">
           <label>Discount Based on Bureau?</label>
           <div class="tw-radio-row">
@@ -277,46 +295,71 @@
             <label><input type="radio" value="no" name="bureau" [(ngModel)]="proposalData.bureauDiscount" /> No</label>
           </div>
         </div>
+
       </div>
     </div>
 
-    <!-- KYC DETAILS -->
+    <!-- ============================================================
+         KYC DETAILS  (Aadhaar + PAN)
+    ============================================================ -->
     <div class="tw-section-card">
       <h4 class="tw-section-title">KYC Details</h4>
-      <div class="tw-row-4">
-        <div class="tw-field">
-          <label [class.tw-label-valid]="isValid('aadharNumber')">
-            Aadhaar Card Number <span class="text-red-600">*</span>
-          </label>
-          <input maxlength="12" class="tw-input" placeholder="Enter 12-digit Aadhaar"
-                 (keydown)="allowAadhaarInput($event)"
-                 [(ngModel)]="proposalData.aadharNumber"
-                 (blur)="validateAadhaar()" />
-          <div class="tw-error" *ngIf="fieldErrors.aadharNumber">{{ fieldErrors.aadharNumber }}</div>
-          <div class="tw-valid-icon" *ngIf="isValid('aadharNumber')">✓</div>
-        </div>
 
-        <div class="tw-field">
-          <label [class.tw-label-valid]="isValid('panNumber')">
-            PAN Card <span class="text-red-600">*</span>
-          </label>
-          <input maxlength="10" class="tw-input uppercase" placeholder="ABCDE1234F"
-                 [(ngModel)]="proposalData.panNumber"
-                 (input)="onPanChange()"
-                 (blur)="validatePan()" />
-          <div class="tw-error" *ngIf="fieldErrors.panNumber">{{ fieldErrors.panNumber }}</div>
-          <div class="tw-valid-icon" *ngIf="isValid('panNumber')">✓</div>
-        </div>
+      <div class="tw-row-4">
+
+        <!-- Aadhaar -->
+ <div class="tw-field"
+     [ngClass]="{'tw-valid': isAadharFieldValid, 'tw-invalid': isAadharFieldInvalid}">
+
+  <label>Aadhaar Card Number *</label>
+
+  <input
+    type="text"
+    maxlength="12"
+    class="tw-input"
+    [(ngModel)]="proposalData.aadharNumber"
+    (input)="validateAadhaar()"
+  />
+
+  <div *ngIf="fieldErrors.aadharNumber" class="tw-error">
+    {{ fieldErrors.aadharNumber }}
+  </div>
+
+</div>
+
+<!-- PanCard -->
+<div class="tw-field"
+     [ngClass]="{'tw-valid': isPanFieldValid, 'tw-invalid': isPanFieldInvalid}">
+
+  <label>PAN Card *</label>
+
+  <input
+    type="text"
+    maxlength="10"
+    class="tw-input"
+    [(ngModel)]="proposalData.panNumber"
+    (input)="validatePan()"
+  />
+
+  <div *ngIf="fieldErrors.panNumber" class="tw-error">
+    {{ fieldErrors.panNumber }}
+  </div>
+
+</div>
+
+
       </div>
 
-      <!-- NAV -->
+      <!-- NAVIGATION -->
       <div class="tw-nav-btns">
         <button class="tw-btn-secondary" disabled>Previous</button>
         <button class="tw-btn-primary" (click)="nextStep()">Next</button>
       </div>
+
     </div>
 
-  </div>
+  </div> <!-- END OF STEP 1 -->
+
 
   <!-- ============================================================
        STEP 2 : INSURED MEMBERS
@@ -326,6 +369,7 @@
     <!-- INSURED MEMBERS HEADER -->
     <div class="tw-section-card mb-4">
       <h4 class="tw-section-title">Insured Members</h4>
+
       <div class="flex gap-6 text-sm font-semibold text-gray-700">
         <div>Adults: {{ adultCount }}</div>
         <div>Children: {{ childCount }}</div>
@@ -333,17 +377,23 @@
       </div>
     </div>
 
-    <!-- ADULT MEMBERS -->
+    <!-- ============================================================
+         ADULT MEMBERS
+    ============================================================ -->
     <div *ngFor="let adult of adults; let i = index" class="tw-section-card mb-4">
+
       <h4 class="tw-section-title">Adult {{ i + 1 }}</h4>
 
-      <!-- Relationship, Title, Name, DOB -->
+      <!-- Row 1 -->
       <div class="tw-row-4">
-        <div class="tw-field">
-          <label [class.tw-label-valid]="isMemberValid(adult, 'relationship')">
-            Relationship <span class="text-red-600">*</span>
-          </label>
-          <select class="tw-input" [(ngModel)]="adult.relationship" (change)="validateMember(adult)">
+
+        <!-- Relationship -->
+        <div class="tw-field" [ngClass]="{ 'tw-invalid': adult.errors?.relationship }">
+          <label>Relationship <span class="text-red-600">*</span></label>
+
+          <select class="tw-input"
+            [(ngModel)]="adult.relationship"
+            (change)="validateMember(adult)">
             <option value="Self">Self</option>
             <option value="Spouse">Spouse</option>
             <option value="Son">Son</option>
@@ -351,558 +401,566 @@
             <option value="Father">Father</option>
             <option value="Mother">Mother</option>
           </select>
-          <div class="tw-valid-icon" *ngIf="isMemberValid(adult, 'relationship')">✓</div>
+
+          <div class="tw-error" *ngIf="adult.errors?.relationship">
+            {{ adult.errors.relationship }}
+          </div>
         </div>
 
-        <div class="tw-field">
-          <label [class.tw-label-valid]="isMemberValid(adult, 'title')">
-            Title <span class="text-red-600">*</span>
-          </label>
-          <select class="tw-input" [(ngModel)]="adult.title" (change)="validateMember(adult)">
+        <!-- Title -->
+        <div class="tw-field" [ngClass]="{ 'tw-invalid': adult.errors?.title }">
+          <label>Title <span class="text-red-600">*</span></label>
+
+          <select class="tw-input"
+            [(ngModel)]="adult.title"
+            (change)="validateMember(adult)">
             <option value="Mr">Mr</option>
             <option value="Ms">Ms</option>
             <option value="Mrs">Mrs</option>
           </select>
-          <div class="tw-valid-icon" *ngIf="isMemberValid(adult, 'title')">✓</div>
+
+          <div class="tw-error" *ngIf="adult.errors?.title">
+            {{ adult.errors.title }}
+          </div>
         </div>
 
-        <div class="tw-field">
-          <label [class.tw-label-valid]="isMemberValid(adult, 'fullName')">
-            Full Name <span class="text-red-600">*</span>
-          </label>
-          <input class="tw-input" placeholder="Enter full name"
-                 [(ngModel)]="adult.fullName"
-                 (blur)="validateMember(adult)" />
-          <div class="tw-error" *ngIf="adult.errors?.fullName">{{ adult.errors.fullName }}</div>
-          <div class="tw-valid-icon" *ngIf="isMemberValid(adult, 'fullName')">✓</div>
+        <!-- Full Name -->
+        <div class="tw-field" [ngClass]="{ 'tw-invalid': adult.errors?.fullName, 'tw-valid': adult.valid?.fullName }">
+          <label>Full Name <span class="text-red-600">*</span></label>
+
+          <input class="tw-input"
+            placeholder="Enter full name"
+            [(ngModel)]="adult.fullName"
+            (input)="validateMember(adult)"
+            (blur)="validateMember(adult)" />
+
+          <div class="tw-error" *ngIf="adult.errors?.fullName">
+            {{ adult.errors.fullName }}
+          </div>
         </div>
 
-        <div class="tw-field">
-          <label [class.tw-label-valid]="isMemberValid(adult, 'dob')">
-            Date of Birth <span class="text-red-600">*</span>
-          </label>
-          <input type="date" class="tw-input" [max]="today" placeholder="Select date"
-                 [(ngModel)]="adult.dob" (blur)="validateMember(adult)" />
-          <div class="tw-error" *ngIf="adult.errors?.dob">{{ adult.errors.dob }}</div>
-          <div class="tw-valid-icon" *ngIf="isMemberValid(adult, 'dob')">✓</div>
+        <!-- DOB -->
+        <div class="tw-field" [ngClass]="{ 'tw-invalid': adult.errors?.dob, 'tw-valid': adult.valid?.dob }">
+          <label>Date of Birth <span class="text-red-600">*</span></label>
+
+          <input type="date"
+            class="tw-input"
+            [max]="today"
+            [(ngModel)]="adult.dob"
+            (input)="validateMember(adult)"
+            (blur)="validateMember(adult)" />
+
+          <div class="tw-error" *ngIf="adult.errors?.dob">
+            {{ adult.errors.dob }}
+          </div>
         </div>
+
       </div>
 
-      <!-- Height, Weight, ABHA ID -->
+      <!-- Row 2: Height, Weight, ABHA, Multi-select -->
       <div class="tw-row-4">
-        <div class="tw-field">
-          <label [class.tw-label-valid]="isMemberValid(adult, 'height')">
-            Height (cm) <span class="text-red-600">*</span>
-          </label>
-          <input class="tw-input" placeholder="e.g., 170" maxlength="3"
-                 (keydown)="blockNonDigits($event)"
-                 [(ngModel)]="adult.height"
-                 (blur)="validateMember(adult)" />
-          <div class="tw-error" *ngIf="adult.errors?.height">{{ adult.errors.height }}</div>
-          <div class="tw-valid-icon" *ngIf="isMemberValid(adult, 'height')">✓</div>
+
+        <!-- Height -->
+        <div class="tw-field"
+          [ngClass]="{ 'tw-invalid': adult.errors?.height, 'tw-valid': adult.valid?.height }">
+
+          <label>Height (cm) <span class="text-red-600">*</span></label>
+
+          <input class="tw-input"
+            maxlength="3"
+            placeholder="e.g., 170"
+            (keydown)="blockNonDigits($event)"
+            [(ngModel)]="adult.height"
+            (input)="validateMember(adult)"
+            (blur)="validateMember(adult)" />
+
+          <div class="tw-error" *ngIf="adult.errors?.height">
+            {{ adult.errors.height }}
+          </div>
         </div>
 
-        <div class="tw-field">
-          <label [class.tw-label-valid]="isMemberValid(adult, 'weight')">
-            Weight (kg) <span class="text-red-600">*</span>
-          </label>
-          <input class="tw-input" placeholder="e.g., 65" maxlength="3"
-                 (keydown)="blockNonDigits($event)"
-                 [(ngModel)]="adult.weight"
-                 (blur)="validateMember(adult)" />
-          <div class="tw-error" *ngIf="adult.errors?.weight">{{ adult.errors.weight }}</div>
-          <div class="tw-valid-icon" *ngIf="isMemberValid(adult, 'weight')">✓</div>
+        <!-- Weight -->
+        <div class="tw-field"
+          [ngClass]="{ 'tw-invalid': adult.errors?.weight, 'tw-valid': adult.valid?.weight }">
+
+          <label>Weight (kg) <span class="text-red-600">*</span></label>
+
+          <input class="tw-input"
+            maxlength="3"
+            placeholder="e.g., 65"
+            (keydown)="blockNonDigits($event)"
+            [(ngModel)]="adult.weight"
+            (input)="validateMember(adult)"
+            (blur)="validateMember(adult)" />
+
+          <div class="tw-error" *ngIf="adult.errors?.weight">
+            {{ adult.errors.weight }}
+          </div>
         </div>
 
+        <!-- ABHA -->
         <div class="tw-field">
           <label>ABHA ID</label>
           <input class="tw-input" placeholder="Enter ABHA ID" [(ngModel)]="adult.abhaId" />
         </div>
 
- <div class="tw-field tw-multi-field">
-  <label>Pre-existing disease (if any)</label>
+        <!-- Diseases Multi-select -->
+        <div class="tw-field tw-multi-field">
+          <label>Pre-existing disease (if any)</label>
 
-  <!-- main box -->
-  <div
-    class="tw-multi-box"
-    [ngClass]="{ 'tw-multi-box--disabled': adult.diseaseLocked }"
-    (click)="toggleDropdown(adult)"
-  >
-    <span>
-      {{ adult.selectedDiseases?.length ? adult.selectedDiseases.join(', ') : 'Select disease' }}
-    </span>
-    <svg
-      class="w-4 h-4 transition-transform"
-      [class.rotate]="adult.dropdownOpen"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M19 9l-7 7-7-7"
-      />
-    </svg>
-  </div>
+          <div class="tw-multi-box"
+            [ngClass]="{ 'tw-multi-box--disabled': adult.diseaseLocked }"
+            (click)="toggleDropdown(adult)">
 
-  <!-- floating dropdown -->
-  <div class="tw-multi-dropdown" *ngIf="adult.dropdownOpen">
-    <div
-      class="tw-multi-option tw-none-option"
-      (click)="selectNone(adult, $event)"
-    >
-      <input
-        type="checkbox"
-        [checked]="adult.selectedDiseases?.includes('None of these')"
-      />
-      <span>None of these</span>
-    </div>
+            <span>
+              {{ adult.selectedDiseases?.length
+                  ? adult.selectedDiseases.join(', ')
+                  : 'Select disease' }}
+            </span>
 
-    <div
-      *ngFor="let disease of diseaseList"
-      class="tw-multi-option"
-      (click)="toggleDisease(adult, disease, $event)"
-    >
-      <input
-        type="checkbox"
-        [checked]="adult.selectedDiseases?.includes(disease)"
-      />
-      <span>{{ disease }}</span>
-    </div>
-  </div>
-</div>
+            <svg class="w-4 h-4 transition-transform"
+              [class.rotate]="adult.dropdownOpen"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
 
+          <div class="tw-multi-dropdown" *ngIf="adult.dropdownOpen">
+
+            <div class="tw-multi-option tw-none-option"
+              (click)="selectNone(adult, $event)">
+              <input type="checkbox"
+                [checked]="adult.selectedDiseases?.includes('None of these')" />
+              <span>None of these</span>
+            </div>
+
+            <div *ngFor="let disease of diseaseList"
+              class="tw-multi-option"
+              (click)="toggleDisease(adult, disease, $event)">
+
+              <input type="checkbox"
+                [checked]="adult.selectedDiseases?.includes(disease)" />
+              <span>{{ disease }}</span>
+            </div>
+
+          </div>
+
+        </div>
 
       </div>
 
-      <!-- Pre-existing Diseases -->
-      <!-- <div class="mt-4">
-        <label class="block text-sm font-semibold text-gray-700 mb-2">
-          Select if any pre-existing diseases
-        </label>
+    </div> <!-- END ADULT LOOP -->
 
-        <div class="tw-multi-box" (click)="toggleDropdown(adult)">
-          <span>
-            {{ adult.selectedDiseases?.length ? adult.selectedDiseases.join(', ') : 'Select Disease' }}
-          </span>
-          <svg class="w-4 h-4 transition-transform" [class.rotate]="adult.dropdownOpen"
-               fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-          </svg>
-        </div>
 
-        <div class="tw-multi-dropdown" *ngIf="adult.dropdownOpen">
-          <div class="tw-multi-option tw-none-option" (click)="selectNone(adult)">
-            <input type="checkbox" [checked]="adult.selectedDiseases?.includes('None of these')" />
-            <span>None of these</span>
-          </div>
-
-          <div *ngFor="let disease of diseaseList" class="tw-multi-option"
-               (click)="toggleDisease(adult, disease)">
-            <input type="checkbox" [checked]="adult.selectedDiseases?.includes(disease)" />
-            <span>{{ disease }}</span>
-          </div>
-        </div>
-      </div> -->
-    </div>
-
-    <!-- CHILD MEMBERS -->
+    <!-- ============================================================
+         CHILD MEMBERS
+    ============================================================ -->
     <div *ngFor="let child of children; let i = index" class="tw-section-card mb-4">
+
       <h4 class="tw-section-title">Child {{ i + 1 }}</h4>
 
+      <!-- Row 1 -->
       <div class="tw-row-4">
-        <div class="tw-field">
-          <label [class.tw-label-valid]="isMemberValid(child, 'relationship')">
-            Relationship <span class="text-red-600">*</span>
-          </label>
-          <select class="tw-input" [(ngModel)]="child.relationship" (change)="validateMember(child)">
+
+        <!-- Relationship -->
+        <div class="tw-field" [ngClass]="{ 'tw-invalid': child.errors?.relationship }">
+          <label>Relationship <span class="text-red-600">*</span></label>
+
+          <select class="tw-input"
+            [(ngModel)]="child.relationship"
+            (change)="validateMember(child)">
             <option value="Son">Son</option>
             <option value="Daughter">Daughter</option>
           </select>
-          <div class="tw-valid-icon" *ngIf="isMemberValid(child, 'relationship')">✓</div>
+
+          <div class="tw-error" *ngIf="child.errors?.relationship">
+            {{ child.errors.relationship }}
+          </div>
         </div>
 
-        <div class="tw-field">
-          <label [class.tw-label-valid]="isMemberValid(child, 'title')">
-            Title <span class="text-red-600">*</span>
-          </label>
-          <select class="tw-input" [(ngModel)]="child.title" (change)="validateMember(child)">
+        <!-- Title -->
+        <div class="tw-field" [ngClass]="{ 'tw-invalid': child.errors?.title }">
+          <label>Title <span class="text-red-600">*</span></label>
+
+          <select class="tw-input"
+            [(ngModel)]="child.title"
+            (change)="validateMember(child)">
             <option value="Master">Master</option>
             <option value="Miss">Miss</option>
           </select>
-          <div class="tw-valid-icon" *ngIf="isMemberValid(child, 'title')">✓</div>
+
+          <div class="tw-error" *ngIf="child.errors?.title">
+            {{ child.errors.title }}
+          </div>
         </div>
 
-        <div class="tw-field">
-          <label [class.tw-label-valid]="isMemberValid(child, 'fullName')">
-            Full Name <span class="text-red-600">*</span>
-          </label>
-          <input class="tw-input" placeholder="Enter full name"
-                 [(ngModel)]="child.fullName"
-                 (blur)="validateMember(child)" />
-          <div class="tw-error" *ngIf="child.errors?.fullName">{{ child.errors.fullName }}</div>
-          <div class="tw-valid-icon" *ngIf="isMemberValid(child, 'fullName')">✓</div>
+        <!-- Full Name -->
+        <div class="tw-field"
+          [ngClass]="{ 'tw-invalid': child.errors?.fullName, 'tw-valid': child.valid?.fullName }">
+
+          <label>Full Name <span class="text-red-600">*</span></label>
+
+          <input class="tw-input"
+            placeholder="Enter full name"
+            [(ngModel)]="child.fullName"
+            (input)="validateMember(child)"
+            (blur)="validateMember(child)" />
+
+          <div class="tw-error" *ngIf="child.errors?.fullName">
+            {{ child.errors.fullName }}
+          </div>
         </div>
 
-        <div class="tw-field">
-          <label [class.tw-label-valid]="isMemberValid(child, 'dob')">
-            Date of Birth <span class="text-red-600">*</span>
-          </label>
-          <input type="date" class="tw-input" [max]="today" placeholder="Select date"
-                 [(ngModel)]="child.dob" (blur)="validateMember(child)" />
-          <div class="tw-error" *ngIf="child.errors?.dob">{{ child.errors.dob }}</div>
-          <div class="tw-valid-icon" *ngIf="isMemberValid(child, 'dob')">✓</div>
+        <!-- DOB -->
+        <div class="tw-field"
+          [ngClass]="{ 'tw-invalid': child.errors?.dob, 'tw-valid': child.valid?.dob }">
+
+          <label>Date of Birth <span class="text-red-600">*</span></label>
+
+          <input type="date"
+            class="tw-input"
+            [max]="today"
+            [(ngModel)]="child.dob"
+            (input)="validateMember(child)"
+            (blur)="validateMember(child)" />
+
+          <div class="tw-error" *ngIf="child.errors?.dob">
+            {{ child.errors.dob }}
+          </div>
         </div>
+
       </div>
 
+      <!-- Row 2 -->
       <div class="tw-row-4">
-        <div class="tw-field">
-          <label [class.tw-label-valid]="isMemberValid(child, 'height')">
-            Height (cm) <span class="text-red-600">*</span>
-          </label>
-          <input class="tw-input" placeholder="e.g., 120" maxlength="3"
-                 (keydown)="blockNonDigits($event)"
-                 [(ngModel)]="child.height"
-                 (blur)="validateMember(child)" />
-          <div class="tw-error" *ngIf="child.errors?.height">{{ child.errors.height }}</div>
-          <div class="tw-valid-icon" *ngIf="isMemberValid(child, 'height')">✓</div>
+
+        <!-- Height -->
+        <div class="tw-field"
+          [ngClass]="{ 'tw-invalid': child.errors?.height, 'tw-valid': child.valid?.height }">
+
+          <label>Height (cm) <span class="text-red-600">*</span></label>
+
+          <input class="tw-input"
+            maxlength="3"
+            placeholder="e.g., 120"
+            (keydown)="blockNonDigits($event)"
+            [(ngModel)]="child.height"
+            (input)="validateMember(child)"
+            (blur)="validateMember(child)" />
+
+          <div class="tw-error" *ngIf="child.errors?.height">
+            {{ child.errors.height }}
+          </div>
         </div>
 
-        <div class="tw-field">
-          <label [class.tw-label-valid]="isMemberValid(child, 'weight')">
-            Weight (kg) <span class="text-red-600">*</span>
-          </label>
-          <input class="tw-input" placeholder="e.g., 25" maxlength="3"
-                 (keydown)="blockNonDigits($event)"
-                 [(ngModel)]="child.weight"
-                 (blur)="validateMember(child)" />
-          <div class="tw-error" *ngIf="child.errors?.weight">{{ child.errors.weight }}</div>
-          <div class="tw-valid-icon" *ngIf="isMemberValid(child, 'weight')">✓</div>
+        <!-- Weight -->
+        <div class="tw-field"
+          [ngClass]="{ 'tw-invalid': child.errors?.weight, 'tw-valid': child.valid?.weight }">
+
+          <label>Weight (kg) <span class="text-red-600">*</span></label>
+
+          <input class="tw-input"
+            maxlength="3"
+            placeholder="e.g., 25"
+            (keydown)="blockNonDigits($event)"
+            [(ngModel)]="child.weight"
+            (input)="validateMember(child)"
+            (blur)="validateMember(child)" />
+
+          <div class="tw-error" *ngIf="child.errors?.weight">
+            {{ child.errors.weight }}
+          </div>
         </div>
 
+        <!-- ABHA -->
         <div class="tw-field">
           <label>ABHA ID</label>
           <input class="tw-input" placeholder="Enter ABHA ID" [(ngModel)]="child.abhaId" />
         </div>
 
-    <div class="tw-field tw-multi-field">
-  <label>Pre-existing disease (if any)</label>
+        <!-- Diseases -->
+        <div class="tw-field tw-multi-field">
 
-  <div
-    class="tw-multi-box"
-    [ngClass]="{ 'tw-multi-box--disabled': child.diseaseLocked }"
-    (click)="toggleDropdown(child)"
-  >
-    <span>
-      {{ child.selectedDiseases?.length ? child.selectedDiseases.join(', ') : 'Select disease' }}
-    </span>
-    <svg
-      class="w-4 h-4 transition-transform"
-      [class.rotate]="child.dropdownOpen"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M19 9l-7 7-7-7"
-      />
-    </svg>
-  </div>
+          <label>Pre-existing disease (if any)</label>
 
-  <div class="tw-multi-dropdown" *ngIf="child.dropdownOpen">
-    <div
-      class="tw-multi-option tw-none-option"
-      (click)="selectNone(child, $event)"
-    >
-      <input
-        type="checkbox"
-        [checked]="child.selectedDiseases?.includes('None of these')"
-      />
-      <span>None of these</span>
-    </div>
+          <div class="tw-multi-box"
+            [ngClass]="{ 'tw-multi-box--disabled': child.diseaseLocked }"
+            (click)="toggleDropdown(child)">
 
-    <div
-      *ngFor="let disease of diseaseList"
-      class="tw-multi-option"
-      (click)="toggleDisease(child, disease, $event)"
-    >
-      <input
-        type="checkbox"
-        [checked]="child.selectedDiseases?.includes(disease)"
-      />
-      <span>{{ disease }}</span>
-    </div>
-  </div>
-</div>
+            <span>
+              {{ child.selectedDiseases?.length
+                  ? child.selectedDiseases.join(', ')
+                  : 'Select disease' }}
+            </span>
 
+            <svg class="w-4 h-4 transition-transform"
+              [class.rotate]="child.dropdownOpen"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+
+          <div class="tw-multi-dropdown" *ngIf="child.dropdownOpen">
+
+            <div class="tw-multi-option tw-none-option"
+              (click)="selectNone(child, $event)">
+              <input type="checkbox"
+                [checked]="child.selectedDiseases?.includes('None of these')" />
+              <span>None of these</span>
+            </div>
+
+            <div *ngFor="let disease of diseaseList"
+              class="tw-multi-option"
+              (click)="toggleDisease(child, disease, $event)">
+
+              <input type="checkbox"
+                [checked]="child.selectedDiseases?.includes(disease)" />
+              <span>{{ disease }}</span>
+            </div>
+
+          </div>
+
+        </div>
 
       </div>
 
+    </div> <!-- END CHILD LOOP -->
 
-    </div>
 
-    <!-- NAVIGATION -->
+    <!-- STEP 2 NAVIGATION -->
     <div class="tw-nav-btns">
       <button class="tw-btn-secondary" (click)="previousStep()">Previous</button>
       <button class="tw-btn-primary" (click)="nextStep()">Next</button>
     </div>
 
-  </div>
-
-  <!-- ============================================================
-       STEP 3 : SUMMARY
-  ============================================================ -->
-  <div *ngIf="currentStep === 3" class="tw-step-content">
-
-    <!-- PROPOSAL SUMMARY -->
-    <div class="tw-section-card">
-      <h4 class="tw-section-title">Proposal Summary</h4>
-      <div class="tw-row-4">
-        <div class="tw-summary-card">
-          <label>Product Name</label>
-          <p>{{ proposalData.productName }}</p>
-        </div>
-        <div class="tw-summary-card">
-          <label>Product Type</label>
-          <p>{{ proposalData.selectedProductType === 'new' ? 'New' : 'Portability' }}</p>
-        </div>
-        <div class="tw-summary-card">
-          <label>Pincode</label>
-          <p>{{ proposalData.pincode }}</p>
-        </div>
-        <div class="tw-summary-card">
-          <label>City & State</label>
-          <p>{{ proposalData.cityState }}</p>
-        </div>
-      </div>
-
-      <div class="tw-row-4">
-        <div class="tw-summary-card">
-          <label>Sum Insured</label>
-          <p>₹ {{ proposalData.sumInsured | number }}</p>
-        </div>
-        <div class="tw-summary-card">
-          <label>Policy Tenure</label>
-          <p>{{ proposalData.selectedTenure }} Year</p>
-        </div>
-        <div class="tw-summary-card">
-          <label>Annual Income</label>
-          <p>{{ getIncomeRangeText(proposalData.annualIncome) }}</p>
-        </div>
-        <div class="tw-summary-card">
-          <label>NRI Discount</label>
-          <p>{{ proposalData.nriDiscount === 'yes' ? 'Yes' : 'No' }}</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- PROPOSER DETAILS SUMMARY -->
-    <div class="tw-section-card">
-      <h4 class="tw-section-title">Proposer Details</h4>
-      <div class="tw-row-4">
-        <div class="tw-summary-card">
-          <label>Proposer Name</label>
-          <p>{{ proposalData.proposerName }}</p>
-        </div>
-        <div class="tw-summary-card">
-          <label>Date of Birth</label>
-          <p>{{ formatDate(proposalData.proposerDOB) }}</p>
-        </div>
-        <div class="tw-summary-card">
-          <label>Gender</label>
-          <p>{{ proposalData.proposerGender }}</p>
-        </div>
-        <div class="tw-summary-card">
-          <label>Mobile</label>
-          <p>{{ proposalData.proposerPhone }}</p>
-        </div>
-      </div>
-      <div class="tw-row-4">
-        <div class="tw-summary-card">
-          <label>Email</label>
-          <p>{{ proposalData.proposerEmail }}</p>
-        </div>
-        <div class="tw-summary-card">
-          <label>Include Self</label>
-          <p>{{ proposalData.includeSelf === 'yes' ? 'Yes' : 'No' }}</p>
-        </div>
-        <div class="tw-summary-card">
-          <label>Bureau Discount</label>
-          <p>{{ proposalData.bureauDiscount === 'yes' ? 'Yes' : 'No' }}</p>
-        </div>
-        <div class="tw-summary-card">
-          <label>Members Count</label>
-          <p>{{ adultCount + childCount }} ({{ adultCount }} Adults, {{ childCount }} Children)</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- INSURED ADULTS SUMMARY -->
-    <div *ngIf="adults.length > 0" class="tw-section-card">
-      <h4 class="tw-section-title">Insured Adults ({{ adults.length }})</h4>
-      <div class="grid md:grid-cols-2 gap-5">
-        <div *ngFor="let adult of adults; let i = index" class="tw-insured-card">
-          <h5 class="tw-insured-title">Adult {{ i + 1 }}</h5>
-
-          <div class="tw-insured-item">
-            <label>Relationship & Title</label>
-            <p>{{ adult.relationship }} ({{ adult.title }})</p>
-          </div>
-
-          <div class="tw-insured-item">
-            <label>Full Name</label>
-            <p>{{ adult.fullName }}</p>
-          </div>
-
-          <div class="tw-insured-item">
-            <label>Date of Birth</label>
-            <p>{{ formatDate(adult.dob) }}</p>
-          </div>
-
-          <div class="tw-insured-item">
-            <label>Height / Weight</label>
-            <p>{{ adult.height }} cm / {{ adult.weight }} kg</p>
-          </div>
-
-          <div class="tw-insured-item">
-            <label>ABHA ID</label>
-            <p>{{ adult.abhaId || 'Not Provided' }}</p>
-          </div>
-
-          <div class="tw-insured-item">
-            <label>ID Proof</label>
-            <p>{{ adult.memberIdProof || 'Not Provided' }}</p>
-          </div>
-
-          <div class="tw-insured-item">
-            <label>Pre-existing Diseases</label>
-            <p>{{ adult.selectedDiseases?.length ? adult.selectedDiseases.join(', ') : 'None' }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- INSURED CHILDREN SUMMARY -->
-    <div *ngIf="children.length > 0" class="tw-section-card">
-      <h4 class="tw-section-title">Insured Children ({{ children.length }})</h4>
-      <div class="grid md:grid-cols-2 gap-5">
-        <div *ngFor="let child of children; let i = index" class="tw-insured-card">
-          <h5 class="tw-insured-title">Child {{ i + 1 }}</h5>
-
-          <div class="tw-insured-item">
-            <label>Relationship & Title</label>
-            <p>{{ child.relationship }} ({{ child.title }})</p>
-          </div>
-
-          <div class="tw-insured-item">
-            <label>Full Name</label>
-            <p>{{ child.fullName }}</p>
-          </div>
-
-          <div class="tw-insured-item">
-            <label>Date of Birth</label>
-            <p>{{ formatDate(child.dob) }}</p>
-          </div>
-
-          <div class="tw-insured-item">
-            <label>Height / Weight</label>
-            <p>{{ child.height }} cm / {{ child.weight }} kg</p>
-          </div>
-
-          <div class="tw-insured-item">
-            <label>ABHA ID</label>
-            <p>{{ child.abhaId || 'Not Provided' }}</p>
-          </div>
-
-          <div class="tw-insured-item">
-            <label>ID Proof</label>
-            <p>{{ child.memberIdProof || 'Not Provided' }}</p>
-          </div>
-
-          <div class="tw-insured-item">
-            <label>Pre-existing Diseases</label>
-            <p>{{ child.selectedDiseases?.length ? child.selectedDiseases.join(', ') : 'None' }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- KYC DETAILS SUMMARY -->
-    <!-- <div class="tw-section-card">
-      <h4 class="tw-section-title">KYC Details (Proposer)</h4>
-      <div class="tw-row-4">
-        <div class="tw-summary-card">
-          <label>Aadhaar Number</label>
-          <p>{{ proposalData.aadharNumber || 'Not Provided' }}</p>
-        </div>
-        <div class="tw-summary-card">
-          <label>PAN Number</label>
-          <p>{{ proposalData.panNumber || 'Not Provided' }}</p>
-        </div>
-        <div class="tw-summary-card">
-          <label>KYC Status</label>
-          <p [class.text-green-600]="proposalData.aadharNumber && proposalData.panNumber"
-             [class.text-red-600]="!proposalData.aadharNumber || !proposalData.panNumber">
-            {{ proposalData.aadharNumber && proposalData.panNumber ? 'Complete' : 'Incomplete' }}
-          </p>
-        </div>
-        <div class="tw-summary-card">
-          <label>Verification</label>
-          <p class="text-blue-600">Pending</p>
-        </div>
-      </div>
-    </div> -->
-
-   <!-- STEP-3 NAVIGATION -->
-
-<div class="tw-nav-btns">
-  <button
-    type="button"
-    class="tw-btn-secondary"
-    (click)="previousStep()"
-  >
-    Previous
-  </button>
-
-  <button
-    type="button"
-    class="tw-btn-primary"
-    (click)="submitProposal($event)"
-  >
-    Submit Proposal
-  </button>
-</div>
-
-
-
-
-  </div>
-
+  </div> <!-- END STEP 2 -->
 
 <!-- ============================================================
-       KYC VERIFICATION POPUP (AFTER SUBMIT)
-  ============================================================ -->
+       STEP 3 : SUMMARY
+============================================================ -->
+<div *ngIf="currentStep === 3" class="tw-step-content">
+
+  <!-- PROPOSAL SUMMARY -->
+  <div class="tw-section-card">
+    <h4 class="tw-section-title">Proposal Summary</h4>
+
+    <div class="tw-row-4">
+      <div class="tw-summary-card">
+        <label>Product Name</label>
+        <p>{{ proposalData.productName }}</p>
+      </div>
+
+      <div class="tw-summary-card">
+        <label>Product Type</label>
+        <p>{{ proposalData.selectedProductType === 'new' ? 'New' : 'Portability' }}</p>
+      </div>
+
+      <div class="tw-summary-card">
+        <label>Pincode</label>
+        <p>{{ proposalData.pincode }}</p>
+      </div>
+
+      <div class="tw-summary-card">
+        <label>City & State</label>
+        <p>{{ proposalData.cityState }}</p>
+      </div>
+    </div>
+
+    <div class="tw-row-4">
+      <div class="tw-summary-card">
+        <label>Sum Insured</label>
+        <p>₹ {{ proposalData.sumInsured | number }}</p>
+      </div>
+
+      <div class="tw-summary-card">
+        <label>Policy Tenure</label>
+        <p>{{ proposalData.selectedTenure }} Year</p>
+      </div>
+
+      <div class="tw-summary-card">
+        <label>Annual Income</label>
+        <p>{{ getIncomeRangeText(proposalData.annualIncome) }}</p>
+      </div>
+
+      <div class="tw-summary-card">
+        <label>NRI Discount</label>
+        <p>{{ proposalData.nriDiscount === 'yes' ? 'Yes' : 'No' }}</p>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- PROPOSER DETAILS -->
+  <div class="tw-section-card">
+    <h4 class="tw-section-title">Proposer Details</h4>
+
+    <div class="tw-row-4">
+      <div class="tw-summary-card">
+        <label>Proposer Name</label>
+        <p>{{ proposalData.proposerName }}</p>
+      </div>
+
+      <div class="tw-summary-card">
+        <label>Date of Birth</label>
+        <p>{{ formatDate(proposalData.proposerDOB) }}</p>
+      </div>
+
+      <div class="tw-summary-card">
+        <label>Gender</label>
+        <p>{{ proposalData.proposerGender }}</p>
+      </div>
+
+      <div class="tw-summary-card">
+        <label>Mobile</label>
+        <p>{{ proposalData.proposerPhone }}</p>
+      </div>
+    </div>
+
+    <div class="tw-row-4">
+      <div class="tw-summary-card">
+        <label>Email</label>
+        <p>{{ proposalData.proposerEmail }}</p>
+      </div>
+
+      <div class="tw-summary-card">
+        <label>Include Self</label>
+        <p>{{ proposalData.includeSelf === 'yes' ? 'Yes' : 'No' }}</p>
+      </div>
+
+      <div class="tw-summary-card">
+        <label>Bureau Discount</label>
+        <p>{{ proposalData.bureauDiscount === 'yes' ? 'Yes' : 'No' }}</p>
+      </div>
+
+      <div class="tw-summary-card">
+        <label>Members Count</label>
+        <p>{{ adultCount + childCount }} ({{ adultCount }} Adults, {{ childCount }} Children)</p>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ADULTS -->
+  <div *ngIf="adults.length > 0" class="tw-section-card">
+    <h4 class="tw-section-title">Insured Adults ({{ adults.length }})</h4>
+
+    <div class="grid md:grid-cols-2 gap-5">
+      <div *ngFor="let adult of adults; let i = index" class="tw-insured-card">
+        <h5 class="tw-insured-title">Adult {{ i + 1 }}</h5>
+
+        <div class="tw-insured-item">
+          <label>Relationship & Title</label>
+          <p>{{ adult.relationship }} ({{ adult.title }})</p>
+        </div>
+
+        <div class="tw-insured-item">
+          <label>Full Name</label>
+          <p>{{ adult.fullName }}</p>
+        </div>
+
+        <div class="tw-insured-item">
+          <label>Date of Birth</label>
+          <p>{{ formatDate(adult.dob) }}</p>
+        </div>
+
+        <div class="tw-insured-item">
+          <label>Height / Weight</label>
+          <p>{{ adult.height }} cm / {{ adult.weight }} kg</p>
+        </div>
+
+        <div class="tw-insured-item">
+          <label>ABHA ID</label>
+          <p>{{ adult.abhaId || 'Not Provided' }}</p>
+        </div>
+
+        <div class="tw-insured-item">
+          <label>ID Proof</label>
+          <p>{{ adult.memberIdProof || 'Not Provided' }}</p>
+        </div>
+
+        <div class="tw-insured-item">
+          <label>Pre-existing Diseases</label>
+          <p>{{ adult.selectedDiseases?.length ? adult.selectedDiseases.join(', ') : 'None' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- CHILDREN -->
+  <div *ngIf="children.length > 0" class="tw-section-card">
+    <h4 class="tw-section-title">Insured Children ({{ children.length }})</h4>
+
+    <div class="grid md:grid-cols-2 gap-5">
+      <div *ngFor="let child of children; let i = index" class="tw-insured-card">
+        <h5 class="tw-insured-title">Child {{ i + 1 }}</h5>
+
+        <div class="tw-insured-item">
+          <label>Relationship & Title</label>
+          <p>{{ child.relationship }} ({{ child.title }})</p>
+        </div>
+
+        <div class="tw-insured-item">
+          <label>Full Name</label>
+          <p>{{ child.fullName }}</p>
+        </div>
+
+        <div class="tw-insured-item">
+          <label>Date of Birth</label>
+          <p>{{ formatDate(child.dob) }}</p>
+        </div>
+
+        <div class="tw-insured-item">
+          <label>Height / Weight</label>
+          <p>{{ child.height }} cm / {{ child.weight }} kg</p>
+        </div>
+
+        <div class="tw-insured-item">
+          <label>ABHA ID</label>
+          <p>{{ child.abhaId || 'Not Provided' }}</p>
+        </div>
+
+        <div class="tw-insured-item">
+          <label>ID Proof</label>
+          <p>{{ child.memberIdProof || 'Not Provided' }}</p>
+        </div>
+
+        <div class="tw-insured-item">
+          <label>Pre-existing Diseases</label>
+          <p>{{ child.selectedDiseases?.length ? child.selectedDiseases.join(', ') : 'None' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- NAVIGATION -->
+  <div class="tw-nav-btns">
+    <button type="button" class="tw-btn-secondary" (click)="previousStep()">Previous</button>
+    <button type="button" class="tw-btn-primary" (click)="submitProposal($event)">Submit Proposal</button>
+  </div>
+
+</div>
+
+
+<!-- KYC POPUP -->
 <div *ngIf="popupOpen" class="tw-popup-overlay">
   <div class="tw-popup-card animate-fadeIn">
+
     <img src="assets/popup.svg" class="tw-popup-img" alt="verifying" />
 
-    <h3 class="text-[18px] font-bold text-[#0b6a7e] mb-2">
-      We’re verifying your KYC details
-    </h3>
+    <h3 class="text-[18px] font-bold text-[#0b6a7e] mb-2">We’re verifying your KYC details</h3>
 
     <p class="text-[14px] text-[#3a4a53] mb-4">
-Sit tight! Once your verification is complete, we’ll send a secure payment link to your registered email so you can easily complete the process.    </p>
+      Sit tight! Once your verification is complete, we’ll send a secure payment link to your registered email.
+    </p>
 
-    <button class="tw-btn-primary mx-auto mt-2" (click)="closePopup()">
-      Go Back
-    </button>
+    <button class="tw-btn-primary mx-auto mt-2" (click)="closePopup()">Go Back</button>
   </div>
 </div>
-
-</div>
-

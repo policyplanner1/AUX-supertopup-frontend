@@ -17,6 +17,8 @@ export class ProposalForm implements OnInit {
   ----------------------------------------- */
   currentStep: number = 1;
   today: string = new Date().toISOString().split('T')[0];
+  minAdultDate: string = '';
+
   fieldErrors: any = {};
   popupOpen: boolean = false;
   step2Error: string = '';
@@ -88,11 +90,19 @@ constructor(
         this.selectedPlan?.tag ||
         '';
 
+        // Calculate minimum DOB (18 years old)
+            const today = new Date();
+            const adultYear = today.getFullYear() - 18;
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+
+            this.minAdultDate = `${adultYear}-${month}-${day}`;
+
       const planName =
         this.selectedPlan?.planName ||
         this.selectedPlan?.name ||
         '';
-
+      this.proposalData.aadharNumber = '';
       this.proposalData.productName = `${companyName} ${planName}`.trim();
     }
 
@@ -110,13 +120,14 @@ constructor(
         this.proposalData.cityState = details.city || '';
         this.proposalData.sumInsured = details.coverAmount || '';
 
-        if (data.members && data.members.length > 0) {
-          const member = data.members[0];
-          if (member.age) {
-            const year = new Date().getFullYear() - Number(member.age);
-            this.proposalData.proposerDOB = `${year}-01-01`;
-          }
-        }
+        // if (data.members && data.members.length > 0) {
+        //   const member = data.members[0];
+        //   if (member.age) {
+        //     const year = new Date().getFullYear() - Number(member.age);
+        //     this.proposalData.proposerDOB = `${year}-01-01`;
+        //   }
+        // }
+          this.proposalData.proposerDOB = '';
       } catch (e) {
         console.error('Failed to parse localStorage supertopup_enquiry', e);
       }
@@ -204,6 +215,9 @@ constructor(
       }
     ];
   }
+  sanitizeAadhaar(value: string): string {
+  return value ? value.replace(/[^0-9]/g, '') : '';
+}
 
   initializeChildren(count: number) {
     this.children = Array(count).fill(null).map(() => ({
@@ -220,6 +234,30 @@ constructor(
       errors: {}
     }));
   }
+
+  get isDobValid() {
+  return !this.fieldErrors.proposerDOB && this.proposalData.proposerDOB;
+}
+
+get isDobInvalid() {
+  return !!this.fieldErrors.proposerDOB;
+}
+
+  get isAadharFieldValid() {
+  return !this.fieldErrors.aadharNumber && (this.proposalData.aadharNumber?.length > 0);
+}
+
+get isAadharFieldInvalid() {
+  return !!this.fieldErrors.aadharNumber;
+}
+
+get isPanFieldValid() {
+  return !this.fieldErrors.panNumber && (this.proposalData.panNumber?.length > 0);
+}
+
+get isPanFieldInvalid() {
+  return !!this.fieldErrors.panNumber;
+}
 
   get adultCount(): number {
     return this.adults.length;
@@ -360,15 +398,39 @@ constructor(
   /* -----------------------------------------
           FIELD VALIDATION METHODS
   ----------------------------------------- */
-  validateDOB() {
-    if (!this.proposalData.proposerDOB) {
-      this.fieldErrors.proposerDOB = "Date of birth is required";
-    } else if (!this.isDOBValid(this.proposalData.proposerDOB)) {
-      this.fieldErrors.proposerDOB = "Enter a valid date of birth";
-    } else {
-      delete this.fieldErrors.proposerDOB;
-    }
+validateDOB() {
+  const dob = this.proposalData.proposerDOB;
+
+  if (!dob) {
+    this.fieldErrors.proposerDOB = "Date of birth is required";
+    return;
   }
+
+  const birthDate = new Date(dob);
+  const today = new Date();
+
+  // Must not be in future
+  if (birthDate > today) {
+    this.fieldErrors.proposerDOB = "Date of birth cannot be in the future";
+    return;
+  }
+
+  // Must be at least 18 years old
+  const age = today.getFullYear() - birthDate.getFullYear();
+  const hasBirthdayPassed =
+    today.getMonth() > birthDate.getMonth() ||
+    (today.getMonth() === birthDate.getMonth() &&
+     today.getDate() >= birthDate.getDate());
+
+  const realAge = hasBirthdayPassed ? age : age - 1;
+
+  if (realAge < 18) {
+    this.fieldErrors.proposerDOB = "Proposer must be at least 18 years old";
+  } else {
+    delete this.fieldErrors.proposerDOB;
+  }
+}
+
 
   validateEmail() {
     const email = this.proposalData.proposerEmail?.trim() || '';
@@ -381,41 +443,54 @@ constructor(
     }
   }
 
-  validateAadhaar() {
-    const aadhaar = this.proposalData.aadharNumber || '';
-    if (!aadhaar) {
-      this.fieldErrors.aadharNumber = "Aadhaar number is required";
-    } else if (!this.isAadhaarValid(aadhaar)) {
-      this.fieldErrors.aadharNumber = "Enter valid 12-digit Aadhaar number";
-    } else {
-      delete this.fieldErrors.aadharNumber;
-    }
+validateAadhaar() {
+  const aadhaar = this.proposalData.aadharNumber || '';
+  if (!aadhaar) {
+    this.fieldErrors.aadharNumber = "Aadhaar number is required";
+  } else if (!this.isAadhaarValid(aadhaar)) {
+    this.fieldErrors.aadharNumber = "Enter valid 12-digit Aadhaar number";
+  } else {
+    delete this.fieldErrors.aadharNumber;
   }
+}
 
-  validatePan() {
-    const pan = this.proposalData.panNumber || '';
-    if (!pan) {
-      this.fieldErrors.panNumber = "PAN number is required";
-    } else if (!this.isPanValid(pan)) {
-      this.fieldErrors.panNumber = "Enter valid PAN format (ABCDE1234F)";
-    } else {
-      delete this.fieldErrors.panNumber;
-    }
+validatePan() {
+  const pan = this.proposalData.panNumber || '';
+  if (!pan) {
+    this.fieldErrors.panNumber = "PAN number is required";
+  } else if (!this.isPanValid(pan)) {
+    this.fieldErrors.panNumber = "Enter valid PAN format (ABCDE1234F)";
+  } else {
+    delete this.fieldErrors.panNumber;
   }
+}
 
   /* -----------------------------------------
           INPUT HANDLING
   ----------------------------------------- */
-  allowAadhaarInput(event: KeyboardEvent) {
-    // Allow control keys (backspace, delete, tab, etc.)
-    if (['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
-      return;
-    }
-    // Allow only digits
-    if (!/[0-9]/.test(event.key)) {
-      event.preventDefault();
-    }
+allowAadhaarInput(event: any) {
+  const key = event.key;
+
+  // Allow control keys
+  if (
+    key === 'Backspace' ||
+    key === 'Delete' ||
+    key === 'Tab' ||
+    key === 'ArrowLeft' ||
+    key === 'ArrowRight' ||
+    key === 'Home' ||
+    key === 'End'
+  ) {
+    return;
   }
+
+  // Android keyboards sometimes return full words or alphabets
+  // So block EVERYTHING except digits 0–9
+  if (!/^[0-9]$/.test(key)) {
+    event.preventDefault();
+  }
+}
+
 
   blockNonDigits(event: KeyboardEvent) {
     if (['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
