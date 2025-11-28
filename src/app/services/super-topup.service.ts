@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { forkJoin, of, Observable, throwError } from 'rxjs';
+import { forkJoin, of, Observable, throwError, from } from 'rxjs';
 import { catchError, timeout } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { db } from '../../firebaseConfig';
+import { collection, addDoc } from 'firebase/firestore';
 
 @Injectable({
   providedIn: 'root'
@@ -33,8 +35,22 @@ private baseUrl = environment.apiUrl;
 
   }
 
-   saveHealthProposal(payload: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/proposals/save`, payload);
+  saveHealthProposal(payload: any) {
+    const apiCall = this.http.post(`${this.baseUrl}/proposals/save`, payload);
+
+    const firebasePayload = {
+      ...payload,
+      lead_type: "super-top-up"
+    };
+
+    const firebaseCall = from(
+      addDoc(collection(db, 'AUX_leads'), firebasePayload)
+    );
+
+    return forkJoin({
+      api: apiCall,
+      firebase: firebaseCall
+    });
   }
 
 }
