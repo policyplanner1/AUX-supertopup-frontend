@@ -9,6 +9,8 @@ import {
 } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
+import { addDoc, collection } from 'firebase/firestore';
+import { db } from '../../../../firebaseConfig';
 
 type MemberKey = 'you' | 'spouse' | 'son' | 'daughter';
 
@@ -114,8 +116,7 @@ export class EnquiryForm {
     const you = this.members.find((m) => m.key === 'you')!;
     you.selected = true;
     this.updateSelectedAges();
-    // this.basicForm.get('pincode')?.valueChanges.subscribe(() => this.updateZone());
-    // this.basicForm.get('city')?.valueChanges.subscribe(() => this.updateZone());
+
   }
 
   get f() {
@@ -142,27 +143,6 @@ export class EnquiryForm {
 
     return '';
   }
-
-  /* ---------- STEP NAV ---------- */
-  // private updateZone(): void {
-  //   const pincode: string = this.basicForm.get('pincode')?.value || '';
-  //   const city: string = (this.basicForm.get('city')?.value || '').toLowerCase();
-
-  //   let zone = '';
-
-  //   // 🔹 Example logic – adjust to your real business rules
-  //   if (!pincode && !city) {
-  //     zone = '';
-  //   } else if (city.includes('mumbai') || /^4[0-9]{5}$/.test(pincode)) {
-  //     zone = '1';
-  //   } else if (/^5[0-9]{5}$/.test(pincode)) {
-  //     zone = '2';
-  //   } else {
-  //     zone = '3';
-  //   }
-
-  //   this.basicForm.patchValue({ zone }, { emitEvent: false });
-  // }
 
   getIconForId(id: string): string {
     if (id === 'you') return this.members.find((m) => m.key === 'you')!.iconPath;
@@ -210,7 +190,7 @@ export class EnquiryForm {
     return this.anyMemberSelected();
   }
 
-  next() {
+  async next() {
     if (this.step === 1) {
       if (!this.anyMemberSelected()) {
         // still using simple alert for step-1; can change to inline later if needed
@@ -242,7 +222,67 @@ export class EnquiryForm {
       console.log('SUBMIT payload', payload);
       localStorage.setItem('supertopup_enquiry', JSON.stringify(payload));
 
-      // ⭐ Navigate to Quotes Screen
+      const details = this.basicForm.getRawValue();
+
+      const layout: Record<string, string> = {};
+
+      // Self / Spouse ages & flags
+      layout['Age'] = this.selectedAges['you'] ?? '';
+      if (this.members.find((m) => m.key === 'you')?.selected) layout['self'] = 'on';
+
+      layout['SAge'] = this.selectedAges['spouse'] ?? '';
+      if (this.members.find((m) => m.key === 'spouse')?.selected) layout['spouse'] = 'on';
+
+      // Cover & customer details
+      layout['cover_amount'] = details.coverAmount ?? '';     
+      layout['cust_Pincode'] = details.pincode ?? '';
+      layout['cust_city'] = details.city ?? '';
+      layout['cust_fname'] = details.firstName ?? '';
+      layout['cust_lname'] = details.lastName ?? '';
+      layout['cust_mobile'] = details.mobile ?? '';
+
+      // Gender
+      layout['gender'] = this.gender ?? '';
+
+      // Sons
+      const sCount = this.getSonCount();
+      if (sCount > 0) {
+        layout['son'] = 'on';
+        layout['sonCount'] = String(sCount);
+        for (let i = 1; i <= sCount; i++) {
+          layout[`son${i}Age`] = this.selectedAges[`son${i}`] ?? '';
+        }
+      } else {
+        layout['sonCount'] = '0';
+      }
+
+      // Daughters
+      const dCount = this.getDaughterCount();
+      if (dCount > 0) {
+        layout['daughter'] = 'on';
+        layout['daughterCount'] = String(dCount);
+        for (let i = 1; i <= dCount; i++) {
+          layout[`daughter${i}Age`] = this.selectedAges[`daughter${i}`] ?? '';
+        }
+      } else {
+        layout['daughterCount'] = '0';
+      }
+
+      console.log('New Layout', layout);
+
+  // SAVE TO FIRESTORE
+  try {
+    await addDoc(collection(db, 'AUX_enquiry_leads'), {
+      ...layout,
+      lead_type: "super-top-up",
+      created_at: new Date().toISOString()
+    });
+
+    console.log('🔥 Saved in Firestore Successfully');
+  } catch (err) {
+    console.error('❌ Firebase Save Error', err);
+  }
+      // Navigate to Quotes Screen
       this.router.navigate(['/supertopup/quotes']);
     }
   }
