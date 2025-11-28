@@ -1,0 +1,476 @@
+<app-header></app-header>
+<!-- OUTER BG -->
+<div class="w-full flex justify-center px-3 sm:px-6 py-6 sm:py-10 bg-[#F5FAFC]">
+  <!-- WHITE CARD SHELL -->
+  <div
+    class="w-full max-w-5xl bg-white rounded-2xl shadow-lg px-4 sm:px-10 py-6 sm:py-10"
+  >
+    <!-- ================= HEADER / STEPPER ================= -->
+    <div class="flex items-center mb-6 sm:mb-10">
+      <!-- Back / Previous: visible from sm and up (mobile design doesn't show it) -->
+      <button
+        type="button"
+        (click)="prev()"
+        class="hidden sm:inline-flex items-center text-[#006D8D] text-sm font-medium mr-4"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-4 h-4 mr-1"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+        Previous
+      </button>
+
+      <!-- Stepper (1-2-3) -->
+      <div class="flex-1 flex justify-center">
+        <div class="flex items-center space-x-4 sm:space-x-8">
+          <!-- STEP 1 -->
+          <div class="flex flex-col items-center">
+            <div
+              class="flex items-center justify-center rounded-full text-xs font-semibold
+                     w-8 h-8 sm:w-7 sm:h-7"
+              [ngClass]="
+                step === 1
+                  ? 'bg-[#006D8D] text-white'
+                  : 'bg-[#E4EDF1] text-[#006D8D]'
+              "
+            >
+              1
+            </div>
+            <span
+              class="mt-1 text-[11px] text-gray-600 hidden md:block whitespace-nowrap"
+            >
+              Select Members
+            </span>
+          </div>
+
+          <div class="h-px w-8 sm:w-12 bg-gray-300"></div>
+
+          <!-- STEP 2 -->
+          <div class="flex flex-col items-center">
+            <div
+              class="flex items-center justify-center rounded-full text-xs font-semibold
+                     w-8 h-8 sm:w-7 sm:h-7"
+              [ngClass]="
+                step === 2
+                  ? 'bg-[#006D8D] text-white'
+                  : 'bg-[#E4EDF1] text-[#006D8D]'
+              "
+            >
+              2
+            </div>
+            <span
+              class="mt-1 text-[11px] text-gray-600 hidden md:block whitespace-nowrap"
+            >
+              Select Age of Members
+            </span>
+          </div>
+
+          <div class="h-px w-8 sm:w-12 bg-gray-300"></div>
+
+          <!-- STEP 3 -->
+          <div class="flex flex-col items-center">
+            <div
+              class="flex items-center justify-center rounded-full text-xs font-semibold
+                     w-8 h-8 sm:w-7 sm:h-7"
+              [ngClass]="
+                step === 3
+                  ? 'bg-[#006D8D] text-white'
+                  : 'bg-[#E4EDF1] text-[#006D8D]'
+              "
+            >
+              3
+            </div>
+            <span
+              class="mt-1 text-[11px] text-gray-600 hidden md:block whitespace-nowrap"
+            >
+              Basic Details
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- ======================= STEP 1 ======================= -->
+<div *ngIf="step === 1" class="space-y-6 sm:space-y-8">
+
+  <h2 class="text-center text-base sm:text-xl font-medium text-gray-700">
+    Select your gender
+  </h2>
+
+  <!-- Gender Toggle -->
+  <div
+    class="mx-auto w-full max-w-[260px] h-9 sm:h-10 rounded-full border border-[#006D8D] flex overflow-hidden"
+  >
+    <button
+      type="button"
+      (click)="setGender('Male')"
+      class="flex-1 text-sm sm:text-base font-medium transition"
+      [ngClass]="gender === 'Male' ? 'bg-[#006D8D] text-white' : 'bg-white text-[#006D8D]'"
+    >
+      Male
+    </button>
+
+    <button
+      type="button"
+      (click)="setGender('Female')"
+      class="flex-1 text-sm sm:text-base font-medium transition"
+      [ngClass]="gender === 'Female' ? 'bg-[#006D8D] text-white' : 'bg-white text-[#006D8D]'"
+    >
+      Female
+    </button>
+  </div>
+
+  <h3 class="text-center text-sm sm:text-xl font-semibold text-gray-700">
+    Select member you want to insure
+  </h3>
+
+  <!-- ONLY SELF -->
+  <div class="flex justify-center mt-4 sm:mt-6">
+    <div
+      class="flex flex-col items-center justify-center
+             w-[140px] sm:w-[170px] h-[160px] sm:h-[210px]
+             bg-white border border-[#E6EEF5] rounded-[18px]
+             shadow-card cursor-pointer"
+    >
+      <img
+        [src]="youIcon"
+        class="mt-5 sm:mt-6 w-14 h-14 sm:w-16 sm:h-16 object-contain"
+      />
+
+      <p class="mt-3 sm:mt-4 text-xs sm:text-sm font-semibold text-gray-700">
+        Self
+      </p>
+    </div>
+  </div>
+
+  <div class="flex justify-center mt-6">
+    <button
+      (click)="next()"
+      class="w-[150px] sm:w-[170px] h-10 sm:h-11 rounded-full
+             bg-[#006D8D] text-white shadow-next hover:bg-[#005b75] text-sm sm:text-base"
+    >
+      Next
+    </button>
+  </div>
+
+</div>
+
+<!-- ======================= STEP 2 ======================= -->
+<div *ngIf="step === 2" class="space-y-6 sm:space-y-10">
+  <h2 class="text-center text-base sm:text-2xl font-medium text-gray-700 tracking-wide">
+    Tell us your age
+  </h2>
+
+  <div class="flex justify-center mt-4">
+    <div
+      class="w-[180px] sm:w-[220px] bg-white rounded-xl border border-[#E5EFF4]
+             shadow-card flex flex-col items-center text-center pt-6 sm:pt-8 pb-5 sm:pb-6"
+    >
+      <img
+        [src]="youIcon"
+        class="w-16 h-16 sm:w-20 sm:h-20 object-contain"
+      />
+
+      <p class="mt-3 sm:mt-4 text-sm sm:text-base font-medium text-gray-700">
+        Your Age
+      </p>
+
+      <div class="mt-5 sm:mt-6 w-full px-6 sm:px-8">
+        <div class="age-dropdown">
+          <div
+            class="age-dropdown__control"
+            (click)="toggleAgeDropdown('you'); $event.stopPropagation()"
+          >
+            <span class="age-dropdown__value">
+              {{ selectedAges['you'] ? getAgeLabel('you') : 'Select Age' }}
+            </span>
+            <span class="age-dropdown__arrow">▾</span>
+          </div>
+
+          <div
+            class="age-dropdown__menu"
+            *ngIf="openAgeDropdownId === 'you'"
+            (click)="$event.stopPropagation()"
+          >
+            <div
+              class="age-dropdown__option age-dropdown__option--placeholder"
+              (click)="selectAge('you', null)"
+            >
+              Select Age
+            </div>
+
+            <div
+              class="age-dropdown__option"
+              *ngFor="let opt of ageOptions"
+              (click)="selectAge('you', opt.value)"
+            >
+              {{ opt.label }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="flex justify-center gap-4 sm:gap-5 mt-8">
+    <button
+      (click)="prev()"
+      class="px-6 sm:px-8 py-2.5 sm:py-3 rounded-[20px] border border-gray-300
+             text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-100"
+    >
+      Previous
+    </button>
+
+    <button
+      (click)="next()"
+      class="px-8 sm:px-10 py-2.5 sm:py-3 rounded-[20px] bg-[#006D8D] text-white
+             text-xs sm:text-sm font-medium shadow-next hover:bg-[#005B75]"
+    >
+      Next
+    </button>
+  </div>
+</div>
+
+   <!-- ======================= STEP 3 ======================= -->
+<div *ngIf="step === 3" class="space-y-8 sm:space-y-12">
+  <h2
+    class="text-center text-base sm:text-2xl font-medium text-gray-700 tracking-wide"
+  >
+    Tell us more about yourself
+  </h2>
+
+  <!-- Soft banner instead of browser alert -->
+  <div
+    *ngIf="basicFormSubmitAttempted && basicForm.invalid"
+    class="mt-2 mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-2
+           flex items-center gap-2 text-xs sm:text-sm text-red-700 justify-center"
+  >
+    <span
+      class="inline-flex w-4 h-4 rounded-full bg-red-500 text-white
+             text-[10px] items-center justify-center font-bold">!</span
+    >
+    <span>Please check the highlighted fields and fill your basic details correctly.</span>
+  </div>
+
+  <form
+    [formGroup]="basicForm"
+    class="max-w-5xl mx-auto space-y-8 sm:space-y-12"
+    novalidate
+  >
+
+    <!-- ROW 1 : FIRST NAME | LAST NAME | MOBILE -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-x-10 sm:gap-x-16 gap-y-6">
+
+      <!-- First Name -->
+      <div>
+        <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
+          First Name <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          formControlName="firstName"
+          class="w-full border-0 border-b border-gray-400 bg-transparent py-2
+                 text-gray-700 text-sm focus:outline-none focus:border-[#006D8D]"
+          [ngClass]="{ 'invalid-field': isInvalid('firstName') }"
+          placeholder="Enter your first name"
+          (keypress)="allowOnlyLetters($event)"
+          autocomplete="given-name"
+        />
+        <div *ngIf="isInvalid('firstName')" class="form-error">
+          <span *ngIf="f['firstName'].errors?.['required']">First name is required.</span>
+          <span *ngIf="f['firstName'].errors?.['pattern']">Only alphabets allowed.</span>
+          <span *ngIf="f['firstName'].errors?.['maxlength']">Max 20 characters.</span>
+        </div>
+      </div>
+
+      <!-- Last Name -->
+      <div>
+        <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
+          Last Name <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          formControlName="lastName"
+          class="w-full border-0 border-b border-gray-400 bg-transparent py-2
+                 text-gray-700 text-sm focus:outline-none focus:border-[#006D8D]"
+          [ngClass]="{ 'invalid-field': isInvalid('lastName') }"
+          placeholder="Enter your last name"
+          (keypress)="allowOnlyLetters($event)"
+          autocomplete="family-name"
+        />
+        <div *ngIf="isInvalid('lastName')" class="form-error">
+          <span *ngIf="f['lastName'].errors?.['required']">Last name is required.</span>
+          <span *ngIf="f['lastName'].errors?.['pattern']">Only alphabets allowed.</span>
+          <span *ngIf="f['lastName'].errors?.['maxlength']">Max 20 characters.</span>
+        </div>
+      </div>
+
+      <!-- Mobile -->
+      <div>
+        <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
+          Mobile Number <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="tel"
+          maxlength="10"
+          formControlName="mobile"
+          class="w-full border-0 border-b border-gray-400 bg-transparent py-2
+                 text-gray-700 text-sm focus:outline-none focus:border-[#006D8D]"
+          [ngClass]="{ 'invalid-field': isInvalid('mobile') }"
+          placeholder="Enter mobile number"
+          (keypress)="allowOnlyDigits($event)"
+          autocomplete="tel"
+        />
+        <div *ngIf="isInvalid('mobile')" class="form-error">
+          <span *ngIf="f['mobile'].errors?.['required']">Mobile is required.</span>
+          <span *ngIf="f['mobile'].errors?.['pattern']">Enter valid mobile number.</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ROW 2 : PINCODE | CITY | COVER AMOUNT | ANNUAL INCOME -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-x-10 sm:gap-x-16 gap-y-6">
+
+      <!-- Pincode -->
+      <div>
+        <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
+          Pincode <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="tel"
+          maxlength="6"
+          formControlName="pincode"
+          class="w-full border-0 border-b border-gray-400 bg-transparent py-2
+                 text-gray-700 text-sm focus:outline-none focus:border-[#006D8D]"
+          [ngClass]="{ 'invalid-field': isInvalid('pincode') }"
+          placeholder="Enter pincode"
+          (keypress)="allowOnlyDigits($event)"
+        />
+        <div *ngIf="isInvalid('pincode')" class="form-error">
+          <span>Pincode is required.</span>
+        </div>
+      </div>
+
+      <!-- City -->
+      <div>
+        <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
+          City <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          formControlName="city"
+          class="w-full border-0 border-b border-gray-400 bg-transparent py-2
+                 text-gray-700 text-sm focus:outline-none focus:border-[#006D8D]"
+          [ngClass]="{ 'invalid-field': isInvalid('city') }"
+          placeholder="Enter your city"
+          (keypress)="allowOnlyLetters($event)"
+        />
+        <div *ngIf="isInvalid('city')" class="form-error">
+          <span>City is required.</span>
+        </div>
+      </div>
+
+      <!-- Cover Amount -->
+      <div>
+        <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
+          Cover Amount <span class="text-red-500">*</span>
+        </label>
+        <select
+          formControlName="coverAmount"
+          class="w-full border-0 border-b border-gray-400 bg-transparent py-2
+                 text-gray-700 text-sm focus:outline-none focus:border-[#006D8D]"
+          [ngClass]="{ 'invalid-field': isInvalid('coverAmount') }"
+        >
+          <option value="">Select cover amount</option>
+                <option value="300000">3 Lakh</option>
+                <option value="500000">5 Lakh</option>
+                <option value="600000">6 Lakh</option>
+                <option value="700000">7 Lakh</option>
+                <option value="800000">8 Lakh</option>
+                <option value="1000000">10 Lakh</option>
+                <option value="1100000">11 Lakh</option>
+                <option value="1200000">12 Lakh</option>
+                <option value="1500000">15 Lakh</option>
+                <option value="1600000">16 Lakh</option>
+                <option value="2000000">20 Lakh</option>
+                <option value="2500000">25 Lakh</option>
+                <option value="5000000">50 Lakh</option>
+                <option value="10000000">1 Crore</option>
+                <option value="30000000">3 Crore</option>
+        </select>
+        <div *ngIf="isInvalid('coverAmount')" class="form-error">
+          <span>Cover amount is required.</span>
+        </div>
+      </div>
+
+      <!-- ⭐ ANNUAL INCOME -->
+<div>
+  <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
+    Annual Income <span class="text-red-500">*</span>
+  </label>
+
+  <div class="relative">
+    <select
+      formControlName="annualIncome"
+      class="w-full border-0 border-b border-gray-400 bg-transparent py-2
+             text-gray-700 text-sm focus:outline-none focus:border-[#006D8D]
+             dropdown-open-down"
+      [ngClass]="{ 'invalid-field': isInvalid('annualIncome') }"
+    >
+      <option value="">Select annual income</option>
+      <option value="3-5">₹3 Lakh – ₹5 Lakh</option>
+      <option value="5-8">₹5 Lakh – ₹8 Lakh</option>
+      <option value="8-12">₹8 Lakh – ₹12 Lakh</option>
+      <option value="12-18">₹12 Lakh – ₹18 Lakh</option>
+      <option value="18-25">₹18 Lakh – ₹25 Lakh</option>
+      <option value="25-40">₹25 Lakh – ₹40 Lakh</option>
+      <option value="40+">₹40 Lakh and Above</option>
+    </select>
+  </div>
+
+  <div *ngIf="isInvalid('annualIncome')" class="form-error">
+    <span>Annual income is required.</span>
+  </div>
+</div>
+
+
+    </div>
+  </form>
+
+  <!-- Buttons -->
+  <div class="flex flex-col sm:flex-row justify-between items-center mt-4 gap-4">
+    <button
+      class="w-full sm:w-auto px-6 py-2.5 rounded border border-gray-300
+             text-gray-700 text-sm hover:bg-gray-100"
+      (click)="prev()"
+      type="button"
+    >
+      Previous
+    </button>
+
+    <button
+      class="w-full sm:w-auto px-10 py-2.5 rounded-[20px] bg-[#006D8D] text-white
+             text-sm shadow-next hover:bg-[#005B75]"
+      type="button"
+      (click)="next()"
+    >
+      Submit
+    </button>
+  </div>
+</div>
+
+  </div>
+</div>
+<app-footer></app-footer>

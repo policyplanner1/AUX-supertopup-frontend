@@ -5,7 +5,7 @@ import { ProposalForm } from './pages/supertopup/proposal-form/proposal-form';
 import { AllFeatures } from './pages/supertopup/all-features/all-features';
 import { Quotes } from './pages/supertopup/quotes/quotes';
 import { NotFound } from './pages/not-found/not-found';
-
+import { PAEnquiryFormComponent } from './pages/personal-accident-cover/enquiry-form/enquiry-form'
 export const routes: Routes = [
   {
     path: 'supertopup',
@@ -15,6 +15,15 @@ export const routes: Routes = [
       { path: 'quotes', component: Quotes },
       { path: '', redirectTo: 'enquiry-form', pathMatch: 'full' },
       { path: 'proposal-form', component: ProposalForm }
+    ]
+  },
+
+   {
+    path: 'personal-accident-cover',
+    children: [
+      { path: 'enquiry-form', component: PAEnquiryFormComponent },
+      { path: 'quotes', component: Quotes }
+
     ]
   },
 

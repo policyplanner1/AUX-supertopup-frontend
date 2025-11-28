@@ -1,5 +1,8 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HeaderComponent } from '../../../shared/components/header/header';
+import { FooterComponent } from '../../../shared/components/footer/footer';
+
 import {
   FormsModule,
   ReactiveFormsModule,
@@ -23,7 +26,8 @@ interface Member {
 @Component({
   selector: 'app-supertopup-stepper',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule,  HeaderComponent,
+    FooterComponent,],
   templateUrl: './enquiry-form.html',
   styleUrl: './enquiry-form.scss',
 })
