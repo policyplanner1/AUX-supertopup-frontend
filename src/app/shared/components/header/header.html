@@ -1,1 +1,50 @@
-<p>header works!</p>
+<header class="bg-white shadow-sm relative" (click)="closeDropdown()">
+  <div class="max-w-7xl mx-auto flex justify-between items-center py-4 px-4 border-b border-blue-100">
+
+    <!-- Logo -->
+ <div class="flex items-center cursor-pointer">
+  <img
+    src="../../../../assets/PP Logo.svg"
+    alt="Policy Planner Logo"
+    class="h-12 w-auto object-contain"
+  />
+</div>
+
+
+    <!-- Navigation -->
+    <nav class="hidden md:flex items-center space-x-10">
+
+      <!-- Dropdown -->
+      <div class="relative" (click)="$event.stopPropagation()">
+        <button
+          (click)="toggleDropdown()"
+          class="flex items-center text-gray-900 font-medium hover:text-orange-600 focus:outline-none">
+          Individual Insurance
+          <svg class="w-4 h-4 ml-1 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.296l3.71-4.067a.75.75 0 111.1 1.02l-4.25 4.67a.75.75 0 01-1.1 0l-4.25-4.67a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+          </svg>
+        </button>
+
+        <div
+          *ngIf="dropdownOpen"
+          class="absolute z-20 mt-2 w-48 bg-white rounded shadow-lg border border-gray-200">
+          <ul class="py-1 text-sm">
+            <li><a class="block px-4 py-2 hover:bg-gray-50">Health Insurance</a></li>
+            <li><a class="block px-4 py-2 hover:bg-gray-50">Motor Insurance</a></li>
+            <li><a class="block px-4 py-2 hover:bg-gray-50">Term Insurance</a></li>
+            <li><a class="block px-4 py-2 hover:bg-gray-50">Travel Insurance</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <a class="text-gray-900 font-medium hover:text-orange-600">Business/SME Insurance</a>
+      <a class="text-gray-900 font-medium hover:text-orange-600">Claim Assistance</a>
+      <a class="text-gray-900 font-medium hover:text-orange-600">About Us</a>
+    </nav>
+
+    <!-- Login Button -->
+    <a class="ml-4 px-6 py-2 rounded-full bg-gradient-to-r from-teal-500 to-blue-700 text-white font-semibold shadow hover:from-teal-600 hover:to-blue-800">
+      Login
+    </a>
+  </div>
+</header>
