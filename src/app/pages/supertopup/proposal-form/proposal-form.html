@@ -229,7 +229,7 @@
       <div class="tw-row-4">
 
         <!-- Sum Insured -->
-     
+
 <div class="tw-field">
   <label>
     Sum Insured
@@ -337,13 +337,15 @@
 
   <label>Aadhaar Card Number *</label>
 
-  <input
-    type="text"
-    maxlength="12"
-    class="tw-input"
-    [(ngModel)]="proposalData.aadharNumber"
-    (input)="validateAadhaar()"
-  />
+<input
+  type="text"
+  maxlength="12"
+  class="tw-input"
+  [(ngModel)]="proposalData.aadharNumber"
+  (keydown)="blockNonDigits($event)"
+  (paste)="blockNonDigitPaste($event)"
+/>
+
 
   <div *ngIf="fieldErrors.aadharNumber" class="tw-error">
     {{ fieldErrors.aadharNumber }}
@@ -353,26 +355,26 @@
 
 <!-- PanCard -->
 <div class="tw-field"
-     [ngClass]="{'tw-valid': isPanFieldValid, 'tw-invalid': isPanFieldInvalid}">
+[ngClass]="{'tw-valid': isPanFieldValid, 'tw-invalid': isPanFieldInvalid}">
 
-  <label>PAN Card *</label>
+<label>PAN Card *</label>
 
-  <input
-    type="text"
-    maxlength="10"
-    class="tw-input"
-    [(ngModel)]="proposalData.panNumber"
-    (input)="validatePan()"
-  />
+<input
+type="text"
+maxlength="10"
+class="tw-input"
+[(ngModel)]="proposalData.panNumber"
+(input)="forcePanUppercase()"
+(keydown)="blockPanInvalidCharacters($event)"
+/>
+
 
   <div *ngIf="fieldErrors.panNumber" class="tw-error">
     {{ fieldErrors.panNumber }}
   </div>
 
 </div>
-
-
-      </div>
+</div>
 
       <!-- NAVIGATION -->
       <div class="tw-nav-btns">

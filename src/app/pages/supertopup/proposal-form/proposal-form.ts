@@ -98,13 +98,13 @@ constructor(
 
             this.minAdultDate = `${adultYear}-${month}-${day}`;
 
-      const planName =
-        this.selectedPlan?.planName ||
-        this.selectedPlan?.name ||
-        '';
-      this.proposalData.aadharNumber = '';
-      this.proposalData.productName = `${companyName} ${planName}`.trim();
-    }
+            const planName =
+              this.selectedPlan?.planName ||
+              this.selectedPlan?.name ||
+              '';
+            this.proposalData.aadharNumber = '';
+            this.proposalData.productName = `${companyName} ${planName}`.trim();
+          }
 
     // Load from localStorage
     const saved = localStorage.getItem("supertopup_enquiry");
@@ -243,7 +243,7 @@ get isDobInvalid() {
   return !!this.fieldErrors.proposerDOB;
 }
 
-  get isAadharFieldValid() {
+get isAadharFieldValid() {
   return !this.fieldErrors.aadharNumber && (this.proposalData.aadharNumber?.length > 0);
 }
 
@@ -492,18 +492,45 @@ allowAadhaarInput(event: any) {
 }
 
 
-  blockNonDigits(event: KeyboardEvent) {
-    if (['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
-      return;
-    }
-    if (!/[0-9]/.test(event.key)) {
-      event.preventDefault();
-    }
-  }
+blockNonDigits(event: KeyboardEvent) {
+  const allowed = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
 
-  onPanChange() {
-    this.proposalData.panNumber = (this.proposalData.panNumber || '').toUpperCase();
+  if (allowed.includes(event.key)) return;
+
+  // Allow only digits
+  if (!/^[0-9]$/.test(event.key)) {
+    event.preventDefault();
   }
+}
+
+blockNonDigitPaste(event: ClipboardEvent) {
+  const pasted = event.clipboardData?.getData('text') || '';
+  if (!/^[0-9]+$/.test(pasted)) {
+    event.preventDefault(); // block paste
+  }
+}
+
+onPanChange() {
+    this.proposalData.panNumber = (this.proposalData.panNumber || '').toUpperCase();
+}
+
+forcePanUppercase() {
+  if (this.proposalData.panNumber) {
+    this.proposalData.panNumber = this.proposalData.panNumber.toUpperCase();
+  }
+}
+
+// Block everything except A–Z and 0–9
+blockPanInvalidCharacters(event: KeyboardEvent) {
+  const allowed = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
+
+  if (allowed.includes(event.key)) return;
+
+  if (!/[a-zA-Z0-9]/.test(event.key)) {
+    event.preventDefault();
+  }
+}
+
 
   /* -----------------------------------------
           DROPDOWN + DISEASE LOGIC

@@ -234,7 +234,7 @@ export class EnquiryForm {
       if (this.members.find((m) => m.key === 'spouse')?.selected) layout['spouse'] = 'on';
 
       // Cover & customer details
-      layout['cover_amount'] = details.coverAmount ?? '';     
+      layout['cover_amount'] = details.coverAmount ?? '';
       layout['cust_Pincode'] = details.pincode ?? '';
       layout['cust_city'] = details.city ?? '';
       layout['cust_fname'] = details.firstName ?? '';

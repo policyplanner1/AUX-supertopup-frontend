@@ -1,6 +1,4 @@
-import { Component, HostListener } from '@angular/core';
-import { CommonModule } from '@angular/common';
-
+import { Component } from '@angular/core';
 import {
   FormsModule,
   ReactiveFormsModule,
@@ -8,246 +6,231 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { HeaderComponent } from '../../../shared/components/header/header';
+import { FooterComponent } from '../../../shared/components/footer/footer';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-pa-enquiry',
   standalone: true,
+  templateUrl: './enquiry-form.html',
+  styleUrls: ['./enquiry-form.scss'],
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
+    HeaderComponent,
+    FooterComponent,
   ],
-  templateUrl: './enquiry-form.html',
-  styleUrl: './enquiry-form.scss',
 })
 export class PAEnquiryFormComponent {
 
-  /* ============================================================
-     STEPPER
-  ============================================================ */
   step = 1;
 
-  /* ============================================================
-     GENDER & ICONS — SAME LOGIC AS SUPERTOPUP
-  ============================================================ */
   gender: 'Male' | 'Female' = 'Male';
-
   maleIcon = 'assets/you.svg';
   femaleIcon = 'assets/spouse.svg';
+  youIcon = this.maleIcon;
 
-  youIcon = this.maleIcon; // default male icon
+  // Main form
+  basicForm!: FormGroup;
 
-  /* ============================================================
-     AGE DROPDOWN
-  ============================================================ */
-  openAgeDropdownId: string | null = null;
-  selectedAges: Record<string, string> = { you: '' };
+  // Flags
+  basicSubmitAttempt = false;
+  riskSubmitAttempt = false;
 
-  ageOptions: { value: string; label: string }[] = [];
+  dobError = false;
+  riskError = false;
 
-  /* ============================================================
-     BASIC DETAILS FORM (INCLUDES ANNUAL INCOME)
-  ============================================================ */
-  basicForm: FormGroup;
-  basicFormSubmitAttempted = false;
+  // Risk popup
+  showRiskPopup = false;
+  activeRiskTab = 0;
+  selectedRiskCategory: string | null = null;
+
+  riskTabs = ['Category 1', 'Category 2', 'Category 3'];
+
+  riskList: any = {
+    0: ['Doctors','Lawyers','Accountants','Architects/Consulting engineers','Teachers','Bankers','Clerical/administrative functions','BFSI professional','Businessman not working on factory floors','Homemaker','Student'],
+    1: ['Builders/Contractors','Engineers on site','Veterinary Doctors', 'Mechanics','Manual labourers not working in mines, explosive industry, electrical intallations and such hazardous industries','Business working on factory floors'],
+    2: ['Working in mines/explosives','Electrical installations','Racer','Circus artist or engaged in such other occupation','Engaged full time/ part time in any adventurous activities','Professional sportsperson','Professional adventurer/trekker/mountaineer','Defense services', 'Drivers'],
+  };
 
   constructor(private fb: FormBuilder, private router: Router) {
     this.basicForm = this.fb.group({
-      firstName: [
-        '',
-        [
-          Validators.required,
-          Validators.maxLength(20),
-          Validators.pattern(/^[A-Za-z ]+$/),
-        ],
-      ],
-      lastName: [
-        '',
-        [
-          Validators.required,
-          Validators.maxLength(20),
-          Validators.pattern(/^[A-Za-z ]+$/),
-        ],
-      ],
-      mobile: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(/^[6-9]\d{9}$/),
-        ],
-      ],
-      pincode: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(/^\d{6}$/),
-        ],
-      ],
-      city: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(/^[A-Za-z ]+$/),
-          Validators.minLength(3),
-        ],
-      ],
-      coverAmount: ['', Validators.required],
+      // Step-2 fields
+      firstName: ['', [Validators.required, Validators.pattern(/^[A-Za-z ]+$/)]],
+      lastName: ['', [Validators.required, Validators.pattern(/^[A-Za-z ]+$/)]],
+      dob: ['', Validators.required],
+      mobile: ['', [Validators.required, Validators.pattern(/^[6-9]\d{9}$/)]],
+      pincode: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
+      city: ['', [Validators.required, Validators.pattern(/^[A-Za-z ]+$/)]],
 
-      /* ⭐ NEW FIELD */
-      annualIncome: ['', Validators.required],
+      // Step-3 fields
+      occupation: ['', Validators.required],
+      incomeRange: ['', Validators.required],
+      coverAmount: ['', Validators.required],
     });
 
-    this.createAgeOptions();
     this.applyGenderIcons();
   }
 
-  /* ============================================================
-     AGE OPTIONS (18 to 70)
-  ============================================================ */
-  createAgeOptions() {
-    this.ageOptions = [];
-    for (let a = 18; a <= 70; a++) {
-      this.ageOptions.push({ value: String(a), label: `${a} Years` });
-    }
-  }
-
-  /* ============================================================
-     GENDER LOGIC (SAME AS SUPERTOPUP)
-  ============================================================ */
+  // Gender change
   setGender(g: 'Male' | 'Female') {
     this.gender = g;
     this.applyGenderIcons();
   }
-
   applyGenderIcons() {
     this.youIcon = this.gender === 'Male' ? this.maleIcon : this.femaleIcon;
   }
 
-  /* ============================================================
-     AGE DROPDOWN — SAME AS SUPERTOPUP
-  ============================================================ */
-  toggleAgeDropdown(id: string) {
-    this.openAgeDropdownId = this.openAgeDropdownId === id ? null : id;
-  }
-
-  selectAge(id: string, value: string | null) {
-    this.selectedAges[id] = value ?? '';
-    this.openAgeDropdownId = null;
-  }
-
-  getAgeLabel(id: string): string {
-    const v = this.selectedAges[id];
-    return v ? `${v} Years` : 'Select Age';
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.age-dropdown')) {
-      this.openAgeDropdownId = null;
-    }
-  }
-
-  /* ============================================================
-     VALIDATION HELPERS (EXACT LIKE SUPERTOPUP)
-  ============================================================ */
+  // Helpers
   get f() {
     return this.basicForm.controls;
   }
 
-  isInvalid(controlName: string): boolean {
-    const ctrl = this.basicForm.get(controlName);
-    return !!ctrl && ctrl.invalid && (ctrl.dirty || ctrl.touched || this.basicFormSubmitAttempted);
-  }
-
+  // Prevent digits in name/city
   allowOnlyLetters(event: KeyboardEvent) {
-    const key = event.key;
-    if (
-      key === 'Backspace' ||
-      key === 'Tab' ||
-      key === 'ArrowLeft' ||
-      key === 'ArrowRight' ||
-      key === 'ArrowUp' ||
-      key === 'Delete'
-    ) {
-      return;
-    }
-    if (!/^[A-Za-z ]$/.test(key)) {
+    if (!/^[A-Za-z ]$/.test(event.key))
       event.preventDefault();
-    }
   }
 
+  // Prevent letters in mobile/pincode
   allowOnlyDigits(event: KeyboardEvent) {
-    const key = event.key;
-    if (
-      key === 'Backspace' ||
-      key === 'Tab' ||
-      key === 'ArrowLeft' ||
-      key === 'ArrowRight' ||
-      key === 'ArrowUp' ||
-      key === 'Delete'
-    ) {
-      return;
-    }
-    if (!/^\d$/.test(key)) {
+    if (!/^\d$/.test(event.key))
       event.preventDefault();
-    }
   }
 
-  /* ============================================================
-     STEPPER NAVIGATION (MATCHES SUPERTOPUP STRUCTURE)
-  ============================================================ */
-  next() {
-    if (this.step === 1) {
-      this.step = 2;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
+  // DOB Validation
+ validateDOB() {
+  const dob = this.basicForm.get('dob')?.value;
 
-    if (this.step === 2) {
-      if (!this.selectedAges['you']) {
-        alert('Please select your age.');
-        return;
-      }
-      this.step = 3;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-
-    if (this.step === 3) {
-      this.basicFormSubmitAttempted = true;
-      if (this.basicForm.invalid) {
-        this.basicForm.markAllAsTouched();
-        return;
-      }
-
-      const payload = this.finalPayload();
-      localStorage.setItem('pa_enquiry', JSON.stringify(payload));
-
-      this.router.navigate(['/personal-accident/quotes']);
-    }
+  // If blank → show error
+  if (!dob) {
+    this.dobError = true;
+    return;
   }
+
+  const birth = new Date(dob);
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+
+  const m = today.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+
+  this.dobError = age < 18;
+}
+
+
+  // Field invalid checker (NO default errors)
+isInvalid(field: string) {
+  const control = this.basicForm.get(field);
+  return control?.invalid && control?.touched;  // NO DIRTY CHECK
+}
+
+  // ===========================
+  // RISK POPUP LOGIC
+  // ===========================
+  openRiskPopup() { this.showRiskPopup = true; }
+  closeRiskPopup() { this.showRiskPopup = false; }
+
+  selectRisk(item: string) {
+    this.selectedRiskCategory = item;
+    this.riskError = false; // Remove error after choosing
+    this.showRiskPopup = false;
+  }
+
+  // ===========================
+  // NEXT BUTTON LOGIC
+  // ===========================
+ next() {
+
+  // ---------------- Step 1 ----------------
+  if (this.step === 1) {
+    this.step = 2;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+
+  // ---------------- Step 2 ----------------
+ if (this.step === 2) {
+
+  // Mark only Step-2 fields touched
+  ['firstName','lastName','dob','mobile','pincode','city']
+    .forEach(field => this.basicForm.get(field)?.markAsTouched());
+
+  this.validateDOB();
+
+  if (this.dobError) return;
+
+  if (
+    this.basicForm.get('firstName')?.invalid ||
+    this.basicForm.get('lastName')?.invalid ||
+    this.basicForm.get('mobile')?.invalid ||
+    this.basicForm.get('pincode')?.invalid ||
+    this.basicForm.get('city')?.invalid
+  ) {
+    return;
+  }
+
+  // Move to STEP-3
+  this.step = 3;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  return;
+}
+
+
+  // ---------------- Step 3 ----------------
+
+if (this.step === 3) {
+
+  // Do NOT mark all fields touched here
+  // this.basicForm.markAllAsTouched(); ❌ REMOVE THIS
+
+  // Validate only when user tries submitting
+  const s3Fields = ['occupation','incomeRange','coverAmount'];
+
+  let hasError = false;
+
+  s3Fields.forEach(field => {
+    const control = this.basicForm.get(field);
+    if (control?.invalid) {
+      control.markAsTouched();   // show error AFTER user presses Get Quotes
+      hasError = true;
+    }
+  });
+
+  // Risk category
+  if (!this.selectedRiskCategory) {
+    this.riskError = true;
+    hasError = true;
+  }
+
+  if (hasError) return;
+
+
+  const payload = {
+    members: [{ id: 'you', gender: this.gender }],
+    details: {
+      ...this.basicForm.value,
+      riskCategory: this.selectedRiskCategory,
+    },
+  };
+
+  localStorage.setItem('pa_enquiry', JSON.stringify(payload));
+  this.router.navigate(['/personal-accident/quotes']);
+  }
+
+}
 
   prev() {
-    if (this.step > 1) this.step--;
-  }
-
-  /* ============================================================
-     FINAL PAYLOAD (SAME FORMAT AS SUPERTOPUP)
-  ============================================================ */
-  finalPayload() {
-    return {
-      members: [
-        {
-          id: 'you',
-          age: this.selectedAges['you'],
-          gender: this.gender,
-        },
-      ],
-      details: this.basicForm.value,
-    };
+    if (this.step > 1) {
+      this.step--;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 }
