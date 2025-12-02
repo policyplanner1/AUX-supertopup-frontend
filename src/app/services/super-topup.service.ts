@@ -11,11 +11,11 @@ import { collection, addDoc } from 'firebase/firestore';
 })
 export class SuperTopupService {
 
-private baseUrl = environment.apiUrl;
+  private baseUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-   /** ✅ Step 1: Get all available health plan endpoints */
+  /** ✅ Step 1: Get all available health plan endpoints */
   getHealthPlanEndpoints(): Observable<any> {
     const url = `${this.baseUrl}/companies/plans?policy=super_top_up`;
     return this.http.get(url);
@@ -31,7 +31,7 @@ private baseUrl = environment.apiUrl;
         })
       )
     );
-        return forkJoin(requests);
+    return forkJoin(requests);
 
   }
 
@@ -52,5 +52,13 @@ private baseUrl = environment.apiUrl;
       firebase: firebaseCall
     });
   }
+
+sendOtp(mobile: string) {
+  return this.http.post<any>(`${this.baseUrl}/otp/send-otp`, { mobile });
+}
+
+verifyOtp(mobile: string, otp: string) {
+  return this.http.post<any>(`${this.baseUrl}/otp/verify-otp`, { mobile, otp });
+}
 
 }
