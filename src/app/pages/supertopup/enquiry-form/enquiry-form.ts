@@ -1,16 +1,11 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  FormsModule,
-  ReactiveFormsModule,
-  FormBuilder,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../../../../firebaseConfig';
+import { SuperTopupService } from '../../../services/super-topup.service';
 
 type MemberKey = 'you' | 'spouse' | 'son' | 'daughter';
 
@@ -59,7 +54,7 @@ export class EnquiryForm {
   // for custom dropdown in Step 2
   openAgeDropdownId: string | null = null;
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder, private router: Router, private myApiService: SuperTopupService) {
     this.basicForm = this.fb.group({
       firstName: [
         '',
@@ -270,18 +265,18 @@ export class EnquiryForm {
 
       console.log('New Layout', layout);
 
-  // SAVE TO FIRESTORE
-  try {
-    await addDoc(collection(db, 'AUX_enquiry_leads'), {
-      ...layout,
-      lead_type: "super-top-up",
-      created_at: new Date().toISOString()
-    });
+      // SAVE TO FIRESTORE
+      try {
+        await addDoc(collection(db, 'AUX_enquiry_leads'), {
+          ...layout,
+          lead_type: "super-top-up",
+          created_at: new Date().toISOString()
+        });
 
-    console.log('🔥 Saved in Firestore Successfully');
-  } catch (err) {
-    console.error('❌ Firebase Save Error', err);
-  }
+        console.log('🔥 Saved in Firestore Successfully');
+      } catch (err) {
+        console.error('❌ Firebase Save Error', err);
+      }
       // Navigate to Quotes Screen
       this.router.navigate(['/supertopup/quotes']);
     }

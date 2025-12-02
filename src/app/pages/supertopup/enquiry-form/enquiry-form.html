@@ -1,30 +1,15 @@
 <!-- OUTER BG -->
 <div class="w-full flex justify-center px-3 sm:px-6 py-6 sm:py-10 bg-[#F5FAFC]">
   <!-- WHITE CARD SHELL -->
-  <div
-    class="w-full max-w-5xl bg-white rounded-2xl shadow-lg px-4 sm:px-10 py-6 sm:py-10"
-  >
+  <div class="w-full max-w-5xl bg-white rounded-2xl shadow-lg px-4 sm:px-10 py-6 sm:py-10">
     <!-- ================= HEADER / STEPPER ================= -->
     <div class="flex items-center mb-6 sm:mb-10">
       <!-- Back / Previous: visible from sm and up (mobile design doesn't show it) -->
-      <button
-        type="button"
-        (click)="prev()"
-        class="hidden sm:inline-flex items-center text-[#006D8D] text-sm font-medium mr-4"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="w-4 h-4 mr-1"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M15 19l-7-7 7-7"
-          />
+      <button type="button" (click)="prev()"
+        class="hidden sm:inline-flex items-center text-[#006D8D] text-sm font-medium mr-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
         </svg>
         Previous
       </button>
@@ -34,20 +19,15 @@
         <div class="flex items-center space-x-4 sm:space-x-8">
           <!-- STEP 1 -->
           <div class="flex flex-col items-center">
-            <div
-              class="flex items-center justify-center rounded-full text-xs font-semibold
-                     w-8 h-8 sm:w-7 sm:h-7"
-              [ngClass]="
+            <div class="flex items-center justify-center rounded-full text-xs font-semibold
+                     w-8 h-8 sm:w-7 sm:h-7" [ngClass]="
                 step === 1
                   ? 'bg-[#006D8D] text-white'
                   : 'bg-[#E4EDF1] text-[#006D8D]'
-              "
-            >
+              ">
               1
             </div>
-            <span
-              class="mt-1 text-[11px] text-gray-600 hidden md:block whitespace-nowrap"
-            >
+            <span class="mt-1 text-[11px] text-gray-600 hidden md:block whitespace-nowrap">
               Select Members
             </span>
           </div>
@@ -56,20 +36,15 @@
 
           <!-- STEP 2 -->
           <div class="flex flex-col items-center">
-            <div
-              class="flex items-center justify-center rounded-full text-xs font-semibold
-                     w-8 h-8 sm:w-7 sm:h-7"
-              [ngClass]="
+            <div class="flex items-center justify-center rounded-full text-xs font-semibold
+                     w-8 h-8 sm:w-7 sm:h-7" [ngClass]="
                 step === 2
                   ? 'bg-[#006D8D] text-white'
                   : 'bg-[#E4EDF1] text-[#006D8D]'
-              "
-            >
+              ">
               2
             </div>
-            <span
-              class="mt-1 text-[11px] text-gray-600 hidden md:block whitespace-nowrap"
-            >
+            <span class="mt-1 text-[11px] text-gray-600 hidden md:block whitespace-nowrap">
               Select Age of Members
             </span>
           </div>
@@ -78,20 +53,15 @@
 
           <!-- STEP 3 -->
           <div class="flex flex-col items-center">
-            <div
-              class="flex items-center justify-center rounded-full text-xs font-semibold
-                     w-8 h-8 sm:w-7 sm:h-7"
-              [ngClass]="
+            <div class="flex items-center justify-center rounded-full text-xs font-semibold
+                     w-8 h-8 sm:w-7 sm:h-7" [ngClass]="
                 step === 3
                   ? 'bg-[#006D8D] text-white'
                   : 'bg-[#E4EDF1] text-[#006D8D]'
-              "
-            >
+              ">
               3
             </div>
-            <span
-              class="mt-1 text-[11px] text-gray-600 hidden md:block whitespace-nowrap"
-            >
+            <span class="mt-1 text-[11px] text-gray-600 hidden md:block whitespace-nowrap">
               Basic Details
             </span>
           </div>
@@ -106,31 +76,21 @@
       </h2>
 
       <!-- Gender Toggle -->
-      <div
-        class="mx-auto w-full max-w-[260px] h-9 sm:h-10 rounded-full border border-[#006D8D] flex overflow-hidden"
-      >
-        <button
-          type="button"
-          (click)="setGender('Male')"
-          class="flex-1 text-sm sm:text-base font-medium transition"
+      <div class="mx-auto w-full max-w-[260px] h-9 sm:h-10 rounded-full border border-[#006D8D] flex overflow-hidden">
+        <button type="button" (click)="setGender('Male')" class="flex-1 text-sm sm:text-base font-medium transition"
           [ngClass]="
             gender === 'Male'
               ? 'bg-[#006D8D] text-white'
               : 'bg-white text-[#006D8D]'
-          "
-        >
+          ">
           Male
         </button>
-        <button
-          type="button"
-          (click)="setGender('Female')"
-          class="flex-1 text-sm sm:text-base font-medium transition"
+        <button type="button" (click)="setGender('Female')" class="flex-1 text-sm sm:text-base font-medium transition"
           [ngClass]="
             gender === 'Female'
               ? 'bg-[#006D8D] text-white'
               : 'bg-white text-[#006D8D]'
-          "
-        >
+          ">
           Female
         </button>
       </div>
@@ -139,57 +99,36 @@
         Select members you want to insure
       </h3>
 
-      <div
-        class="w-full max-w-md sm:max-w-3xl mx-auto grid grid-cols-2 md:grid-cols-4
-               gap-4 sm:gap-6 justify-items-center"
-      >
+      <div class="w-full max-w-md sm:max-w-3xl mx-auto grid grid-cols-2 md:grid-cols-4
+               gap-4 sm:gap-6 justify-items-center">
         <ng-container *ngFor="let m of members">
-          <div
-            (click)="toggleMember(m.key)"
-            class="relative flex flex-col items-center
+          <div (click)="toggleMember(m.key)" class="relative flex flex-col items-center
                    w-full max-w-[140px] sm:max-w-[170px]
                    h-[160px] sm:h-[210px]
                    rounded-[18px] border bg-white cursor-pointer
                    shadow-card transition-transform duration-200 hover:-translate-y-1"
-            [ngClass]="m.selected ? 'gradient-border' : 'border-[#E6EEF5]'"
-          >
-            <img
-              [src]="m.iconPath"
-              class="mt-5 sm:mt-6 w-14 h-14 sm:w-16 sm:h-16 object-contain"
-            />
+            [ngClass]="m.selected ? 'gradient-border' : 'border-[#E6EEF5]'">
+            <img [src]="m.iconPath" class="mt-5 sm:mt-6 w-14 h-14 sm:w-16 sm:h-16 object-contain" />
 
-            <p
-              class="mt-3 sm:mt-4 text-xs sm:text-sm font-semibold text-gray-700"
-            >
+            <p class="mt-3 sm:mt-4 text-xs sm:text-sm font-semibold text-gray-700">
               {{ m.label }}
             </p>
 
             <!-- child counter pinned at bottom for Son / Daughter (visible desktop & mobile) -->
-            <div
-              *ngIf="m.key === 'son' || m.key === 'daughter'"
-              class="mt-auto mb-3 sm:mb-4 pt-2 flex items-center justify-center gap-5"
-            >
-              <button
-                (click)="decrementChild(m.key); $event.stopPropagation()"
-                class="w-6 h-6 sm:w-7 sm:h-7 rounded-full border border-[#00A2C4]
-                       flex items-center justify-center text-[#00A2C4] text-sm"
-                [disabled]="m.count === 0"
-              >
+            <div *ngIf="m.key === 'son' || m.key === 'daughter'"
+              class="mt-auto mb-3 sm:mb-4 pt-2 flex items-center justify-center gap-5">
+              <button (click)="decrementChild(m.key); $event.stopPropagation()" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full border border-[#00A2C4]
+                       flex items-center justify-center text-[#00A2C4] text-sm" [disabled]="m.count === 0">
                 –
               </button>
 
-              <span
-                class="text-xs sm:text-sm font-semibold text-gray-700 min-w-[1.5rem] text-center"
-              >
+              <span class="text-xs sm:text-sm font-semibold text-gray-700 min-w-[1.5rem] text-center">
                 {{ m.count }}
               </span>
 
-              <button
-                (click)="incrementChild(m.key); $event.stopPropagation()"
-                class="w-6 h-6 sm:w-7 sm:h-7 rounded-full border border-[#00A2C4]
+              <button (click)="incrementChild(m.key); $event.stopPropagation()" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full border border-[#00A2C4]
                        flex items-center justify-center text-[#00A2C4] text-sm"
-                [disabled]="getTotalChildren() >= maxChildren"
-              >
+                [disabled]="getTotalChildren() >= maxChildren">
                 +
               </button>
             </div>
@@ -198,11 +137,8 @@
       </div>
 
       <div class="flex justify-center mt-4 sm:mt-8">
-        <button
-          (click)="next()"
-          class="w-[150px] sm:w-[170px] h-10 sm:h-11 rounded-full
-                 bg-[#006D8D] text-white shadow-next hover:bg-[#005b75] text-sm sm:text-base"
-        >
+        <button (click)="next()" class="w-[150px] sm:w-[170px] h-10 sm:h-11 rounded-full
+                 bg-[#006D8D] text-white shadow-next hover:bg-[#005b75] text-sm sm:text-base">
           Next
         </button>
       </div>
@@ -210,23 +146,16 @@
 
     <!-- ======================= STEP 2 ======================= -->
     <div *ngIf="step === 2" class="space-y-6 sm:space-y-10">
-      <h2
-        class="text-center text-base sm:text-2xl font-medium text-gray-700 tracking-wide"
-      >
+      <h2 class="text-center text-base sm:text-2xl font-medium text-gray-700 tracking-wide">
         Tell us the age of your family members
       </h2>
 
       <!-- AGE CARDS: wrap + center -->
       <div class="flex flex-wrap justify-center gap-6 sm:gap-10 mt-2 sm:mt-4">
         <ng-container *ngFor="let id of getFlatMemberList()">
-          <div
-            class="w-[180px] sm:w-[220px] bg-white rounded-xl border border-[#E5EFF4]
-                   shadow-card flex flex-col items-center text-center pt-6 sm:pt-8 pb-5 sm:pb-6"
-          >
-            <img
-              [src]="getIconForId(id)"
-              class="w-16 h-16 sm:w-20 sm:h-20 object-contain"
-            />
+          <div class="w-[180px] sm:w-[220px] bg-white rounded-xl border border-[#E5EFF4]
+                   shadow-card flex flex-col items-center text-center pt-6 sm:pt-8 pb-5 sm:pb-6">
+            <img [src]="getIconForId(id)" class="w-16 h-16 sm:w-20 sm:h-20 object-contain" />
 
             <p class="mt-3 sm:mt-4 text-sm sm:text-base font-medium text-gray-700">
               {{ getAgeTitle(id) }}
@@ -235,36 +164,23 @@
             <div class="mt-5 sm:mt-6 w-full px-6 sm:px-8">
               <!-- CUSTOM DROPDOWN (always opens downwards) -->
               <div class="age-dropdown">
-                <div
-                  class="age-dropdown__control"
-                  (click)="toggleAgeDropdown(id); $event.stopPropagation()"
-                >
+                <div class="age-dropdown__control" (click)="toggleAgeDropdown(id); $event.stopPropagation()">
                   <span class="age-dropdown__value">
                     {{
-                      selectedAges[id]
-                        ? getAgeLabelForId(id, selectedAges[id])
-                        : 'Select Age'
+                    selectedAges[id]
+                    ? getAgeLabelForId(id, selectedAges[id])
+                    : 'Select Age'
                     }}
                   </span>
                   <span class="age-dropdown__arrow">▾</span>
                 </div>
 
-                <div
-                  class="age-dropdown__menu"
-                  *ngIf="openAgeDropdownId === id"
-                  (click)="$event.stopPropagation()"
-                >
-                  <div
-                    class="age-dropdown__option age-dropdown__option--placeholder"
-                    (click)="selectAge(id, null)"
-                  >
+                <div class="age-dropdown__menu" *ngIf="openAgeDropdownId === id" (click)="$event.stopPropagation()">
+                  <div class="age-dropdown__option age-dropdown__option--placeholder" (click)="selectAge(id, null)">
                     Select Age
                   </div>
-                  <div
-                    class="age-dropdown__option"
-                    *ngFor="let opt of getAgeOptionsForId(id)"
-                    (click)="selectAge(id, opt.value)"
-                  >
+                  <div class="age-dropdown__option" *ngFor="let opt of getAgeOptionsForId(id)"
+                    (click)="selectAge(id, opt.value)">
                     {{ opt.label }}
                   </div>
                 </div>
@@ -276,19 +192,13 @@
 
       <!-- Nav buttons -->
       <div class="flex justify-center gap-4 sm:gap-5 mt-4 sm:mt-8">
-        <button
-          (click)="prev()"
-          class="px-6 sm:px-8 py-2.5 sm:py-3 rounded-[20px] border border-gray-300
-                 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-100"
-        >
+        <button (click)="prev()" class="px-6 sm:px-8 py-2.5 sm:py-3 rounded-[20px] border border-gray-300
+                 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-100">
           Previous
         </button>
 
-        <button
-          (click)="next()"
-          class="px-8 sm:px-10 py-2.5 sm:py-3 rounded-[20px] bg-[#006D8D] text-white
-                 text-xs sm:text-sm font-medium shadow-next hover:bg-[#005B75]"
-        >
+        <button (click)="next()" class="px-8 sm:px-10 py-2.5 sm:py-3 rounded-[20px] bg-[#006D8D] text-white
+                 text-xs sm:text-sm font-medium shadow-next hover:bg-[#005B75]">
           Next
         </button>
       </div>
@@ -296,48 +206,29 @@
 
     <!-- ======================= STEP 3 ======================= -->
     <div *ngIf="step === 3" class="space-y-8 sm:space-y-12">
-      <h2
-        class="text-center text-base sm:text-2xl font-medium text-gray-700 tracking-wide"
-      >
+      <h2 class="text-center text-base sm:text-2xl font-medium text-gray-700 tracking-wide">
         Tell us more about yourself
       </h2>
 
       <!-- Soft banner instead of browser alert -->
-      <div
-        *ngIf="basicFormSubmitAttempted && basicForm.invalid"
-        class="mt-2 mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-2
-               flex items-center gap-2 text-xs sm:text-sm text-red-700 justify-center"
-      >
-        <span
-          class="inline-flex w-4 h-4 rounded-full bg-red-500 text-white
-                 text-[10px] items-center justify-center font-bold"
-          >!</span
-        >
+      <div *ngIf="basicFormSubmitAttempted && basicForm.invalid" class="mt-2 mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-2
+               flex items-center gap-2 text-xs sm:text-sm text-red-700 justify-center">
+        <span class="inline-flex w-4 h-4 rounded-full bg-red-500 text-white
+                 text-[10px] items-center justify-center font-bold">!</span>
         <span>Please check the highlighted fields and fill your basic details correctly.</span>
       </div>
 
-      <form
-        [formGroup]="basicForm"
-        class="max-w-5xl mx-auto space-y-8 sm:space-y-12"
-        novalidate
-      >
+      <form [formGroup]="basicForm" class="max-w-5xl mx-auto space-y-8 sm:space-y-12" novalidate>
         <!-- Row 1: 3 fields -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-x-10 sm:gap-x-16 gap-y-6">
           <div>
             <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
               First Name <span class="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              formControlName="firstName"
-              class="w-full border-0 border-b border-gray-400 bg-transparent py-2
+            <input type="text" formControlName="firstName" class="w-full border-0 border-b border-gray-400 bg-transparent py-2
                      text-gray-700 text-sm focus:outline-none focus:border-[#006D8D]"
-              [ngClass]="{ 'invalid-field': isInvalid('firstName') }"
-              placeholder="Enter your first name"
-              (keypress)="allowOnlyLetters($event)"
-              (input)="onNameInput('firstName')"
-              autocomplete="given-name"
-            />
+              [ngClass]="{ 'invalid-field': isInvalid('firstName') }" placeholder="Enter your first name"
+              (keypress)="allowOnlyLetters($event)" (input)="onNameInput('firstName')" autocomplete="given-name" />
             <div *ngIf="isInvalid('firstName')" class="form-error">
               <span *ngIf="f['firstName'].errors?.['required']">
                 First name is required.
@@ -355,17 +246,10 @@
             <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
               Last Name <span class="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              formControlName="lastName"
-              class="w-full border-0 border-b border-gray-400 bg-transparent py-2
+            <input type="text" formControlName="lastName" class="w-full border-0 border-b border-gray-400 bg-transparent py-2
                      text-gray-700 text-sm focus:outline-none focus:border-[#006D8D]"
-              [ngClass]="{ 'invalid-field': isInvalid('lastName') }"
-              placeholder="Enter your last name"
-              (keypress)="allowOnlyLetters($event)"
-              (input)="onNameInput('lastName')"
-              autocomplete="family-name"
-            />
+              [ngClass]="{ 'invalid-field': isInvalid('lastName') }" placeholder="Enter your last name"
+              (keypress)="allowOnlyLetters($event)" (input)="onNameInput('lastName')" autocomplete="family-name" />
             <div *ngIf="isInvalid('lastName')" class="form-error">
               <span *ngIf="f['lastName'].errors?.['required']">
                 Last name is required.
@@ -412,18 +296,10 @@
             <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
               Pincode <span class="text-red-500">*</span>
             </label>
-            <input
-              type="tel"
-              formControlName="pincode"
-              maxlength="6"
-              class="w-full border-0 border-b border-gray-400 bg-transparent py-2
+            <input type="tel" formControlName="pincode" maxlength="6" class="w-full border-0 border-b border-gray-400 bg-transparent py-2
                      text-gray-700 text-sm focus:outline-none focus:border-[#006D8D]"
-              [ngClass]="{ 'invalid-field': isInvalid('pincode') }"
-              placeholder="Enter 6-digit pincode"
-              (keypress)="allowOnlyDigits($event)"
-              (input)="onNumberInput('pincode', 6)"
-              autocomplete="postal-code"
-            />
+              [ngClass]="{ 'invalid-field': isInvalid('pincode') }" placeholder="Enter 6-digit pincode"
+              (keypress)="allowOnlyDigits($event)" (input)="onNumberInput('pincode', 6)" autocomplete="postal-code" />
             <div *ngIf="isInvalid('pincode')" class="form-error">
               <span *ngIf="f['pincode'].errors?.['required']">
                 Pincode is required.
@@ -438,17 +314,10 @@
             <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
               City <span class="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              formControlName="city"
-              class="w-full border-0 border-b border-gray-400 bg-transparent py-2
+            <input type="text" formControlName="city" class="w-full border-0 border-b border-gray-400 bg-transparent py-2
                      text-gray-700 text-sm focus:outline-none focus:border-[#006D8D]"
-              [ngClass]="{ 'invalid-field': isInvalid('city') }"
-              placeholder="Enter your city"
-              (keypress)="allowOnlyLetters($event)"
-              (input)="onNameInput('city')"
-              autocomplete="address-level2"
-            />
+              [ngClass]="{ 'invalid-field': isInvalid('city') }" placeholder="Enter your city"
+              (keypress)="allowOnlyLetters($event)" (input)="onNameInput('city')" autocomplete="address-level2" />
             <div *ngIf="isInvalid('city')" class="form-error">
               <span *ngIf="f['city'].errors?.['required']">
                 City is required.
@@ -467,12 +336,9 @@
               Cover Amount <span class="text-red-500">*</span>
             </label>
             <div class="relative w-full">
-              <select
-                formControlName="coverAmount"
-                class="w-full border-0 border-b border-gray-400 bg-transparent py-2
+              <select formControlName="coverAmount" class="w-full border-0 border-b border-gray-400 bg-transparent py-2
                        text-gray-700 text-sm focus:outline-none focus:border-[#006D8D] appearance-none"
-                [ngClass]="{ 'invalid-field': isInvalid('coverAmount') }"
-              >
+                [ngClass]="{ 'invalid-field': isInvalid('coverAmount') }">
                 <option value="">Select cover amount</option>
                 <option value="300000">3 Lakh</option>
                 <option value="500000">5 Lakh</option>
@@ -490,10 +356,8 @@
                 <option value="10000000">1 Crore</option>
                 <option value="30000000">3 Crore</option>
               </select>
-              <span
-                class="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2
-                       text-[#006D8D] text-[10px] sm:text-xs"
-              >
+              <span class="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2
+                       text-[#006D8D] text-[10px] sm:text-xs">
                 ▾
               </span>
             </div>
@@ -506,21 +370,13 @@
 
       <!-- Buttons -->
       <div class="flex flex-col sm:flex-row justify-between items-center mt-4 gap-4">
-        <button
-          class="w-full sm:w-auto px-6 py-2.5 rounded border border-gray-300
-                 text-gray-700 text-sm hover:bg-gray-100"
-          (click)="prev()"
-          type="button"
-        >
+        <button class="w-full sm:w-auto px-6 py-2.5 rounded border border-gray-300
+                 text-gray-700 text-sm hover:bg-gray-100" (click)="prev()" type="button">
           Previous
         </button>
 
-        <button
-          class="w-full sm:w-auto px-10 py-2.5 rounded-[20px] bg-[#006D8D] text-white
-                 text-sm shadow-next hover:bg-[#005B75]"
-          type="button"
-          (click)="next()"
-        >
+        <button class="w-full sm:w-auto px-10 py-2.5 rounded-[20px] bg-[#006D8D] text-white
+                 text-sm shadow-next hover:bg-[#005B75]" type="button" (click)="next()">
           Submit
         </button>
       </div>
