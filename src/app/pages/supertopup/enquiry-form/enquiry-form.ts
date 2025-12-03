@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, signal, computed, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../../../../firebaseConfig';
 import { SuperTopupService } from '../../../services/super-topup.service';
+import { firstValueFrom } from 'rxjs'; // <-- new import
 
 type MemberKey = 'you' | 'spouse' | 'son' | 'daughter';
 
@@ -53,6 +54,17 @@ export class EnquiryForm {
 
   // for custom dropdown in Step 2
   openAgeDropdownId: string | null = null;
+
+  // OTP state as Signals (keeps template reactive)
+  otpModalOpenSignal: WritableSignal<boolean> = signal(false);
+  otpDigitsSignal: WritableSignal<string[]> = signal(['', '', '', '']);
+  otpErrorSignal: WritableSignal<string | null> = signal(null);
+  otpSentSignal: WritableSignal<boolean> = signal(false);
+  resendTimerSignal: WritableSignal<number> = signal(0); // seconds remaining for resend
+  otpValueSignal = computed(() => this.otpDigitsSignal().join(''));
+  mobileVerifiedSignal: WritableSignal<boolean> = signal(false); // track if mobile is verified
+  private resendIntervalId: any = null;
+  private readonly resendCooldown = 30; // seconds
 
   constructor(private fb: FormBuilder, private router: Router, private myApiService: SuperTopupService) {
     this.basicForm = this.fb.group({
@@ -213,72 +225,14 @@ export class EnquiryForm {
         return;
       }
 
-      const payload = this.buildPayload();
-      console.log('SUBMIT payload', payload);
-      localStorage.setItem('supertopup_enquiry', JSON.stringify(payload));
-
-      const details = this.basicForm.getRawValue();
-
-      const layout: Record<string, string> = {};
-
-      // Self / Spouse ages & flags
-      layout['Age'] = this.selectedAges['you'] ?? '';
-      if (this.members.find((m) => m.key === 'you')?.selected) layout['self'] = 'on';
-
-      layout['SAge'] = this.selectedAges['spouse'] ?? '';
-      if (this.members.find((m) => m.key === 'spouse')?.selected) layout['spouse'] = 'on';
-
-      // Cover & customer details
-      layout['cover_amount'] = details.coverAmount ?? '';
-      layout['cust_Pincode'] = details.pincode ?? '';
-      layout['cust_city'] = details.city ?? '';
-      layout['cust_fname'] = details.firstName ?? '';
-      layout['cust_lname'] = details.lastName ?? '';
-      layout['cust_mobile'] = details.mobile ?? '';
-
-      // Gender
-      layout['gender'] = this.gender ?? '';
-
-      // Sons
-      const sCount = this.getSonCount();
-      if (sCount > 0) {
-        layout['son'] = 'on';
-        layout['sonCount'] = String(sCount);
-        for (let i = 1; i <= sCount; i++) {
-          layout[`son${i}Age`] = this.selectedAges[`son${i}`] ?? '';
-        }
-      } else {
-        layout['sonCount'] = '0';
+      // Check if mobile is verified before final submission
+      if (!this.mobileVerifiedSignal()) {
+        this.otpErrorSignal.set('Please verify your mobile number first.');
+        return;
       }
 
-      // Daughters
-      const dCount = this.getDaughterCount();
-      if (dCount > 0) {
-        layout['daughter'] = 'on';
-        layout['daughterCount'] = String(dCount);
-        for (let i = 1; i <= dCount; i++) {
-          layout[`daughter${i}Age`] = this.selectedAges[`daughter${i}`] ?? '';
-        }
-      } else {
-        layout['daughterCount'] = '0';
-      }
-
-      console.log('New Layout', layout);
-
-      // SAVE TO FIRESTORE
-      try {
-        await addDoc(collection(db, 'AUX_enquiry_leads'), {
-          ...layout,
-          lead_type: "super-top-up",
-          created_at: new Date().toISOString()
-        });
-
-        console.log('🔥 Saved in Firestore Successfully');
-      } catch (err) {
-        console.error('❌ Firebase Save Error', err);
-      }
-      // Navigate to Quotes Screen
-      this.router.navigate(['/supertopup/quotes']);
+      // All checks passed, proceed with submission
+      await this.completeSubmissionAfterOtp();
     }
   }
 
@@ -538,5 +492,260 @@ export class EnquiryForm {
     if (!target.closest('.age-dropdown')) {
       this.openAgeDropdownId = null;
     }
+  }
+
+  /** Open OTP modal, send OTP and start resend timer */
+  async openOtpModal() {
+    this.initOtpState();
+    this.otpModalOpenSignal.set(true);
+
+    const mobile = (this.basicForm.get('mobile')?.value || '').toString();
+    if (!mobile) {
+      this.otpErrorSignal.set('Mobile number missing');
+      return;
+    }
+
+    try {
+      await this.sendOtpToMobile(mobile);
+      // focus first input slightly after open
+      setTimeout(() => {
+        const el = document.getElementById('otp-0') as HTMLInputElement | null;
+        el?.focus();
+      }, 50);
+    } catch (err: any) {
+      // extract error message from response or error object
+      const errorMsg = err?.error?.message || err?.message || 'Failed to send OTP. Please try again.';
+      this.otpErrorSignal.set(errorMsg);
+      // console.log('Send OTP error:', err);
+    }
+  }
+
+  initOtpState() {
+    this.otpDigitsSignal.set(['', '', '', '']);
+    this.otpErrorSignal.set(null);
+    this.otpSentSignal.set(false);
+    this.stopResendTimer();
+    this.resendTimerSignal.set(0);
+  }
+
+  async sendOtpToMobile(mobile: string) {
+    try {
+      const resp: any = await firstValueFrom(this.myApiService.sendOtp(mobile));
+      // API may return a success flag; respect it if present
+      if (resp && typeof resp.success !== 'undefined' && resp.success !== true) {
+        this.otpSentSignal.set(false);
+        console.log('OTP send failed response', resp.message);
+        throw new Error(resp.message || 'Failed to send OTP');
+      }
+      this.otpSentSignal.set(true);
+      this.startResendTimer();
+    } catch (err) {
+      this.otpSentSignal.set(false);
+      throw err;
+    }
+  }
+
+  startResendTimer() {
+    this.stopResendTimer();
+    this.resendTimerSignal.set(this.resendCooldown);
+    this.resendIntervalId = setInterval(() => {
+      this.resendTimerSignal.update(v => {
+        const next = v - 1;
+        if (next <= 0) {
+          this.stopResendTimer();
+          return 0;
+        }
+        return next;
+      });
+    }, 1000);
+  }
+
+  stopResendTimer() {
+    if (this.resendIntervalId) {
+      clearInterval(this.resendIntervalId);
+      this.resendIntervalId = null;
+    }
+  }
+
+  /** Input handlers for OTP digits */
+  onOtpInput(index: number, event: Event) {
+    const input = event.target as HTMLInputElement;
+    let val = (input.value || '').replace(/\D/g, '').slice(0, 1);
+    const arr = [...this.otpDigitsSignal()];
+    arr[index] = val;
+    this.otpDigitsSignal.set(arr);
+    input.value = val;
+
+    if (val && index < 3) {
+      const next = document.getElementById(`otp-${index + 1}`) as HTMLInputElement | null;
+      next?.focus();
+    }
+
+    // if last digit entered, auto-submit verification
+    if (index === 3 && this.otpDigitsSignal().join('').length === 4) {
+      this.submitOtp();
+    }
+  }
+
+  onOtpKeydown(index: number, event: KeyboardEvent) {
+    const key = event.key;
+    if (key === 'Backspace') {
+      if (!this.otpDigitsSignal()[index] && index > 0) {
+        const prev = document.getElementById(`otp-${index - 1}`) as HTMLInputElement | null;
+        prev?.focus();
+      } else {
+        // clear current
+        const arr = [...this.otpDigitsSignal()];
+        arr[index] = '';
+        this.otpDigitsSignal.set(arr);
+      }
+    }
+  }
+
+  onOtpPaste(event: ClipboardEvent) {
+    const text = event.clipboardData?.getData('text') || '';
+    const digits = text.replace(/\D/g, '').slice(0, 4).split('');
+    if (digits.length > 0) {
+      const arr = [...this.otpDigitsSignal()];
+      for (let i = 0; i < 4; i++) {
+        arr[i] = digits[i] || '';
+        const el = document.getElementById(`otp-${i}`) as HTMLInputElement | null;
+        if (el) el.value = arr[i];
+      }
+      this.otpDigitsSignal.set(arr);
+      event.preventDefault();
+      // auto-submit if we have 4 digits
+      if (digits.length === 4) {
+        this.submitOtp();
+      }
+    }
+  }
+
+  async submitOtp() {
+    this.otpErrorSignal.set(null);
+    const otp = this.otpDigitsSignal().join('');
+
+    if (otp.length !== 4) {
+      this.otpErrorSignal.set('Enter 4-digit OTP');
+      return;
+    }
+
+    const mobile = (this.basicForm.get('mobile')?.value || '').toString();
+    try {
+      // inspect response body - backend may return { valid: false } without throwing
+      const resp: any = await firstValueFrom(this.myApiService.verifyOtp(mobile, otp));
+      if (!resp || resp.valid !== true) {
+        // show server message when available, else fallback
+        const errorMsg = resp?.message || resp?.error || 'Invalid OTP. Please try again.';
+        this.otpErrorSignal.set(errorMsg);
+        console.log('OTP verification failed:', resp);
+        return;
+      }
+      // Mark mobile as verified
+      this.mobileVerifiedSignal.set(true);
+       // verified -> close modal and complete the submission flow
+       this.closeOtpModal();
+    } catch (err: any) {
+      // network/error case - try to extract message from error response
+       const errorMsg = err?.error?.message || err?.message || 'Invalid OTP. Please try again.';
+       this.otpErrorSignal.set(errorMsg);
+       console.log('OTP submission error:', err);
+     }
+   }
+
+  async resendOtp() {
+    const mobile = (this.basicForm.get('mobile')?.value || '').toString();
+    if (!mobile) {
+      this.otpErrorSignal.set('Mobile number not available');
+      return;
+    }
+    try {
+      await this.sendOtpToMobile(mobile);
+      this.otpErrorSignal.set(null);
+      // clear inputs and focus first
+      this.otpDigitsSignal.set(['', '', '', '']);
+      setTimeout(() => {
+        const el = document.getElementById('otp-0') as HTMLInputElement | null;
+        el?.focus();
+      }, 50);
+    } catch (err) {
+      this.otpErrorSignal.set('Failed to resend OTP');
+    }
+  }
+
+  closeOtpModal() {
+    this.otpModalOpenSignal.set(false);
+    this.stopResendTimer();
+  }
+
+  /** Extracted submission logic to call after OTP verification */
+  private async completeSubmissionAfterOtp() {
+    // reuse the previous code that performed the save. Build payload/layout then save to firestore and navigate.
+    const payload = this.buildPayload();
+    console.log('SUBMIT payload', payload);
+    localStorage.setItem('supertopup_enquiry', JSON.stringify(payload));
+
+    const details = this.basicForm.getRawValue();
+
+    const layout: Record<string, string> = {};
+
+    // Self / Spouse ages & flags
+    layout['Age'] = this.selectedAges['you'] ?? '';
+    if (this.members.find((m) => m.key === 'you')?.selected) layout['self'] = 'on';
+
+    layout['SAge'] = this.selectedAges['spouse'] ?? '';
+    if (this.members.find((m) => m.key === 'spouse')?.selected) layout['spouse'] = 'on';
+
+    // Cover & customer details
+    layout['cover_amount'] = details.coverAmount ?? '';
+    layout['cust_Pincode'] = details.pincode ?? '';
+    layout['cust_city'] = details.city ?? '';
+    layout['cust_fname'] = details.firstName ?? '';
+    layout['cust_lname'] = details.lastName ?? '';
+    layout['cust_mobile'] = details.mobile ?? '';
+
+    // Gender
+    layout['gender'] = this.gender ?? '';
+
+    // Sons
+    const sCount = this.getSonCount();
+    if (sCount > 0) {
+      layout['son'] = 'on';
+      layout['sonCount'] = String(sCount);
+      for (let i = 1; i <= sCount; i++) {
+        layout[`son${i}Age`] = this.selectedAges[`son${i}`] ?? '';
+      }
+    } else {
+      layout['sonCount'] = '0';
+    }
+
+    // Daughters
+    const dCount = this.getDaughterCount();
+    if (dCount > 0) {
+      layout['daughter'] = 'on';
+      layout['daughterCount'] = String(dCount);
+      for (let i = 1; i <= dCount; i++) {
+        layout[`daughter${i}Age`] = this.selectedAges[`daughter${i}`] ?? '';
+      }
+    } else {
+      layout['daughterCount'] = '0';
+    }
+
+    console.log('New Layout', layout);
+
+    // SAVE TO FIRESTORE
+    try {
+      await addDoc(collection(db, 'AUX_enquiry_leads'), {
+        ...layout,
+        lead_type: "super-top-up",
+        created_at: new Date().toISOString()
+      });
+
+      console.log('🔥 Saved in Firestore Successfully');
+    } catch (err) {
+      console.error('❌ Firebase Save Error', err);
+    }
+    // Navigate to Quotes Screen
+    this.router.navigate(['/supertopup/quotes']);
   }
 }

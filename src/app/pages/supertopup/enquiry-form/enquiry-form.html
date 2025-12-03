@@ -287,11 +287,15 @@
                 Enter a valid 10-digit mobile number (starting from 6–9).
               </span>
             </div>
+            <!-- Verify Number Button -->
+            <button type="button" (click)="openOtpModal()" class="mt-2 text-xs sm:text-sm px-3 py-1 rounded
+                     bg-[#006D8D] text-white hover:bg-[#005B75] font-medium"
+             [disabled]="isInvalid('mobile') || mobileVerifiedSignal()">
+             {{ mobileVerifiedSignal() ? '✓ Verified' : 'Verify Number' }}
+           </button>
+           <span *ngIf="mobileVerifiedSignal()" class="text-xs text-green-600 ml-2">Mobile verified</span>
           </div>
-        </div>
 
-        <!-- Row 2: 4 fields -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-x-10 sm:gap-x-16 gap-y-6">
           <div>
             <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
               Pincode <span class="text-red-500">*</span>
@@ -331,7 +335,7 @@
             </div>
           </div>
 
-          <div class="md:col-span-2">
+          <div class="">
             <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
               Cover Amount <span class="text-red-500">*</span>
             </label>
@@ -375,10 +379,62 @@
           Previous
         </button>
 
-        <button class="w-full sm:w-auto px-10 py-2.5 rounded-[20px] bg-[#006D8D] text-white
-                 text-sm shadow-next hover:bg-[#005B75]" type="button" (click)="next()">
-          Submit
-        </button>
+        <button class="w-full sm:w-auto px-10 py-2.5 rounded-[20px] text-white
+                 text-sm shadow-next" type="button" (click)="next()"
+          [ngClass]="mobileVerifiedSignal() 
+            ? 'bg-[#006D8D] hover:bg-[#005B75]' 
+            : 'bg-gray-400 cursor-not-allowed'">
+           Submit
+         </button>
+       </div>
+     </div>
+
+    <!-- OTP Modal (4-digit) -->
+    <div *ngIf="otpModalOpenSignal()" class="fixed inset-0 z-40 flex items-center justify-center">
+      <!-- overlay -->
+      <div class="absolute inset-0 bg-black/40"></div>
+
+      <!-- modal -->
+      <div class="relative bg-white rounded-xl shadow-lg w-[92%] max-w-sm p-5 z-50">
+        <div class="flex justify-between items-start mb-3">
+          <div>
+            <h3 class="text-base font-semibold text-gray-700">Verify Mobile</h3>
+            <p class="text-xs text-gray-500 mt-1">Enter the 4-digit OTP sent to your mobile</p>
+          </div>
+          <button (click)="closeOtpModal()" class="text-gray-400 hover:text-gray-600">✕</button>
+        </div>
+
+        <div class="flex justify-center gap-2 mb-3" (paste)="onOtpPaste($event)">
+          <input id="otp-0" [value]="otpDigitsSignal()[0]" type="text" maxlength="1" inputmode="numeric" class="w-12 h-12 text-center rounded-lg border border-gray-200"
+                 (input)="onOtpInput(0, $event)" (keydown)="onOtpKeydown(0, $event)" />
+          <input id="otp-1" [value]="otpDigitsSignal()[1]" type="text" maxlength="1" inputmode="numeric" class="w-12 h-12 text-center rounded-lg border border-gray-200"
+                 (input)="onOtpInput(1, $event)" (keydown)="onOtpKeydown(1, $event)" />
+          <input id="otp-2" [value]="otpDigitsSignal()[2]" type="text" maxlength="1" inputmode="numeric" class="w-12 h-12 text-center rounded-lg border border-gray-200"
+                 (input)="onOtpInput(2, $event)" (keydown)="onOtpKeydown(2, $event)" />
+          <input id="otp-3" [value]="otpDigitsSignal()[3]" type="text" maxlength="1" inputmode="numeric" class="w-12 h-12 text-center rounded-lg border border-gray-200"
+                 (input)="onOtpInput(3, $event)" (keydown)="onOtpKeydown(3, $event)" />
+        </div>
+
+        <div *ngIf="otpErrorSignal()" class="text-xs text-red-600 text-center mb-2">
+          {{ otpErrorSignal() }}
+        </div>
+
+        <div class="flex items-center justify-between gap-3">
+          <button (click)="submitOtp()" class="flex-1 px-4 py-2 rounded-md bg-[#006D8D] text-white text-sm font-medium"
+                  [disabled]="otpValueSignal().length !== 4">
+            Verify
+          </button>
+
+          <button (click)="resendOtp()" class="flex-1 px-4 py-2 rounded-md border text-sm font-medium"
+                  [disabled]="resendTimerSignal() > 0">
+            <span *ngIf="resendTimerSignal() === 0">Resend</span>
+            <span *ngIf="resendTimerSignal() > 0">Resend ({{ resendTimerSignal() }}s)</span>
+          </button>
+        </div>
+
+        <p class="mt-3 text-xs text-gray-500 text-center">
+          Didn't receive OTP? Check your mobile number or try again after the cooldown.
+        </p>
       </div>
     </div>
   </div>
