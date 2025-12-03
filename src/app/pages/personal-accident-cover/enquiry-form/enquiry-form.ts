@@ -29,7 +29,6 @@ import { RouterModule } from '@angular/router';
 export class PAEnquiryFormComponent {
 
   step = 1;
-
   gender: 'Male' | 'Female' = 'Male';
   maleIcon = 'assets/you.svg';
   femaleIcon = 'assets/spouse.svg';
@@ -76,6 +75,28 @@ export class PAEnquiryFormComponent {
 
     this.applyGenderIcons();
   }
+  goBack() {
+    window.history.back();
+  }
+
+  /** Auto-uppercase entire name + remove invalid chars */
+onNameInput(controlName: string) {
+  const ctrl = this.basicForm.get(controlName);
+  if (!ctrl) return;
+
+  let raw = (ctrl.value || '') as string;
+
+  // Keep only letters + spaces
+  raw = raw.replace(/[^A-Za-z ]/g, '');
+
+  // Convert entire string to uppercase
+  const formatted = raw.toUpperCase();
+
+  if (formatted !== raw) {
+    ctrl.setValue(formatted, { emitEvent: false });
+  }
+}
+
 
   // Gender change
   setGender(g: 'Male' | 'Female') {
@@ -199,7 +220,7 @@ if (this.step === 3) {
   s3Fields.forEach(field => {
     const control = this.basicForm.get(field);
     if (control?.invalid) {
-      control.markAsTouched();   // show error AFTER user presses Get Quotes
+      control.markAsTouched();
       hasError = true;
     }
   });
@@ -224,10 +245,9 @@ if (this.step === 3) {
   localStorage.setItem('pa_enquiry', JSON.stringify(payload));
   this.router.navigate(['/personal-accident/quotes']);
   }
-
 }
 
-  prev() {
+prev() {
     if (this.step > 1) {
       this.step--;
       window.scrollTo({ top: 0, behavior: 'smooth' });
