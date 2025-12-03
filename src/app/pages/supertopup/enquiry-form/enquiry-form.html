@@ -287,11 +287,15 @@
                 Enter a valid 10-digit mobile number (starting from 6–9).
               </span>
             </div>
+            <!-- Verify Number Button -->
+            <button type="button" (click)="openOtpModal()" class="mt-2 text-xs sm:text-sm px-3 py-1 rounded
+                     bg-[#006D8D] text-white hover:bg-[#005B75] font-medium"
+             [disabled]="isInvalid('mobile') || mobileVerifiedSignal()">
+             {{ mobileVerifiedSignal() ? '✓ Verified' : 'Verify Number' }}
+           </button>
+           <span *ngIf="mobileVerifiedSignal()" class="text-xs text-green-600 ml-2">Mobile verified</span>
           </div>
-        </div>
 
-        <!-- Row 2: 4 fields -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-x-10 sm:gap-x-16 gap-y-6">
           <div>
             <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
               Pincode <span class="text-red-500">*</span>
@@ -331,7 +335,7 @@
             </div>
           </div>
 
-          <div class="md:col-span-2">
+          <div class="">
             <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
               Cover Amount <span class="text-red-500">*</span>
             </label>
@@ -375,12 +379,15 @@
           Previous
         </button>
 
-        <button class="w-full sm:w-auto px-10 py-2.5 rounded-[20px] bg-[#006D8D] text-white
-                 text-sm shadow-next hover:bg-[#005B75]" type="button" (click)="next()">
-          Submit
-        </button>
-      </div>
-    </div>
+        <button class="w-full sm:w-auto px-10 py-2.5 rounded-[20px] text-white
+                 text-sm shadow-next" type="button" (click)="next()"
+          [ngClass]="mobileVerifiedSignal() 
+            ? 'bg-[#006D8D] hover:bg-[#005B75]' 
+            : 'bg-gray-400 cursor-not-allowed'">
+           Submit
+         </button>
+       </div>
+     </div>
 
     <!-- OTP Modal (4-digit) -->
     <div *ngIf="otpModalOpenSignal()" class="fixed inset-0 z-40 flex items-center justify-center">

@@ -62,6 +62,7 @@ export class EnquiryForm {
   otpSentSignal: WritableSignal<boolean> = signal(false);
   resendTimerSignal: WritableSignal<number> = signal(0); // seconds remaining for resend
   otpValueSignal = computed(() => this.otpDigitsSignal().join(''));
+  mobileVerifiedSignal: WritableSignal<boolean> = signal(false); // track if mobile is verified
   private resendIntervalId: any = null;
   private readonly resendCooldown = 30; // seconds
 
@@ -224,9 +225,14 @@ export class EnquiryForm {
         return;
       }
 
-      // Instead of completing submission directly, open OTP modal to verify mobile
-      await this.openOtpModal();
-      // submission continues after successful OTP verification
+      // Check if mobile is verified before final submission
+      if (!this.mobileVerifiedSignal()) {
+        this.otpErrorSignal.set('Please verify your mobile number first.');
+        return;
+      }
+
+      // All checks passed, proceed with submission
+      await this.completeSubmissionAfterOtp();
     }
   }
 
@@ -635,16 +641,17 @@ export class EnquiryForm {
         console.log('OTP verification failed:', resp);
         return;
       }
-      // verified -> close modal and complete the submission flow
-      this.closeOtpModal();
-      await this.completeSubmissionAfterOtp();
+      // Mark mobile as verified
+      this.mobileVerifiedSignal.set(true);
+       // verified -> close modal and complete the submission flow
+       this.closeOtpModal();
     } catch (err: any) {
       // network/error case - try to extract message from error response
-      const errorMsg = err?.error?.message || err?.message || 'Invalid OTP. Please try again.';
-      this.otpErrorSignal.set(errorMsg);
-      console.log('OTP submission error:', err);
-    }
-  }
+       const errorMsg = err?.error?.message || err?.message || 'Invalid OTP. Please try again.';
+       this.otpErrorSignal.set(errorMsg);
+       console.log('OTP submission error:', err);
+     }
+   }
 
   async resendOtp() {
     const mobile = (this.basicForm.get('mobile')?.value || '').toString();
