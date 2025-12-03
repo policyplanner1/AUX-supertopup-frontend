@@ -425,6 +425,11 @@ export class EnquiryForm {
     this.selectedAges[id] = value;
   }
 
+  goBack() {
+  window.history.back();
+}
+
+
   /* ---------- VALIDATION HELPERS FOR UI & KEYBOARD ---------- */
 
   isInvalid(controlName: string): boolean {
@@ -473,16 +478,24 @@ export class EnquiryForm {
     }
   }
 
-  /** Extra safety: clean pasted text for name/city */
+ /** Auto-capitalize each word + clean unwanted chars */
   onNameInput(controlName: string) {
     const ctrl = this.basicForm.get(controlName);
     if (!ctrl) return;
-    const raw = (ctrl.value || '') as string;
-    const sanitized = raw.replace(/[^A-Za-z ]/g, '');
-    if (sanitized !== raw) {
-      ctrl.setValue(sanitized, { emitEvent: false });
+
+    let raw = (ctrl.value || '') as string;
+
+    // Remove invalid characters (only letters + spaces)
+    raw = raw.replace(/[^A-Za-z ]/g, '');
+
+    // Capitalize each word
+    const formatted = raw.toUpperCase();
+
+    if (formatted !== raw) {
+      ctrl.setValue(formatted, { emitEvent: false });
     }
   }
+
 
   /** Extra safety: clean pasted text for mobile/pincode, keep only digits and max length */
   onNumberInput(controlName: string, maxLength: number) {
