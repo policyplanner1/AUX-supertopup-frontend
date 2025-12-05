@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { SuperTopupService } from '../../../services/super-topup.service';
+import { PAService } from '../../../services/pa.service';
 import { toPng } from "html-to-image";
 import jsPDF from 'jspdf';
 
@@ -30,8 +30,7 @@ export class PAQuotesComponent implements OnInit {
   pincode = '';
   name = '';
 
-  deductibleList = signal<number[]>([]);
-  selectedDeductible: number | null = null;
+  // deductible removed — using base/addon instead
 
   insurerList = signal<string[]>([]);
   selectedInsurer: string | null = null;
@@ -53,10 +52,10 @@ export class PAQuotesComponent implements OnInit {
   adultCount: number | null = null;
   childCount: number | null = null;
 
-  constructor(private router: Router, private api: SuperTopupService) {}
+  constructor(private router: Router, private api: PAService) { }
 
   ngOnInit(): void {
-    const savedData = localStorage.getItem('supertopup_enquiry');
+    const savedData = localStorage.getItem('pa_enquiry');
 
     if (savedData) {
       try {
@@ -182,25 +181,9 @@ export class PAQuotesComponent implements OnInit {
     }
   }
 
-  onDeductibleChange(event: any) {
-    const value = event.target.value;
-
-    if (value === '') {
-      this.selectedDeductible = null;
-    } else {
-      this.selectedDeductible = Number(value);
-    }
-
-    if (this.basePayload) {
-      (this.basePayload as any).deductibleAmount =
-        this.selectedDeductible ?? null;
-
-      this.fetchAllPlans(this.basePayload);
-    }
+  buildPlanKey(plan: any): string {
+    return plan.uniqueId;
   }
-buildPlanKey(plan: any): string {
-  return plan.uniqueId;
-}
 
 
   /* -------------------- Fetch + Map all plans -------------------- */
@@ -214,89 +197,62 @@ buildPlanKey(plan: any): string {
           next: (resArray) => {
             // 1️⃣ Extract insurer names
             const insurerNames: string[] = [];
+            console.log('API Responses:', resArray);
             resArray.forEach((res: any) => {
-              if (res?.companyName) {
-                insurerNames.push(res.companyName.trim());
+              if (res?.company) {
+                insurerNames.push(res.company.trim());
               }
             });
             const uniqueInsurers = Array.from(new Set(insurerNames)).sort();
             this.insurerList.set(uniqueInsurers);
 
-            // 2️⃣ Extract all deductibles
-            const allDeductibles: number[] = [];
-            resArray.forEach((res: any) => {
-              if (res?.premiums) {
-                res.premiums.forEach((pm: any) => {
-                  const d = Number(pm.deductible);
-                  if (!isNaN(d)) allDeductibles.push(d);
-                });
-              }
-            });
-            const uniqueSorted = Array.from(new Set(allDeductibles)).sort(
-              (a, b) => a - b
-            );
-            this.deductibleList.set(uniqueSorted);
 
             // 3️⃣ Filter + Map Plans
             const mappedPlans = resArray
-              .filter((res: any) => res && res.planName)
+              .filter((res: any) => res && res.plan)
               .flatMap((p: any) => {
-                let premiums = p.premiums || [];
-
-                // deductible filter
-                if (this.selectedDeductible !== null) {
-                  premiums = premiums.filter(
-                    (pm: any) =>
-                      Number(pm.deductible) === this.selectedDeductible
-                  );
-                }
 
                 // insurer filter
                 if (this.selectedInsurer !== null) {
-                  if (p.companyName !== this.selectedInsurer) return [];
+                  if (p.company !== this.selectedInsurer) return [];
                 }
 
+                console.log('Processing plan:', p);
                 const coverAmountNum = Number(p.coverAmount) || 0;
 
-                return premiums.map((pm: any) => {
-                  const premiumNum = Number(pm.premium) || 0;
-                  const dedNum = Number(pm.deductible) || 0;
-              return {
-                uniqueId: crypto.randomUUID(),
-                // UI fields
-                logo: `assets/quote/${p.logoUrl}`,
-                name: p.planName,
-                tag: p.companyName,
-                cover: `₹ ${this.formatIndianCurrency(coverAmountNum)}`,
-                deductible: `₹ ${this.formatIndianCurrency(dedNum)}`,
-                price: `₹ ${this.formatIndianCurrency(premiumNum)}`,
-                features: p.features?.length ? p.features : ['No Key Features Available'],
-                brochure: pm.brochureUrl || p.brochureUrl || null,
+                const baseNum = Number(p.base ?? 0) || 0;
+                const addonNum = Number(p.addon ?? 0) || 0;
+                return {
+                  uniqueId: crypto.randomUUID(),
+                  // UI fields
+                  logo: `assets/quote/${p.logoUrl}`,
+                  name: p.plan,
+                  tag: p.company,
+                  cover: `₹ ${this.formatIndianCurrency(coverAmountNum)}`,
+                  base: `₹ ${this.formatIndianCurrency(baseNum)}`,
+                  addon: `₹ ${this.formatIndianCurrency(addonNum)}`,
+                  features: ['No Key Features Available'],
+                  brochure: p.brochureUrl || null,
 
-                // Compare
-                planId: pm.planId || p.planId || `${p.planName}-${dedNum}-${premiumNum}`,
-                coverAmountNumber: coverAmountNum,
-                deductibleNumber: dedNum,
-                priceNumber: premiumNum,
-                insurerName: p.companyName,
-                otherDetails: this.buildOtherDetails(p, pm),
+                  // Compare
+                  planId: p.planId || `${p.planName}`,
+                  coverAmountNumber: coverAmountNum,
+                  baseNumber: baseNum,
+                  addonNumber: addonNum,
+                  insurerName: p.company,
+                  otherDetails: p,
+                };
 
-                // IMPORTANT FOR FEATURES PAGE
-                fullPlan: p,        // <-- ADD THIS
-                fullPremium: pm,    // <-- ADD THIS
-              };
-
-                });
               });
 
             // 4️⃣ Sorting
             if (this.selectedSort === 'low') {
               mappedPlans.sort(
-                (a: any, b: any) => a.priceNumber - b.priceNumber
+                (a: any, b: any) => a.baseNumber - b.baseNumber
               );
             } else if (this.selectedSort === 'high') {
               mappedPlans.sort(
-                (a: any, b: any) => b.priceNumber - a.priceNumber
+                (a: any, b: any) => b.baseNumber - a.baseNumber
               );
             }
 
@@ -313,100 +269,62 @@ buildPlanKey(plan: any): string {
     });
   }
 
-  private buildOtherDetails(p: any, pm: any): Record<string, string> {
-    const details: Record<string, string> = {};
 
-    if (p.companyName) details['Insurer'] = p.companyName;
-    if (p.planName) details['Plan Name'] = p.planName;
-    if (p.coverAmount) {
-      const num = Number(p.coverAmount) || 0;
-      details['Cover Amount'] = '₹ ' + this.formatIndianCurrency(num);
-    }
-    if (pm.deductible != null) {
-      const d = Number(pm.deductible) || 0;
-      details['Deductible Amount'] = '₹ ' + this.formatIndianCurrency(d);
-    }
-    if (pm.premium != null) {
-      const pr = Number(pm.premium) || 0;
-      details['Monthly Premium'] = '₹ ' + this.formatIndianCurrency(pr);
-    }
-    if (p.roomType) details['Room Category'] = p.roomType;
-    if (p.tenure) details['Policy Tenure'] = String(p.tenure);
-
-    // if backend sends structured otherDetails JSON, merge it
-    try {
-      const extra =
-        p.otherDetails ||
-        (p.plan?.other_details
-          ? JSON.parse(p.plan.other_details)
-          : undefined);
-      if (extra && typeof extra === 'object') {
-        Object.keys(extra).forEach((k) => {
-          if (extra[k] != null && extra[k] !== '') {
-            details[k] = String(extra[k]);
-          }
-        });
-      }
-    } catch {
-      // ignore parse errors
-    }
-
-    return details;
-  }
 
   /* -------------------- Compare logic -------------------- */
   allowAadhaarInput(event: any) {
-  const allowed = /^[0-9]$/;
+    const allowed = /^[0-9]$/;
 
-  // BLOCK ALL ALPHABETS, SYMBOLS IN ANDROID ALSO
-  if (!allowed.test(event.key)) {
-    event.preventDefault();
+    // BLOCK ALL ALPHABETS, SYMBOLS IN ANDROID ALSO
+    if (!allowed.test(event.key)) {
+      event.preventDefault();
+    }
   }
-}
 
   get emptySlots(): number[] {
     const remaining = this.maxCompare - this.compare.length;
     return remaining > 0 ? Array(remaining).fill(0) : [];
   }
 
-isSelected(plan: any): boolean {
-  return this.compare.some((p) => p.key === plan.uniqueId);
-}
+  isSelected(plan: any): boolean {
+    return this.compare.some((p) => p.key === plan.uniqueId);
+  }
 
   onCompareToggle(plan: any, event: any) {
-  const checked = event.target.checked;
-  const key = plan.uniqueId;
+    const checked = event.target.checked;
+    const key = plan.uniqueId;
 
 
-  if (checked) {
-    if (this.compare.length >= this.maxCompare) {
-      alert(`You can compare up to ${this.maxCompare} plans.`);
-      event.target.checked = false;
-      return;
+    if (checked) {
+      if (this.compare.length >= this.maxCompare) {
+        alert(`You can compare up to ${this.maxCompare} plans.`);
+        event.target.checked = false;
+        return;
+      }
+
+      if (!this.isSelected(plan)) {
+        this.compare.push({
+          key: plan.uniqueId,
+          planId: plan.planId,
+          insurerName: plan.insurerName || plan.tag,
+          productName: plan.name,
+          logo: plan.logo,
+          coverAmount: plan.coverAmountNumber,
+          monthlyPrice: plan.priceNumber,
+          base: plan.baseNumber,
+          addon: plan.addonNumber,
+          otherDetails: plan.otherDetails || {},
+          sourcePlan: plan,
+        });
+      }
+    } else {
+      this.compare = this.compare.filter((p) => p.key !== key);
     }
-
-    if (!this.isSelected(plan)) {
-      this.compare.push({
-        key: plan.uniqueId,
-        planId: plan.planId,
-        insurerName: plan.insurerName || plan.tag,
-        productName: plan.name,
-        logo: plan.logo,
-        coverAmount: plan.coverAmountNumber,
-        monthlyPrice: plan.priceNumber,
-        deductible: plan.deductibleNumber,
-        otherDetails: plan.otherDetails || {},
-        sourcePlan: plan,
-      });
-    }
-  } else {
-    this.compare = this.compare.filter((p) => p.key !== key);
   }
-}
 
   callNow() {
-  window.location.href = "tel:+917798612243"; // replace with your number
-}
+    window.location.href = "tel:+917798612243"; // replace with your number
+  }
 
   getDetailsKeys(): string[] {
     return Object.keys(this.compare[0]?.otherDetails || {});
@@ -470,24 +388,24 @@ isSelected(plan: any): boolean {
   // downloadBrochure(url: string) {
   //   window.open(url, '_blank');
   // }
-goToAllFeatures(plan: any) {
-  const combined = {
-    ...plan.fullPlan,
-    premiums: [plan.fullPremium],
+  goToAllFeatures(plan: any) {
+    const combined = {
+      ...plan.fullPlan,
+      premiums: [plan.fullPremium],
 
-    totalBasePremium: Number(plan.fullPremium.premium) || 0,
-    totalDiscount: Number(plan.fullPremium.discount) || 0,
-    totalPayablePremium: Number(plan.fullPremium.premium) || 0,
+      totalBasePremium: Number(plan.fullPremium.premium) || 0,
+      totalDiscount: Number(plan.fullPremium.discount) || 0,
+      totalPayablePremium: Number(plan.fullPremium.premium) || 0,
 
-    deductible: plan.fullPremium.deductible,
-    deductibleAmount: plan.fullPremium.deductible,
-    coverAmount: plan.fullPlan.coverAmount,
-  };
+      base: Number(plan.fullPremium.base ?? plan.fullPlan.base ?? 0) || 0,
+      addon: Number(plan.fullPremium.addon ?? plan.fullPlan.addon ?? 0) || 0,
+      coverAmount: plan.fullPlan.coverAmount,
+    };
 
-  this.router.navigate(['supertopup/all-features'], {
-    state: { selectedPlan: combined }
-  });
-}
+    this.router.navigate(['supertopup/all-features'], {
+      state: { selectedPlan: combined }
+    });
+  }
 
 
   goToProposal(plan: any) {
@@ -498,26 +416,26 @@ goToAllFeatures(plan: any) {
 
   /* -------------------- PDF Download (same logic) -------------------- */
 
- downloadPDF() {
-  const element = document.getElementById("compareWrapper");
-  if (!element) return;
+  downloadPDF() {
+    const element = document.getElementById("compareWrapper");
+    if (!element) return;
 
-  toPng(element, { cacheBust: true })
-    .then((dataUrl) => {
-      const pdf = new jsPDF("p", "mm", "a4");
-      const imgProps = pdf.getImageProperties(dataUrl);
+    toPng(element, { cacheBust: true })
+      .then((dataUrl) => {
+        const pdf = new jsPDF("p", "mm", "a4");
+        const imgProps = pdf.getImageProperties(dataUrl);
 
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-      pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save("comparison.pdf");
-    })
-    .catch((error) => {
-      console.error("PDF export error:", error);
-      alert("Unable to export PDF due to browser color incompatibility.");
-    });
-}
+        pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfHeight);
+        pdf.save("comparison.pdf");
+      })
+      .catch((error) => {
+        console.error("PDF export error:", error);
+        alert("Unable to export PDF due to browser color incompatibility.");
+      });
+  }
 
 
   /* -------------------- Grid template for compare table -------------------- */
