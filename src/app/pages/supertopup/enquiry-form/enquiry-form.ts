@@ -380,8 +380,16 @@ export class EnquiryForm {
   }
 
   goBack() {
-  window.history.back();
+  if (this.step > 1) {
+    // Go to immediate previous STEP
+    this.step--;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else {
+
+    this.router.navigate(['/supertopup/quotes']);
+  }
 }
+
 
 
   /* ---------- VALIDATION HELPERS FOR UI & KEYBOARD ---------- */

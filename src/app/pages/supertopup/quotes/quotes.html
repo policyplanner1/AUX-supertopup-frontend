@@ -3,15 +3,41 @@
 
   <!-- Top Bar -->
   <div
-    class="w-full bg-white rounded-xl px-4 py-3 relative flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+    class="w-full bg-white rounded-xl px-3 sm:px-4 py-2.5 sm:py-3
+           flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3">
 
-    <!-- Breadcrumb -->
-    <div class="text-sm text-gray-500 flex flex-wrap items-center gap-1 md:gap-2">
-      <span>Health Insurance</span>
-      <span>›</span>
-      <span>Personal Details</span>
-      <span>›</span>
-      <span class="font-semibold text-gray-700">List of Quotes</span>
+    <!-- LEFT: Back Arrow + Breadcrumbs -->
+    <div class="flex items-center gap-2 min-w-0">
+      <!-- Back Arrow -->
+      <button
+        type="button"
+        (click)="goBack()"
+        class="flex items-center mr-1 flex-shrink-0 group"
+        aria-label="Go back"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg"
+             class="w-5 h-5 text-[#006D8D] group-hover:text-[#004b60] transition"
+             fill="none"
+             viewBox="0 0 24 24"
+             stroke="currentColor"
+             stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6" />
+        </svg>
+      </button>
+
+      <!-- Breadcrumbs -->
+      <div
+        class="text-[13px] sm:text-sm text-gray-500 flex flex-wrap items-center gap-0.5 sm:gap-1 md:gap-2 min-w-0">
+        <span class="truncate max-w-[220px] xs:max-w-[260px] sm:max-w-none">
+          super-top-up Insurance
+        </span>
+        <span>›</span>
+        <span>Personal Details</span>
+        <span>›</span>
+        <span class="font-semibold text-gray-700">
+          List of Quotes
+        </span>
+      </div>
     </div>
 
     <!-- Right Side Contact -->

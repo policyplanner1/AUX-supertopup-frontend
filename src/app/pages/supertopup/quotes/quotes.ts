@@ -279,7 +279,7 @@ buildPlanKey(plan: any): string {
                 deductibleNumber: dedNum,
                 priceNumber: premiumNum,
                 insurerName: p.companyName,
-                otherDetails: this.buildOtherDetails(p, pm),
+                otherDetails: p.otherDetails,
 
                 // IMPORTANT FOR FEATURES PAGE
                 fullPlan: p,        // <-- ADD THIS
@@ -313,46 +313,46 @@ buildPlanKey(plan: any): string {
     });
   }
 
-  private buildOtherDetails(p: any, pm: any): Record<string, string> {
-    const details: Record<string, string> = {};
+  // private buildOtherDetails(p: any, pm: any): Record<string, string> {
+  //   const details: Record<string, string> = {};
 
-    if (p.companyName) details['Insurer'] = p.companyName;
-    if (p.planName) details['Plan Name'] = p.planName;
-    if (p.coverAmount) {
-      const num = Number(p.coverAmount) || 0;
-      details['Cover Amount'] = '₹ ' + this.formatIndianCurrency(num);
-    }
-    if (pm.deductible != null) {
-      const d = Number(pm.deductible) || 0;
-      details['Deductible Amount'] = '₹ ' + this.formatIndianCurrency(d);
-    }
-    if (pm.premium != null) {
-      const pr = Number(pm.premium) || 0;
-      details['Monthly Premium'] = '₹ ' + this.formatIndianCurrency(pr);
-    }
-    if (p.roomType) details['Room Category'] = p.roomType;
-    if (p.tenure) details['Policy Tenure'] = String(p.tenure);
+  //   if (p.companyName) details['Insurer'] = p.companyName;
+  //   if (p.planName) details['Plan Name'] = p.planName;
+  //   if (p.coverAmount) {
+  //     const num = Number(p.coverAmount) || 0;
+  //     details['Cover Amount'] = '₹ ' + this.formatIndianCurrency(num);
+  //   }
+  //   if (pm.deductible != null) {
+  //     const d = Number(pm.deductible) || 0;
+  //     details['Deductible Amount'] = '₹ ' + this.formatIndianCurrency(d);
+  //   }
+  //   if (pm.premium != null) {
+  //     const pr = Number(pm.premium) || 0;
+  //     details['Monthly Premium'] = '₹ ' + this.formatIndianCurrency(pr);
+  //   }
+  //   if (p.roomType) details['Room Category'] = p.roomType;
+  //   if (p.tenure) details['Policy Tenure'] = String(p.tenure);
 
-    // if backend sends structured otherDetails JSON, merge it
-    try {
-      const extra =
-        p.otherDetails ||
-        (p.plan?.other_details
-          ? JSON.parse(p.plan.other_details)
-          : undefined);
-      if (extra && typeof extra === 'object') {
-        Object.keys(extra).forEach((k) => {
-          if (extra[k] != null && extra[k] !== '') {
-            details[k] = String(extra[k]);
-          }
-        });
-      }
-    } catch {
-      // ignore parse errors
-    }
+  //   // if backend sends structured otherDetails JSON, merge it
+  //   try {
+  //     const extra =
+  //       p.otherDetails ||
+  //       (p.plan?.other_details
+  //         ? JSON.parse(p.plan.other_details)
+  //         : undefined);
+  //     if (extra && typeof extra === 'object') {
+  //       Object.keys(extra).forEach((k) => {
+  //         if (extra[k] != null && extra[k] !== '') {
+  //           details[k] = String(extra[k]);
+  //         }
+  //       });
+  //     }
+  //   } catch {
+  //     // ignore parse errors
+  //   }
 
-    return details;
-  }
+  //   return details;
+  // }
 
   /* -------------------- Compare logic -------------------- */
   allowAadhaarInput(event: any) {
@@ -395,9 +395,11 @@ isSelected(plan: any): boolean {
         coverAmount: plan.coverAmountNumber,
         monthlyPrice: plan.priceNumber,
         deductible: plan.deductibleNumber,
-        otherDetails: plan.otherDetails || {},
+        otherDetails: JSON.parse(plan.otherDetails),
         sourcePlan: plan,
       });
+
+      console.log("data",this.compare);
     }
   } else {
     this.compare = this.compare.filter((p) => p.key !== key);
@@ -409,6 +411,7 @@ isSelected(plan: any): boolean {
 }
 
   getDetailsKeys(): string[] {
+    console.log("otherdetails",this.compare[0]?.otherDetails);
     return Object.keys(this.compare[0]?.otherDetails || {});
   }
 
@@ -470,6 +473,10 @@ isSelected(plan: any): boolean {
   // downloadBrochure(url: string) {
   //   window.open(url, '_blank');
   // }
+goBack() {
+  window.history.back();
+}
+
 goToAllFeatures(plan: any) {
   const combined = {
     ...plan.fullPlan,
@@ -498,29 +505,119 @@ goToAllFeatures(plan: any) {
 
   /* -------------------- PDF Download (same logic) -------------------- */
 
- downloadPDF() {
-  const element = document.getElementById("compareWrapper");
-  if (!element) return;
+downloadPDF() {
+  const wrapper = document.getElementById('compareWrapper') as HTMLElement | null;
+  if (!wrapper) return;
 
-  toPng(element, { cacheBust: true })
-    .then((dataUrl) => {
-      const pdf = new jsPDF("p", "mm", "a4");
-      const imgProps = pdf.getImageProperties(dataUrl);
+  // 1) Get the parts we actually want in PDF: user strip + comparison area
+  const userStrip = wrapper.querySelector('.cmp-user-strip') as HTMLElement | null;
+  const pdfRootOriginal = wrapper.querySelector('.cmp-pdf-root') as HTMLElement | null;
+  if (!pdfRootOriginal) return;
 
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+  // 2) Build a clean export container (no header, no fixed flex stuff)
+  const exportContainer = document.createElement('div');
+  exportContainer.id = 'compareExport';
+  exportContainer.style.position = 'absolute';
+  exportContainer.style.top = '0';
+  exportContainer.style.left = '0';
+  exportContainer.style.zIndex = '-1';              // behind everything → no flicker
+  exportContainer.style.backgroundColor = '#ffffff';
+  exportContainer.style.display = 'block';
+  exportContainer.style.padding = '0';
+  exportContainer.style.margin = '0';
+  exportContainer.style.width = '100%';
+  exportContainer.style.overflow = 'visible';
 
-      pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save("comparison.pdf");
+  // Clone user strip (optional) and comparison root into this container
+  if (userStrip) {
+    const userStripClone = userStrip.cloneNode(true) as HTMLElement;
+    exportContainer.appendChild(userStripClone);
+  }
+  const pdfRootClone = pdfRootOriginal.cloneNode(true) as HTMLElement;
+  exportContainer.appendChild(pdfRootClone);
+
+  document.body.appendChild(exportContainer);
+
+  // 3) Remove flex / height / scroll constraints INSIDE the export container
+  const pdfRoot = exportContainer.querySelector('.cmp-pdf-root') as HTMLElement | null;
+  if (pdfRoot) {
+    pdfRoot.style.display = 'block';
+    pdfRoot.style.height = 'auto';
+    pdfRoot.style.maxHeight = 'none';
+    pdfRoot.style.overflow = 'visible';
+  }
+
+  const pdfArea = exportContainer.querySelector('.cmp-pdf-area') as HTMLElement | null;
+  if (pdfArea) {
+    pdfArea.style.display = 'block';
+    pdfArea.style.height = 'auto';
+    pdfArea.style.maxHeight = 'none';
+    pdfArea.style.overflow = 'visible';
+  }
+
+  const tableWrapper = exportContainer.querySelector('.cmp-table-wrapper') as HTMLElement | null;
+  if (tableWrapper) {
+    tableWrapper.style.display = 'block';
+    tableWrapper.style.height = 'auto';
+    tableWrapper.style.maxHeight = 'none';
+    tableWrapper.style.overflow = 'visible';
+  }
+
+  // 4) Capture full height of this export container
+  requestAnimationFrame(() => {
+    const exportWidth = exportContainer.scrollWidth;
+    const exportHeight = exportContainer.scrollHeight;
+
+    toPng(exportContainer, {
+      cacheBust: true,
+      width: exportWidth,
+      height: exportHeight,
+      style: {
+        width: `${exportWidth}px`,
+        height: `${exportHeight}px`,
+        overflow: 'visible',
+      } as any,
     })
-    .catch((error) => {
-      console.error("PDF export error:", error);
-      alert("Unable to export PDF due to browser color incompatibility.");
-    });
+      .then((dataUrl) => {
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgProps = pdf.getImageProperties(dataUrl);
+
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+
+        // Fit image to page width, keep aspect ratio
+        const imgWidth = pdfWidth;
+        const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+
+        let heightLeft = imgHeight;
+        let position = 0;
+
+        // First page
+        pdf.addImage(dataUrl, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pdfHeight;
+
+        // Additional pages if the content is taller than one page
+        while (heightLeft > 0) {
+          pdf.addPage();
+          position -= pdfHeight; // shift image up by one page height
+          pdf.addImage(dataUrl, 'PNG', 0, position, imgWidth, imgHeight);
+          heightLeft -= pdfHeight;
+        }
+
+        pdf.save('comparison.pdf');
+      })
+      .catch((error) => {
+        console.error('PDF export error:', error);
+        alert('Unable to export PDF due to browser color incompatibility.');
+      })
+      .finally(() => {
+        // 5) Clean up – remove temporary export container
+        document.body.removeChild(exportContainer);
+      });
+  });
 }
 
-
-  /* -------------------- Grid template for compare table -------------------- */
+/* -------------------- Grid template for compare table -------------------- */
 
   getGridTemplateColumns(): string {
     const planCount = this.compare?.length || 0;

@@ -76,8 +76,8 @@ export class PAEnquiryFormComponent {
     this.applyGenderIcons();
   }
   goBack() {
-    window.history.back();
-  }
+  window.history.back();
+}
 
   /** Auto-uppercase entire name + remove invalid chars */
 onNameInput(controlName: string) {
