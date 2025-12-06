@@ -8,6 +8,7 @@ import jsPDF from 'jspdf';
 // Define the payload type OUTSIDE the class
 type PlanPayload = {
   coverAmount: number;
+  category: number;
   age: number;
   sage: number | null;
   c1age: number | null;
@@ -109,6 +110,7 @@ export class PAQuotesComponent implements OnInit {
 
     return {
       coverAmount: this.toNum(enquiry.coverAmount, 0),
+      category: this.toNum(enquiry.riskCategory, 0),
 
       age: this.toNum(you?.age, 0), // YOU age
       sage: this.numOrNull(spouse?.age), // Spouse age or null

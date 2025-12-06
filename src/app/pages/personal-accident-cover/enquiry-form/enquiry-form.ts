@@ -52,9 +52,9 @@ export class PAEnquiryFormComponent {
   riskTabs = ['Category 1', 'Category 2', 'Category 3'];
 
   riskList: any = {
-    0: ['Doctors','Lawyers','Accountants','Architects/Consulting engineers','Teachers','Bankers','Clerical/administrative functions','BFSI professional','Businessman not working on factory floors','Homemaker','Student'],
-    1: ['Builders/Contractors','Engineers on site','Veterinary Doctors', 'Mechanics','Manual labourers not working in mines, explosive industry, electrical intallations and such hazardous industries','Business working on factory floors'],
-    2: ['Working in mines/explosives','Electrical installations','Racer','Circus artist or engaged in such other occupation','Engaged full time/ part time in any adventurous activities','Professional sportsperson','Professional adventurer/trekker/mountaineer','Defense services', 'Drivers'],
+    1: ['Doctors','Lawyers','Accountants','Architects/Consulting engineers','Teachers','Bankers','Clerical/administrative functions','BFSI professional','Businessman not working on factory floors','Homemaker','Student'],
+    2: ['Builders/Contractors','Engineers on site','Veterinary Doctors', 'Mechanics','Manual labourers not working in mines, explosive industry, electrical intallations and such hazardous industries','Business working on factory floors'],
+    3: ['Working in mines/explosives','Electrical installations','Racer','Circus artist or engaged in such other occupation','Engaged full time/ part time in any adventurous activities','Professional sportsperson','Professional adventurer/trekker/mountaineer','Defense services', 'Drivers'],
   };
 
   constructor(private fb: FormBuilder, private router: Router) {
@@ -238,7 +238,7 @@ if (this.step === 3) {
     members: [{ id: 'you', gender: this.gender }],
     details: {
       ...this.basicForm.value,
-      riskCategory: this.selectedRiskCategory,
+      riskCategory: this.activeRiskTab,
     },
   };
 

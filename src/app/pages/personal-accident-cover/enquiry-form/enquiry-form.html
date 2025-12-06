@@ -267,8 +267,8 @@
 
       <!-- Tabs -->
       <div class="popup-tabs">
-        <button *ngFor="let tab of riskTabs; let i=index" class="popup-tab" [class.active]="activeRiskTab === i"
-          (click)="activeRiskTab = i">
+        <button *ngFor="let tab of riskTabs; let i=index" class="popup-tab" [class.active]="activeRiskTab === (i + 1)"
+          (click)="activeRiskTab = i + 1">
           {{ tab }}
         </button>
 
