@@ -43,6 +43,7 @@ export class Quotes implements OnInit {
 
   // Flat plan list used in UI
   plans = signal<any[]>([]);
+  emptySlots = signal<number[]>([]);
 
   // Compare + summary strip
   maxCompare = 3;
@@ -56,6 +57,9 @@ export class Quotes implements OnInit {
   constructor(private router: Router, private api: SuperTopupService) {}
 
   ngOnInit(): void {
+
+     // Always default sort as low-to-high
+    this.selectedSort = 'low';
     const savedData = localStorage.getItem('supertopup_enquiry');
 
     if (savedData) {
@@ -290,14 +294,14 @@ buildPlanKey(plan: any): string {
               });
 
             // 4️⃣ Sorting
+            if (!this.selectedSort) {
+                this.selectedSort = 'low';
+              }
+
             if (this.selectedSort === 'low') {
-              mappedPlans.sort(
-                (a: any, b: any) => a.priceNumber - b.priceNumber
-              );
+              mappedPlans.sort((a: any, b: any) => a.priceNumber - b.priceNumber);
             } else if (this.selectedSort === 'high') {
-              mappedPlans.sort(
-                (a: any, b: any) => b.priceNumber - a.priceNumber
-              );
+              mappedPlans.sort((a: any, b: any) => b.priceNumber - a.priceNumber);
             }
 
             this.plans.set(mappedPlans);
@@ -364,10 +368,7 @@ buildPlanKey(plan: any): string {
   }
 }
 
-  get emptySlots(): number[] {
-    const remaining = this.maxCompare - this.compare.length;
-    return remaining > 0 ? Array(remaining).fill(0) : [];
-  }
+
 
 isSelected(plan: any): boolean {
   return this.compare.some((p) => p.key === plan.uniqueId);
@@ -415,19 +416,30 @@ isSelected(plan: any): boolean {
     return Object.keys(this.compare[0]?.otherDetails || {});
   }
 
-  removeFromCompare(plan: any) {
-    this.compare = this.compare.filter((p) => p.planId !== plan.planId);
+removeFromCompare2(plan: any) {
+  this.compare = this.compare.filter(p => p.planId !== plan.planId);
+
+  this.updateEmptySlots();
+
+  // If only 0 or 1 left → close comparison
+  if (this.compare.length < 2) {
+    this.isCompareOpen = false;
+
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 150);
+    return;
   }
 
-  removeFromCompare2(plan: any) {
-    this.removeFromCompare(plan);
-  }
+  // Smooth UI refresh
+  setTimeout(() => this.forceReflow(), 50);
+}
 
-  clearCompare() {
+clearCompare() {
     this.compare = [];
   }
 
-  compareNow() {
+compareNow() {
     if (this.compare.length >= 2) {
       this.isCompareOpen = true;
     } else {
@@ -470,6 +482,22 @@ isSelected(plan: any): boolean {
     }
   }
 
+updateEmptySlots() {
+  const remaining = this.maxCompare - this.compare.length;
+
+  // Ensure min = 0, max = 3
+  const count = Math.max(0, Math.min(remaining, this.maxCompare));
+
+  this.emptySlots.set(Array(count).fill(0));
+}
+
+
+
+forceReflow() {
+  const wrapper = document.getElementById('compareWrapper');
+  if (wrapper) wrapper.style.display = 'block'; // forces reflow
+}
+
   // downloadBrochure(url: string) {
   //   window.open(url, '_blank');
   // }
@@ -509,110 +537,103 @@ downloadPDF() {
   const wrapper = document.getElementById('compareWrapper') as HTMLElement | null;
   if (!wrapper) return;
 
-  // 1) Get the parts we actually want in PDF: user strip + comparison area
   const userStrip = wrapper.querySelector('.cmp-user-strip') as HTMLElement | null;
-  const pdfRootOriginal = wrapper.querySelector('.cmp-pdf-root') as HTMLElement | null;
-  if (!pdfRootOriginal) return;
+  const cmpRootOriginal = wrapper.querySelector('.cmp-pdf-root') as HTMLElement | null;
+  if (!cmpRootOriginal) return;
 
-  // 2) Build a clean export container (no header, no fixed flex stuff)
-  const exportContainer = document.createElement('div');
-  exportContainer.id = 'compareExport';
-  exportContainer.style.position = 'absolute';
-  exportContainer.style.top = '0';
-  exportContainer.style.left = '0';
-  exportContainer.style.zIndex = '-1';              // behind everything → no flicker
-  exportContainer.style.backgroundColor = '#ffffff';
-  exportContainer.style.display = 'block';
-  exportContainer.style.padding = '0';
-  exportContainer.style.margin = '0';
-  exportContainer.style.width = '100%';
-  exportContainer.style.overflow = 'visible';
+  /* ---------------------------------------------------
+     1) BUILD CLEAN EXPORT (no scroll, no fixed heights)
+  ----------------------------------------------------*/
+  const exportBox = document.createElement('div');
+  exportBox.id = 'cmpPdfExport';
+  exportBox.style.position = 'absolute';
+  exportBox.style.left = '0';
+  exportBox.style.top = '0';
+  exportBox.style.width = '100%';
+  exportBox.style.zIndex = '-9999';
+  exportBox.style.background = '#ffffff';
+  exportBox.style.padding = '0';
+  exportBox.style.margin = '0';
+  exportBox.style.overflow = 'visible';
+  document.body.appendChild(exportBox);
 
-  // Clone user strip (optional) and comparison root into this container
   if (userStrip) {
-    const userStripClone = userStrip.cloneNode(true) as HTMLElement;
-    exportContainer.appendChild(userStripClone);
-  }
-  const pdfRootClone = pdfRootOriginal.cloneNode(true) as HTMLElement;
-  exportContainer.appendChild(pdfRootClone);
-
-  document.body.appendChild(exportContainer);
-
-  // 3) Remove flex / height / scroll constraints INSIDE the export container
-  const pdfRoot = exportContainer.querySelector('.cmp-pdf-root') as HTMLElement | null;
-  if (pdfRoot) {
-    pdfRoot.style.display = 'block';
-    pdfRoot.style.height = 'auto';
-    pdfRoot.style.maxHeight = 'none';
-    pdfRoot.style.overflow = 'visible';
+    exportBox.appendChild(userStrip.cloneNode(true));
   }
 
-  const pdfArea = exportContainer.querySelector('.cmp-pdf-area') as HTMLElement | null;
-  if (pdfArea) {
-    pdfArea.style.display = 'block';
-    pdfArea.style.height = 'auto';
-    pdfArea.style.maxHeight = 'none';
-    pdfArea.style.overflow = 'visible';
-  }
+  const cmpClone = cmpRootOriginal.cloneNode(true) as HTMLElement;
+  exportBox.appendChild(cmpClone);
 
-  const tableWrapper = exportContainer.querySelector('.cmp-table-wrapper') as HTMLElement | null;
-  if (tableWrapper) {
-    tableWrapper.style.display = 'block';
-    tableWrapper.style.height = 'auto';
-    tableWrapper.style.maxHeight = 'none';
-    tableWrapper.style.overflow = 'visible';
-  }
+  /* ---------------------------------------------------
+     2) REMOVE FLEX/SCROLL/CUTTING
+  ----------------------------------------------------*/
+  const all = exportBox.querySelectorAll('*') as NodeListOf<HTMLElement>;
+  all.forEach((el) => {
+    el.style.maxHeight = 'none';
+    el.style.height = 'auto';
+    el.style.overflow = 'visible';
+    el.style.flex = 'unset';
+    el.style.display = el.style.display === 'flex' ? 'block' : el.style.display;
+  });
 
-  // 4) Capture full height of this export container
+  /* ---------------------------------------------------
+     3) AUTO-FULL WIDTH (important for many columns)
+  ----------------------------------------------------*/
+  const totalColumns = this.compare.length + 1; // +1 left label column
+  const approxWidth = totalColumns * 380; // ~380px per column for safe capture
+  exportBox.style.width = approxWidth + 'px';
+
+  /* ---------------------------------------------------
+     4) CAPTURE WITH FULL HEIGHT + WIDTH
+  ----------------------------------------------------*/
   requestAnimationFrame(() => {
-    const exportWidth = exportContainer.scrollWidth;
-    const exportHeight = exportContainer.scrollHeight;
+    const fullWidth = exportBox.scrollWidth;
+    const fullHeight = exportBox.scrollHeight;
 
-    toPng(exportContainer, {
+    toPng(exportBox, {
       cacheBust: true,
-      width: exportWidth,
-      height: exportHeight,
+      width: fullWidth,
+      height: fullHeight,
       style: {
-        width: `${exportWidth}px`,
-        height: `${exportHeight}px`,
-        overflow: 'visible',
+        width: fullWidth + 'px',
+        height: fullHeight + 'px',
+        transform: 'scale(1)',
       } as any,
     })
-      .then((dataUrl) => {
+      .then((img) => {
         const pdf = new jsPDF('p', 'mm', 'a4');
-        const imgProps = pdf.getImageProperties(dataUrl);
 
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const pdfW = pdf.internal.pageSize.getWidth();
+        const pdfH = pdf.internal.pageSize.getHeight();
 
-        // Fit image to page width, keep aspect ratio
-        const imgWidth = pdfWidth;
-        const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+        const imgProps = pdf.getImageProperties(img);
 
-        let heightLeft = imgHeight;
+        const imgW = pdfW;
+        const imgH = (imgProps.height * imgW) / imgProps.width;
+
+        let heightLeft = imgH;
         let position = 0;
 
-        // First page
-        pdf.addImage(dataUrl, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pdfHeight;
+        // first page
+        pdf.addImage(img, 'PNG', 0, position, imgW, imgH);
+        heightLeft -= pdfH;
 
-        // Additional pages if the content is taller than one page
+        // more pages
         while (heightLeft > 0) {
+          position -= pdfH;
           pdf.addPage();
-          position -= pdfHeight; // shift image up by one page height
-          pdf.addImage(dataUrl, 'PNG', 0, position, imgWidth, imgHeight);
-          heightLeft -= pdfHeight;
+          pdf.addImage(img, 'PNG', 0, position, imgW, imgH);
+          heightLeft -= pdfH;
         }
 
         pdf.save('comparison.pdf');
       })
-      .catch((error) => {
-        console.error('PDF export error:', error);
-        alert('Unable to export PDF due to browser color incompatibility.');
+      .catch((err) => {
+        console.error(err);
+        alert('Unable to export PDF. Please try again.');
       })
       .finally(() => {
-        // 5) Clean up – remove temporary export container
-        document.body.removeChild(exportContainer);
+        document.body.removeChild(exportBox);
       });
   });
 }

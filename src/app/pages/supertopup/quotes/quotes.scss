@@ -1,3 +1,4 @@
+
 .filter-btn {
   padding: 0.4rem 1rem;
   background: #fff;
@@ -75,6 +76,8 @@
 #compareWrapper.export-pdf .cmp-user-strip {
   padding: 4px 12px !important;
 }
+
+
 /* ==========================================================
    FULL MOBILE RESPONSIVENESS FOR COMPARISON TABLE
    EXACTLY LIKE HEALTH INSURANCE VERSION
@@ -144,6 +147,26 @@
   }
 
   /* BODY ROWS ALSO SLIDE HORIZONTALLY */
+
+
+
+.cmp-cover-section, .cmp-deductible-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.cmp-cover-value, .cmp-deductible-value {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.cmp-cover-label, .cmp-deductible-label {
+  font-size: 14px;
+  color: #667085;
+}
+
   .cmp-row {
     display: inline-flex !important;
     width: auto !important;
@@ -216,4 +239,120 @@
     flex: 1;
     font-size: 14px;
   }
+
+  @media (max-width: 768px) {
+  .cmp-top {
+    grid-template-columns: 1fr; /* Stack all columns vertically */
+    // gap: 15px;
+  }
+
+  .cmp-cover-section, .cmp-deductible-section {
+    margin-bottom: 10px;
+  }
+}
+
+/* ==========================================================
+   PERFECT RESPONSIVE COMPARISON TABLE (MOBILE ≤ 768px)
+   Works for all phones — no overlap, proper alignment
+   ========================================================== */
+@media (max-width: 768px) {
+
+  /* Allow horizontal scroll */
+  #compareWrapper,
+  .cmp-table-wrapper {
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    white-space: nowrap !important;
+  }
+
+  /* Force header & body rows into horizontal flex */
+  .cmp-top,
+  .cmp-row {
+    display: inline-flex !important;
+    width: auto !important;
+    min-width: 100% !important;
+  }
+
+  /* -----------------------------
+     LEFT STICKY FEATURE COLUMN
+     ----------------------------- */
+  .cmp-features-col,
+  .cmp-feature-col {
+    position: sticky;
+    left: 0;
+    z-index: 30;
+    min-width: 165px !important;
+    max-width: 165px !important;
+    background: #f1f7fb !important;
+    border-right: 1px solid #d7e1ea !important;
+    white-space: normal !important; /* TEXT WRAPS CORRECTLY */
+  }
+
+  /* Feature label text */
+  .cmp-feature-name {
+    font-size: 13px !important;
+    line-height: 1.3 !important;
+    white-space: normal !important;
+  }
+
+  /* -----------------------------
+     PLAN COLUMN (Right Side)
+     ----------------------------- */
+  .cmp-plan-col,
+  .cmp-data-col {
+    min-width: 260px !important;
+    max-width: 260px !important;
+    flex-shrink: 0 !important;
+    white-space: normal !important;  /* FIX TEXT BREAKING */
+    text-align: center !important;
+    padding: 12px !important;
+    background: #fff;
+  }
+
+  /* Company logo */
+  .cmp-company-logo {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  /* Values (Cover / Deductible) */
+  .cmp-cover-value,
+  .cmp-deductible-value {
+    font-size: 18px !important;
+    font-weight: 600 !important;
+  }
+
+  .cmp-cover-label,
+  .cmp-deductible-label {
+    font-size: 13px !important;
+    color: #64748b !important;
+  }
+
+  /* BUY NOW */
+  .cmp-buy-now-btn {
+    width: 100% !important;
+    font-size: 12px !important;
+    padding: 8px !important;
+    min-height: 32px !important;
+  }
+
+  /* HEART ICON (summary image) */
+  .cmp-heart-icon {
+    width: 70px !important;
+    height: 70px !important;
+  }
+
+  /* Header */
+  .cmp-screen__header {
+    padding: 10px !important;
+    font-size: 14px !important;
+  }
+
+  /* Force grid-template-columns to NOT break in mobile */
+  .cmp-top,
+  .cmp-row {
+    grid-template-columns: none !important;
+    }
+  }
+
 }

@@ -1,5 +1,5 @@
 <!-- MAIN QUOTES CONTAINER -->
-<div class="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6">
+<div class="main-quotes-wrapper w-full max-w-7xl mx-auto px-4 sm:px-6 py-6">
 
   <!-- Top Bar -->
   <div
@@ -50,13 +50,13 @@
       <span>+91 7798612243</span>
     </div>
 
-    <div class="absolute bottom-0 left-0 right-0 h-[1px] bg-gray-200 -mx-4 sm:-mx-6"></div>
+    <!-- <div class="absolute bottom-0 left-0 right-0 h-[1px] bg-gray-200 -mx-4 sm:-mx-6"></div> -->
   </div>
 
   <!-- Quick Filters -->
   <div class="w-full bg-white rounded-xl px-4 py-4 flex flex-wrap gap-3 relative">
 
-    <span class="font-semibold text-gray-700 whitespace-nowrap w-full sm:w-auto">
+    <span class="flex items-center justify-center font-semibold text-gray-700 whitespace-nowrap w-full sm:w-auto">
       Quick Filters
     </span>
 
@@ -104,7 +104,9 @@
 
     <!-- Sort By Dropdown -->
     <div class="dropdown filter-btn w-full sm:w-auto">
-      <select (change)="onSortChange($event)" class="w-full sm:w-auto bg-transparent outline-none">
+      <select (change)="onSortChange($event)"
+        class="w-full sm:w-auto bg-transparent outline-none"
+        [value]="selectedSort">
         <option value="">Sort By</option>
         <option value="low">Price: Low to High</option>
         <option value="high">Price: High to Low</option>
@@ -125,7 +127,7 @@
   </div>
 
   <!-- Quote Count -->
-  <p class="mt-6 text-gray-600 text-lg">
+  <p class="mt-6 text-gray-600 md:text-lg text-sm">
     Here are <span class="text-[#006D8D] font-semibold">{{plans().length}} plans</span> made just for you, {{name}}
     <img class="w-10 h-10 inline-block" src="assets/heading-arrow.gif" alt="gif">
   </p>
@@ -194,7 +196,9 @@
             <div
               class="w-full md:w-[30%] bg-gradient-to-b from-[#E8F7FF] to-white p-3 md:p-6 flex flex-col justify-between">
 
-              <div class="flex justify-between mb-3 md:mb-4">
+              <div class="flex justify-between mb-0 gap-0 !leading-tight">
+
+
                 <div>
                   <p class="text-gray-600 text-xs flex items-center gap-1">
                     Cover Amt <span class="text-gray-400 text-[12px]">ⓘ</span>
@@ -319,7 +323,8 @@
         </div>
         <button type="button"
           class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-100 rounded"
-          (click)="removeFromCompare(p)">
+          (click)="removeFromCompare2(p)"
+>
           ✕
         </button>
       </div>
@@ -327,7 +332,7 @@
       <!-- Empty slots -->
       <div
         class="flex items-center justify-center px-4 py-3 border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 flex-shrink-0 min-w-[120px] text-sm font-medium text-slate-400"
-        *ngFor="let n of emptySlots">
+       *ngFor="let n of emptySlots()">
         Add Plan
       </div>
     </div>
@@ -351,7 +356,7 @@
 <!-- ===========================
      FULL-SCREEN COMPARISON
 =========================== -->
-<div *ngIf="isCompareOpen" id="compareWrapper" class="fixed inset-0 z-[1400] flex flex-col bg-white overflow-hidden">
+<div *ngIf="isCompareOpen" id="compareWrapper" class="compare-screen fixed inset-0 z-[1400] flex flex-col bg-white overflow-hidden">
   <!-- HEADER -->
   <div class="cmp-screen__header flex items-center bg-white border-b border-slate-200 px-4 py-3 flex-shrink-0">
     <button type="button" class="bg-transparent border-0 text-[#006d8d] font-semibold text-[15px] cursor-pointer"
@@ -442,6 +447,15 @@
               </div>
               <div class="cmp-cover-value font-semibold text-[18px] text-[#222]">
                 ₹ {{ p.coverAmount | number : '1.0-0' : 'en-IN' }}
+              </div>
+            </div>
+
+              <div class="cmp-deductible-section text-center w-full py-1">
+              <div class="cmp-deductible-label text-[14px] text-[#667085] mb-2">
+                Deductible Amount
+              </div>
+              <div class="cmp-deductible-value font-semibold text-[18px] text-[#222]">
+                ₹ {{ p.deductible | number : '1.0-0' : 'en-IN' }}
               </div>
             </div>
 
