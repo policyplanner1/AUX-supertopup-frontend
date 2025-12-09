@@ -2,11 +2,13 @@ import { Component, HostListener, signal, computed, WritableSignal } from '@angu
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../../../../firebaseConfig';
 import { SuperTopupService } from '../../../services/super-topup.service';
-import { firstValueFrom } from 'rxjs'; // <-- new import
+import { firstValueFrom } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
 
 type MemberKey = 'you' | 'spouse' | 'son' | 'daughter';
 
@@ -26,9 +28,11 @@ interface Member {
   styleUrl: './enquiry-form.scss',
 })
 export class EnquiryForm {
+
   step = 1;
   gender: 'Male' | 'Female' = 'Male';
   maxChildren = 4;
+  private readonly ENQUIRY_KEY = 'supertopup_enquiry_temp';
 
   // base icons (male/female generic) used for swapping
   maleIcon = 'assets/supertopup/you.svg';
@@ -66,7 +70,7 @@ export class EnquiryForm {
   private resendIntervalId: any = null;
   private readonly resendCooldown = 30; // seconds
 
-  constructor(private fb: FormBuilder, private router: Router, private myApiService: SuperTopupService) {
+  constructor(private fb: FormBuilder, private router: Router, private route: ActivatedRoute, private location: Location, private myApiService: SuperTopupService) {
     this.basicForm = this.fb.group({
       firstName: [
         '',
@@ -111,20 +115,47 @@ export class EnquiryForm {
     });
   }
 
-  ngOnInit(): void {
-    // fill ages (kept for reference; custom dropdown uses helper methods)
-    for (let a = 18; a <= 100; a++) this.adultAges.push(a);
-    this.childAges.push('91 Days');
-    for (let a = 1; a <= 25; a++) this.childAges.push(a);
+ngOnInit(): void {
 
-    // set icons according to current gender
+  // Step from URL
+  this.route.queryParams.subscribe(params => {
+    const s = Number(params['step']);
+    if (s === 1 || s === 2 || s === 3) {
+      this.step = s;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  });
+
+  // Fill ages
+  for (let a = 18; a <= 100; a++) this.adultAges.push(a);
+  this.childAges.push('91 Days');
+  for (let a = 1; a <= 25; a++) this.childAges.push(a);
+
+
+const clearRoutes = ['/', ''];
+
+this.router.events.subscribe((event) => {
+  if (event instanceof NavigationEnd) {
+    const cleanUrl = event.urlAfterRedirects.split('?')[0]; //  remove query
+  if (clearRoutes.includes(cleanUrl)) {
+      this.clearTempEnquiry();
+    }
+  }
+});
+
+
+  // Restore temp only if coming back from quotes journey
+  const restored = this.restoreFromSession();
+
+  // Default init
+  if (!restored) {
     this.applyGenderIcons();
-    // ensure You is selected
     const you = this.members.find((m) => m.key === 'you')!;
     you.selected = true;
     this.updateSelectedAges();
-
   }
+}
+
 
   get f() {
     return this.basicForm.controls;
@@ -207,6 +238,7 @@ export class EnquiryForm {
 
       this.updateSelectedAges();
       this.step = 2;
+      this.syncStepToUrl();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (this.step === 2) {
       const missing = this.getFlatMemberList().some((id) => !this.selectedAges[id]);
@@ -215,6 +247,7 @@ export class EnquiryForm {
         return;
       }
       this.step = 3;
+      this.syncStepToUrl();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (this.step === 3) {
       // no browser alert – show only UI banner + field messages
@@ -236,9 +269,13 @@ export class EnquiryForm {
     }
   }
 
-  prev() {
-    if (this.step > 1) this.step--;
+prev() {
+  if (this.step > 1) {
+    this.step--;
+    this.syncStepToUrl();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+}
 
   /* ---------- GENDER & ICONS ---------- */
   setGender(g: 'Male' | 'Female') {
@@ -379,16 +416,20 @@ export class EnquiryForm {
     this.selectedAges[id] = value;
   }
 
-  goBack() {
+private readonly LANDING_URL = 'https://policyplanner.com/#/';
+
+goBack() {
   if (this.step > 1) {
-    // Go to immediate previous STEP
     this.step--;
+    this.syncStepToUrl();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   } else {
-
-    this.router.navigate(['/supertopup/quotes']);
+    // ✅ Always go to landing page when on step 1
+    window.location.href = this.LANDING_URL;
   }
 }
+
+
 
 
 
@@ -704,7 +745,7 @@ export class EnquiryForm {
     // reuse the previous code that performed the save. Build payload/layout then save to firestore and navigate.
     const payload = this.buildPayload();
     console.log('SUBMIT payload', payload);
-    localStorage.setItem('supertopup_enquiry', JSON.stringify(payload));
+sessionStorage.setItem(this.ENQUIRY_KEY, JSON.stringify(payload));
 
     const details = this.basicForm.getRawValue();
 
@@ -769,4 +810,82 @@ export class EnquiryForm {
     // Navigate to Quotes Screen
     this.router.navigate(['/supertopup/quotes']);
   }
+  private syncStepToUrl() {
+  this.router.navigate([], {
+    relativeTo: this.route,
+    queryParams: { step: this.step },
+    queryParamsHandling: 'merge',
+    replaceUrl: true
+  });
+}
+
+  private restoreFromSession(): boolean {
+  const raw = sessionStorage.getItem(this.ENQUIRY_KEY);
+  if (!raw) return false;
+
+  try {
+    const payload = JSON.parse(raw);
+    const membersArr = payload?.members || [];
+    const details = payload?.details || {};
+
+    // 1) Gender
+    this.gender = details.gender === 'Female' ? 'Female' : 'Male';
+
+    // 2) Member selection + counts
+    const ids: string[] = membersArr.map((m: any) => m.id);
+
+    const spouseSelected = ids.includes('spouse');
+    const sonCount = ids.filter(id => id.startsWith('son')).length;
+    const daughterCount = ids.filter(id => id.startsWith('daughter')).length;
+
+    const you = this.members.find(m => m.key === 'you')!;
+    const spouse = this.members.find(m => m.key === 'spouse')!;
+    const son = this.members.find(m => m.key === 'son')!;
+    const daughter = this.members.find(m => m.key === 'daughter')!;
+
+    you.selected = true;
+
+    spouse.selected = spouseSelected;
+    spouse.count = spouseSelected ? 1 : 0;
+
+    son.count = sonCount;
+    son.selected = sonCount > 0;
+
+    daughter.count = daughterCount;
+    daughter.selected = daughterCount > 0;
+
+    // 3) Ages
+    const ageMap: Record<string, string> = {};
+    membersArr.forEach((m: any) => {
+      ageMap[m.id] = m.age ?? '';
+    });
+    this.selectedAges = ageMap;
+    this.updateSelectedAges();
+
+    // 4) Basic form
+    this.basicForm.patchValue({
+      firstName: details.firstName || '',
+      lastName: details.lastName || '',
+      mobile: details.mobile || '',
+      pincode: details.pincode || '',
+      city: details.city || '',
+      coverAmount: details.coverAmount || ''
+    }, { emitEvent: false });
+
+    // 5) Icons
+    this.applyGenderIcons();
+
+    // 6) Mobile verified simple restore
+    this.mobileVerifiedSignal.set(!!details.mobile);
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+  private clearTempEnquiry() {
+  sessionStorage.removeItem(this.ENQUIRY_KEY);
+}
+
+
 }

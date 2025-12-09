@@ -502,8 +502,11 @@ forceReflow() {
   //   window.open(url, '_blank');
   // }
 goBack() {
-  window.history.back();
+  this.router.navigate(['/supertopup/enquiry-form'], {
+    queryParams: { step: 3 }
+  });
 }
+
 
 goToAllFeatures(plan: any) {
   const combined = {
