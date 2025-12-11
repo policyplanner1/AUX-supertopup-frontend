@@ -142,16 +142,12 @@
                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   </span>
-                  No Key Features Available
+                  {{ f }}
                 </li>
               </ul>
 
-              <div *ngIf="!p.features || p.features.length === 0" class="text-gray-500 text-sm italic">
-                No key features available
-              </div>
-
-              <button class="mt-3 md:mt-4 text-sm text-green-700 font-semibold hover:underline"
-                (click)="goToAllFeatures(p)">
+              <button *ngIf="p.features[0] !== 'No Key Features Available'"
+                class="mt-3 md:mt-4 text-sm text-green-700 font-semibold hover:underline" (click)="goToAllFeatures(p)">
                 View All Features
               </button>
 
@@ -169,15 +165,15 @@
                   <p class="font-semibold mt-1">{{ p.cover }}</p>
                 </div>
 
-               
-                
+
+
               </div>
 
               <button
                 class="bg-[#007AAA] hover:bg-[#006988] text-white font-semibold py-2 rounded-md shadow text-sm mb-2">
                 Buy Now {{ p.base }}
               </button>
-              <button *ngIf="p.addon !== 0"
+              <button *ngIf="p.addonNumber > 0"
                 class="bg-[#007AAA] hover:bg-[#006988] text-white font-semibold py-2 rounded-md shadow text-xs">
                 Buy Now ( with compulsory add-on) <br> {{ p.addon }}
               </button>

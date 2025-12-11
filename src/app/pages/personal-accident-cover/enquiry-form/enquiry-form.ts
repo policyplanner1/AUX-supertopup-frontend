@@ -40,8 +40,9 @@ export class PAEnquiryFormComponent {
   // Flags
   basicSubmitAttempt = false;
   riskSubmitAttempt = false;
-
   dobError = false;
+  dobFormatError = false;  // ⬅️ new
+
   riskError = false;
 
   // Risk popup
@@ -125,26 +126,65 @@ onNameInput(controlName: string) {
   }
 
   // DOB Validation
- validateDOB() {
-  const dob = this.basicForm.get('dob')?.value;
+validateDOB() {
+  const dobStr: string = this.basicForm.get('dob')?.value;
 
-  // If blank → show error
-  if (!dob) {
-    this.dobError = true;
+  this.dobError = false;
+  this.dobFormatError = false;
+
+  if (!dobStr) {
+    this.dobFormatError = true; // nothing entered
     return;
   }
 
-  const birth = new Date(dob);
-  const today = new Date();
-  let age = today.getFullYear() - birth.getFullYear();
+  // Check pattern DD/MM/YYYY
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(dobStr);
+  if (!match) {
+    this.dobFormatError = true;
+    return;
+  }
 
-  const m = today.getMonth() - birth.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+  const day = Number(match[1]);
+  const month = Number(match[2]);
+  const year = Number(match[3]);
+
+  // Basic range checks
+  if (month < 1 || month > 12 || day < 1 || day > 31) {
+    this.dobFormatError = true;
+    return;
+  }
+
+  const dobDate = new Date(year, month - 1, day);
+
+  // Check if JS date matches entered parts (catches 31/02, 30/02 etc.)
+  if (
+    dobDate.getFullYear() !== year ||
+    dobDate.getMonth() !== month - 1 ||
+    dobDate.getDate() !== day
+  ) {
+    this.dobFormatError = true;
+    return;
+  }
+
+  const today = new Date();
+
+  // Future date not allowed
+  if (dobDate > today) {
+    this.dobFormatError = true;
+    return;
+  }
+
+  // Age calculation
+  let age = today.getFullYear() - year;
+  const m = today.getMonth() - (month - 1);
+  if (m < 0 || (m === 0 && today.getDate() < day)) {
     age--;
   }
 
+  // Age must be >= 18
   this.dobError = age < 18;
 }
+
 
 
   // Field invalid checker (NO default errors)
@@ -253,4 +293,40 @@ prev() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
+
+  onDobInput(event: Event) {
+  const input = event.target as HTMLInputElement;
+  let value = input.value || '';
+
+  // Remove all non-digits
+  value = value.replace(/\D/g, '');
+
+  // Limit to max 8 digits (DDMMYYYY)
+  if (value.length > 8) {
+    value = value.slice(0, 8);
+  }
+
+  // Insert slashes → DD/MM/YYYY
+  let formatted = '';
+  if (value.length <= 2) {
+    formatted = value;
+  } else if (value.length <= 4) {
+    formatted = value.slice(0, 2) + '/' + value.slice(2);
+  } else {
+    formatted =
+      value.slice(0, 2) +
+      '/' +
+      value.slice(2, 4) +
+      '/' +
+      value.slice(4);
+  }
+
+  // Update control without re-triggering change loops
+  this.basicForm.get('dob')?.setValue(formatted, { emitEvent: false });
+
+  // Reset errors while user is typing
+  this.dobError = false;
+  this.dobFormatError = false;
+}
+
 }

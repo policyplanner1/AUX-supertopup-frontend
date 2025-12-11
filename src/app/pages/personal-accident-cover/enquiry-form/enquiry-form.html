@@ -4,71 +4,62 @@
 <div class="w-full flex justify-center px-3 sm:px-6 py-6 sm:py-10 bg-[#F5FAFC]">
   <div class="w-full max-w-5xl bg-white rounded-2xl shadow-lg px-4 sm:px-10 py-6 sm:py-10">
 
-   <!-- ================= HEADER / STEPPER ================= -->
-<div class="flex items-center mb-6 sm:mb-10 w-full">
+    <!-- ================= HEADER / STEPPER ================= -->
+    <div class="flex items-center mb-6 sm:mb-10 w-full">
 
-  <!-- Back Arrow (visible on all steps) -->
-  <button
-    type="button"
-    (click)="goBack()"
-    class="flex items-center mr-4 group"
-    aria-label="Go back">
-    <svg xmlns="http://www.w3.org/2000/svg"
-         class="w-5 h-5 text-[#006D8D] group-hover:text-[#004b60] transition"
-         fill="none" viewBox="0 0 24 24"
-         stroke="currentColor" stroke-width="2">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6"/>
-    </svg>
-  </button>
+      <!-- Back Arrow (visible on all steps) -->
+      <button type="button" (click)="goBack()" class="flex items-center mr-4 group" aria-label="Go back">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#006D8D] group-hover:text-[#004b60] transition"
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6" />
+        </svg>
+      </button>
 
-  <!-- Stepper Centered -->
-  <div class="flex-1 flex justify-center">
-    <div class="flex items-center space-x-4 sm:space-x-8">
+      <!-- Stepper Centered -->
+      <div class="flex-1 flex justify-center">
+        <div class="flex items-center space-x-4 sm:space-x-8">
 
-      <!-- STEP 1 -->
-      <div class="flex flex-col items-center">
-        <div class="flex items-center justify-center rounded-full text-xs font-semibold
-        w-8 h-8 sm:w-7 sm:h-7"
-        [ngClass]="step === 1 ? 'bg-[#006D8D] text-white' : 'bg-[#E4EDF1] text-[#006D8D]'">
-          1
+          <!-- STEP 1 -->
+          <div class="flex flex-col items-center">
+            <div class="flex items-center justify-center rounded-full text-xs font-semibold
+        w-8 h-8 sm:w-7 sm:h-7" [ngClass]="step === 1 ? 'bg-[#006D8D] text-white' : 'bg-[#E4EDF1] text-[#006D8D]'">
+              1
+            </div>
+            <span class="mt-1 text-[11px] text-gray-600 hidden md:block whitespace-nowrap">
+              Select Members
+            </span>
+          </div>
+
+          <div class="h-px w-8 sm:w-12 bg-gray-300"></div>
+
+          <!-- STEP 2 -->
+          <div class="flex flex-col items-center">
+            <div class="flex items-center justify-center rounded-full text-xs font-semibold
+        w-8 h-8 sm:w-7 sm:h-7" [ngClass]="step === 2 ? 'bg-[#006D8D] text-white' : 'bg-[#E4EDF1] text-[#006D8D]'">
+              2
+            </div>
+            <span class="mt-1 text-[11px] text-gray-600 hidden md:block whitespace-nowrap">
+              Basic Details
+            </span>
+          </div>
+
+          <div class="h-px w-8 sm:w-12 bg-gray-300"></div>
+
+          <!-- STEP 3 -->
+          <div class="flex flex-col items-center">
+            <div class="flex items-center justify-center rounded-full text-xs font-semibold
+        w-8 h-8 sm:w-7 sm:h-7" [ngClass]="step === 3 ? 'bg-[#006D8D] text-white' : 'bg-[#E4EDF1] text-[#006D8D]'">
+              3
+            </div>
+            <span class="mt-1 text-[11px] text-gray-600 hidden md:block whitespace-nowrap">
+              Additional Details
+            </span>
+          </div>
+
         </div>
-        <span class="mt-1 text-[11px] text-gray-600 hidden md:block whitespace-nowrap">
-          Select Members
-        </span>
-      </div>
-
-      <div class="h-px w-8 sm:w-12 bg-gray-300"></div>
-
-      <!-- STEP 2 -->
-      <div class="flex flex-col items-center">
-        <div class="flex items-center justify-center rounded-full text-xs font-semibold
-        w-8 h-8 sm:w-7 sm:h-7"
-        [ngClass]="step === 2 ? 'bg-[#006D8D] text-white' : 'bg-[#E4EDF1] text-[#006D8D]'">
-          2
-        </div>
-        <span class="mt-1 text-[11px] text-gray-600 hidden md:block whitespace-nowrap">
-          Basic Details
-        </span>
-      </div>
-
-      <div class="h-px w-8 sm:w-12 bg-gray-300"></div>
-
-      <!-- STEP 3 -->
-      <div class="flex flex-col items-center">
-        <div class="flex items-center justify-center rounded-full text-xs font-semibold
-        w-8 h-8 sm:w-7 sm:h-7"
-        [ngClass]="step === 3 ? 'bg-[#006D8D] text-white' : 'bg-[#E4EDF1] text-[#006D8D]'">
-          3
-        </div>
-        <span class="mt-1 text-[11px] text-gray-600 hidden md:block whitespace-nowrap">
-          Additional Details
-        </span>
       </div>
 
     </div>
-  </div>
-
-</div>
 
 
     <!-- ======================= STEP 1 ======================= -->
@@ -140,11 +131,24 @@
           </div>
 
           <!-- DOB -->
+          <!-- DOB -->
           <div>
             <label class="pp-label">Date of Birth <span class="text-red-600">*</span></label>
-            <input formControlName="dob" type="date" class="pp-input" (change)="validateDOB()" />
-            <p *ngIf="dobError" class="pp-error">Age must be 18 or above</p>
+
+            <input formControlName="dob" type="text" class="pp-input" maxlength="10" placeholder="DD/MM/YYYY"
+              (input)="onDobInput($event)" (blur)="validateDOB()" />
+
+            <!-- Format error -->
+            <p *ngIf="dobFormatError" class="pp-error">
+              Enter valid date in DD/MM/YYYY format
+            </p>
+
+            <!-- Age error -->
+            <p *ngIf="dobError && !dobFormatError" class="pp-error">
+              Age must be 18 or above
+            </p>
           </div>
+
 
         </div>
 

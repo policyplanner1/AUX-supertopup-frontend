@@ -233,7 +233,11 @@ export class PAQuotesComponent implements OnInit {
                   cover: `₹ ${this.formatIndianCurrency(coverAmountNum)}`,
                   base: `₹ ${this.formatIndianCurrency(baseNum)}`,
                   addon: `₹ ${this.formatIndianCurrency(addonNum)}`,
-                  features: ['No Key Features Available'],
+                 features: Array.isArray(p.features) && p.features.length
+                      ? p.features.map((f: any) =>
+                        typeof f === 'string' ? f : f?.includes || ''
+                      ).filter(Boolean)
+                      : ['No Key Features Available'],
                   brochure: p.brochureUrl || null,
 
                   // Compare
