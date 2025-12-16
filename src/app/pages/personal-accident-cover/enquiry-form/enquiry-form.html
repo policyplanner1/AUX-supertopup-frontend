@@ -1,16 +1,19 @@
-<app-header></app-header>
-
 <!-- OUTER BG -->
 <div class="w-full flex justify-center px-3 sm:px-6 py-6 sm:py-10 bg-[#F5FAFC]">
   <div class="w-full max-w-5xl bg-white rounded-2xl shadow-lg px-4 sm:px-10 py-6 sm:py-10">
 
     <!-- ================= HEADER / STEPPER ================= -->
     <div class="flex items-center mb-6 sm:mb-10 w-full">
-
-      <!-- Back Arrow (visible on all steps) -->
-      <button type="button" (click)="goBack()" class="flex items-center mr-4 group" aria-label="Go back">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#006D8D] group-hover:text-[#004b60] transition"
-          fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <!-- Back Arrow (hidden on mobile) -->
+      <button
+        type="button"
+        (click)="goBack()"
+        class="hidden sm:flex items-center mr-4 group"
+        aria-label="Go back"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg"
+            class="w-5 h-5 text-[#006D8D] group-hover:text-[#004b60] transition"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6" />
         </svg>
       </button>
@@ -18,11 +21,11 @@
       <!-- Stepper Centered -->
       <div class="flex-1 flex justify-center">
         <div class="flex items-center space-x-4 sm:space-x-8">
-
           <!-- STEP 1 -->
           <div class="flex flex-col items-center">
             <div class="flex items-center justify-center rounded-full text-xs font-semibold
-        w-8 h-8 sm:w-7 sm:h-7" [ngClass]="step === 1 ? 'bg-[#006D8D] text-white' : 'bg-[#E4EDF1] text-[#006D8D]'">
+                        w-8 h-8 sm:w-7 sm:h-7"
+                [ngClass]="step === 1 ? 'bg-[#006D8D] text-white' : 'bg-[#E4EDF1] text-[#006D8D]'">
               1
             </div>
             <span class="mt-1 text-[11px] text-gray-600 hidden md:block whitespace-nowrap">
@@ -35,7 +38,8 @@
           <!-- STEP 2 -->
           <div class="flex flex-col items-center">
             <div class="flex items-center justify-center rounded-full text-xs font-semibold
-        w-8 h-8 sm:w-7 sm:h-7" [ngClass]="step === 2 ? 'bg-[#006D8D] text-white' : 'bg-[#E4EDF1] text-[#006D8D]'">
+                        w-8 h-8 sm:w-7 sm:h-7"
+                [ngClass]="step === 2 ? 'bg-[#006D8D] text-white' : 'bg-[#E4EDF1] text-[#006D8D]'">
               2
             </div>
             <span class="mt-1 text-[11px] text-gray-600 hidden md:block whitespace-nowrap">
@@ -48,19 +52,17 @@
           <!-- STEP 3 -->
           <div class="flex flex-col items-center">
             <div class="flex items-center justify-center rounded-full text-xs font-semibold
-        w-8 h-8 sm:w-7 sm:h-7" [ngClass]="step === 3 ? 'bg-[#006D8D] text-white' : 'bg-[#E4EDF1] text-[#006D8D]'">
+                        w-8 h-8 sm:w-7 sm:h-7"
+                [ngClass]="step === 3 ? 'bg-[#006D8D] text-white' : 'bg-[#E4EDF1] text-[#006D8D]'">
               3
             </div>
             <span class="mt-1 text-[11px] text-gray-600 hidden md:block whitespace-nowrap">
               Additional Details
             </span>
           </div>
-
         </div>
       </div>
-
     </div>
-
 
     <!-- ======================= STEP 1 ======================= -->
     <div *ngIf="step === 1" class="space-y-6 sm:space-y-8">
@@ -69,14 +71,16 @@
       </h2>
 
       <div class="mx-auto w-full max-w-[260px] h-9 sm:h-10 rounded-full border border-[#006D8D]
-      flex overflow-hidden">
-        <button type="button" (click)="setGender('Male')" class="flex-1 text-sm font-medium transition"
-          [ngClass]="gender === 'Male' ? 'bg-[#006D8D] text-white' : 'bg-white text-[#006D8D]'">
+                  flex overflow-hidden">
+        <button type="button" (click)="setGender('Male')"
+                class="flex-1 text-sm font-medium transition"
+                [ngClass]="gender === 'Male' ? 'bg-[#006D8D] text-white' : 'bg-white text-[#006D8D]'">
           Male
         </button>
 
-        <button type="button" (click)="setGender('Female')" class="flex-1 text-sm font-medium transition"
-          [ngClass]="gender === 'Female' ? 'bg-[#006D8D] text-white' : 'bg-white text-[#006D8D]'">
+        <button type="button" (click)="setGender('Female')"
+                class="flex-1 text-sm font-medium transition"
+                [ngClass]="gender === 'Female' ? 'bg-[#006D8D] text-white' : 'bg-white text-[#006D8D]'">
           Female
         </button>
       </div>
@@ -88,78 +92,73 @@
       <!-- ONLY SELF -->
       <div class="flex justify-center mt-4 sm:mt-6">
         <div class="flex flex-col items-center justify-center w-[140px] sm:w-[170px]
-        h-[160px] sm:h-[210px] bg-white border border-[#E6EEF5]
-        rounded-[18px] shadow-card cursor-pointer">
+                    h-[160px] sm:h-[210px] bg-white border border-[#E6EEF5]
+                    rounded-[18px] shadow-card cursor-pointer">
           <img [src]="youIcon" class="mt-5 w-14 h-14 object-contain" />
           <p class="mt-3 text-xs sm:text-sm font-semibold text-gray-700">Self</p>
         </div>
       </div>
 
       <div class="flex justify-center mt-6">
-        <button (click)="next()" class="w-[150px] sm:w-[170px] h-10 sm:h-11 rounded-full
-            bg-[#006D8D] text-white shadow-next hover:bg-[#005b75] text-sm sm:text-base">
+        <button type="button" (click)="next()"
+                class="w-[150px] sm:w-[170px] h-10 sm:h-11 rounded-full
+                       bg-[#006D8D] text-white shadow-next hover:bg-[#005b75] text-sm sm:text-base">
           Next
         </button>
       </div>
     </div>
 
-
     <!-- ================= STEP 2 : BASIC DETAILS ================= -->
-    <form [formGroup]="basicForm">
+    <form [formGroup]="basicForm" novalidate>
       <div *ngIf="step === 2" class="w-full">
-
         <h2 class="text-xl font-semibold text-[#006D8D] mb-6">Personal Details</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-
           <!-- FIRST NAME -->
           <div>
             <label class="pp-label">First Name <span class="text-red-600">*</span></label>
-            <input formControlName="firstName" type="text" class="pp-input" (keypress)="allowOnlyLetters($event)"
-              (input)="onNameInput('firstName')" placeholder="Enter first name" />
-
+            <input formControlName="firstName" type="text" class="pp-input"
+                   (keypress)="allowOnlyLetters($event)"
+                   (input)="onNameInput('firstName')"
+                   placeholder="Enter first name" />
             <p *ngIf="isInvalid('firstName')" class="pp-error">Enter valid first name</p>
           </div>
 
           <!-- LAST NAME -->
           <div>
             <label class="pp-label">Last Name <span class="text-red-600">*</span></label>
-            <input formControlName="lastName" type="text" class="pp-input" (keypress)="allowOnlyLetters($event)"
-              (input)="onNameInput('lastName')" placeholder="Enter last name" />
-
+            <input formControlName="lastName" type="text" class="pp-input"
+                   (keypress)="allowOnlyLetters($event)"
+                   (input)="onNameInput('lastName')"
+                   placeholder="Enter last name" />
             <p *ngIf="isInvalid('lastName')" class="pp-error">Enter valid last name</p>
           </div>
 
           <!-- DOB -->
-          <!-- DOB -->
           <div>
             <label class="pp-label">Date of Birth <span class="text-red-600">*</span></label>
+            <input formControlName="dob" type="text" class="pp-input" maxlength="10"
+                  placeholder="DD/MM/YYYY"
+                  (input)="onDobInput($event)"
+                  (blur)="validateDOB()" />
 
-            <input formControlName="dob" type="text" class="pp-input" maxlength="10" placeholder="DD/MM/YYYY"
-              (input)="onDobInput($event)" (blur)="validateDOB()" />
-
-            <!-- Format error -->
             <p *ngIf="dobFormatError" class="pp-error">
               Enter valid date in DD/MM/YYYY format
             </p>
-
-            <!-- Age error -->
             <p *ngIf="dobError && !dobFormatError" class="pp-error">
               Age must be 18 or above
             </p>
           </div>
-
-
         </div>
 
         <!-- ROW 2 -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
-
           <!-- MOBILE -->
           <div>
             <label class="pp-label">Mobile Number <span class="text-red-600">*</span></label>
             <input maxlength="10" formControlName="mobile" type="text" class="pp-input"
-              (keypress)="allowOnlyDigits($event)" placeholder="Enter mobile number" />
+                  (keypress)="allowOnlyDigits($event)"
+                  placeholder="Enter mobile number" />
             <p *ngIf="isInvalid('mobile')" class="pp-error">Enter valid 10-digit mobile</p>
           </div>
 
@@ -167,32 +166,33 @@
           <div>
             <label class="pp-label">Pincode <span class="text-red-600">*</span></label>
             <input maxlength="6" formControlName="pincode" type="text" class="pp-input"
-              (keypress)="allowOnlyDigits($event)" placeholder="Enter pincode" />
+                   (keypress)="allowOnlyDigits($event)"
+                   placeholder="Enter pincode" />
             <p *ngIf="isInvalid('pincode')" class="pp-error">Enter valid 6-digit pincode</p>
           </div>
 
           <!-- CITY -->
           <div>
             <label class="pp-label">City <span class="text-red-600">*</span></label>
-            <input formControlName="city" type="text" class="pp-input" (keypress)="allowOnlyLetters($event)"
-              placeholder="Enter city" />
+            <input formControlName="city" type="text" class="pp-input"
+                  (keypress)="allowOnlyLetters($event)"
+                  placeholder="Enter city" />
             <p *ngIf="isInvalid('city')" class="pp-error">Enter valid city name</p>
           </div>
-
         </div>
 
         <div class="mt-10 flex justify-end">
-          <button type="button" (click)="next()" class="pp-btn-primary">Continue</button>
+          <button type="button" (click)="next()" class="pp-btn-primary">
+            Continue
+          </button>
         </div>
       </div>
 
       <!-- ================= STEP 3 : ADDITIONAL DETAILS ================= -->
       <div *ngIf="step === 3" class="w-full">
-
         <h2 class="text-xl font-semibold text-[#006D8D] mb-6">Additional Details</h2>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
-
           <!-- OCCUPATION -->
           <div>
             <label class="pp-label">Occupation of Insured <span class="text-red-600">*</span></label>
@@ -210,9 +210,9 @@
             <label class="pp-label">Annual Income Range <span class="text-red-600">*</span></label>
             <select formControlName="incomeRange" class="pp-select">
               <option value="" disabled>Select Income Range</option>
-              <option>₹3 Lakh – ₹5 Lakh</option>
-              <option>₹6 Lakh – ₹8 Lakh</option>
-              <option>₹9 Lakh – ₹12 Lakh</option>
+              <option>₹3 Lakh  – ₹5 Lakh</option>
+              <option>₹6 Lakh  – ₹8 Lakh</option>
+              <option>₹9 Lakh  – ₹12 Lakh</option>
               <option>₹13 Lakh – ₹18 Lakh</option>
               <option>₹19 Lakh – ₹25 Lakh</option>
               <option>₹26 Lakh – ₹40 Lakh</option>
@@ -221,15 +221,36 @@
             <p *ngIf="isInvalid('incomeRange')" class="pp-error">Please select income range</p>
           </div>
 
-          <!-- RISK CATEGORY (IMPROVED ONLY THIS UI) -->
+          <!-- NATURE OF WORK / DESIGNATION -->
           <div>
-            <label class="pp-label">Risk Category <span class="text-red-600">*</span></label>
+            <label class="pp-label">
+              Nature of Work / Designation <span class="text-red-600">*</span>
+            </label>
 
-            <div class="pp-select cursor-pointer flex items-center justify-between" (click)="openRiskPopup()">
-              {{ selectedRiskCategory || 'Select Risk Category' }}
-            </div>
+            <button
+              type="button"
+              (click)="openRiskPopup()"
+              class="w-full flex items-center justify-between gap-3
+                    rounded-xl border border-slate-200 bg-white px-4 py-3
+                    text-sm text-slate-700 shadow-sm
+                    hover:border-slate-300 hover:bg-slate-50
+                    focus:outline-none focus:ring-2 focus:ring-[#006D8D]/25
+                    active:scale-[0.99] transition-all duration-200"
+            >
+              <span class="truncate" [class.text-slate-400]="!selectedRiskCategory">
+                {{ selectedRiskCategory || 'Select Nature of Work / Designation' }}
+              </span>
 
-            <p *ngIf="riskError" class="pp-error">Please select a risk category</p>
+              <svg xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4 text-slate-500"
+                viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                      d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
+                      clip-rule="evenodd" />
+              </svg>
+            </button>
+
+            <p *ngIf="riskError" class="pp-error mt-1">Please select Nature of work/Designation</p>
           </div>
 
           <!-- COVER AMOUNT -->
@@ -241,7 +262,7 @@
               <option value="1500000">15 Lakh</option>
               <option value="2000000">20 Lakh</option>
               <option value="2500000">25 Lakh</option>
-              <option value="5000000">30 Lakh</option>
+              <option value="3000000">30 Lakh</option>
               <option value="3500000">35 Lakh</option>
               <option value="5000000">50 Lakh</option>
               <option value="7500000">75 Lakh</option>
@@ -253,41 +274,172 @@
             </select>
             <p *ngIf="isInvalid('coverAmount')" class="pp-error">Please select cover amount</p>
           </div>
-
         </div>
 
         <div class="flex justify-between mt-10">
           <button type="button" class="pp-btn-secondary" (click)="prev()">Back</button>
           <button type="button" class="pp-btn-primary" (click)="next()">Get Quotes</button>
         </div>
-
       </div>
     </form>
 
+    <!-- ================== NATURE OF WORK POPUP (RESPONSIVE FIXED) ================== -->
 
-    <!-- ================== RISK POPUP ================== -->
-    <div *ngIf="showRiskPopup" class="popup-overlay" (click)="closeRiskPopup()"></div>
-    <div *ngIf="showRiskPopup" class="risk-popup animate-popup" (click)="$event.stopPropagation()">
+    <!-- Overlay (ONLY ONE) -->
+    <div
+      class="fixed inset-0 z-[98] bg-slate-900/40 backdrop-blur-[2px]
+             transition-opacity duration-300 ease-out"
+      [ngClass]="showRiskPopup ? 'opacity-100' : 'opacity-0 pointer-events-none'"
+      (click)="closeRiskPopup()"
+    ></div>
 
-      <!-- Tabs -->
-      <div class="popup-tabs">
-        <button *ngFor="let tab of riskTabs; let i=index" class="popup-tab" [class.active]="activeRiskTab === (i + 1)"
-          (click)="activeRiskTab = i + 1">
-          {{ tab }}
-        </button>
-
-      </div>
-
-      <!-- Items -->
-      <div class="mt-4 space-y-3">
-        <div *ngFor="let item of riskList[activeRiskTab]" class="popup-row"
-          [class.selected]="selectedRiskCategory === item" (click)="selectRisk(item)">
-          <span class="bullet-dot"></span>
-          <span>{{ item }}</span>
+    <!-- Wrapper: Mobile bottom sheet + Desktop centered -->
+    <div
+      class="fixed inset-x-0 bottom-0 z-[99]
+             sm:inset-0 sm:flex sm:items-center sm:justify-center
+             transition-all duration-300 ease-out"
+      [ngClass]="showRiskPopup
+        ? 'opacity-100 translate-y-0'
+        : 'opacity-0 translate-y-full sm:translate-y-0 pointer-events-none'"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Modal box -->
+      <div
+        class="w-full sm:w-[420px] sm:max-w-[420px]
+               bg-white shadow-2xl ring-1 ring-black/5
+               rounded-t-3xl sm:rounded-3xl overflow-hidden
+               max-h-[85dvh] sm:max-h-[80vh]
+               flex flex-col
+               pb-[env(safe-area-inset-bottom)]"
+        (click)="$event.stopPropagation()"
+      >
+        <!-- Mobile drag handle -->
+        <div class="sm:hidden flex justify-center pt-2">
+          <span class="h-1.5 w-12 rounded-full bg-slate-300"></span>
         </div>
+
+        <!-- Header -->
+        <div class="px-5 pt-4 pb-4 border-b border-slate-100">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <p class="text-[15px] font-semibold text-slate-900 leading-5">
+                Select Nature of Work / Designation
+              </p>
+
+              <div class="mt-2 flex items-center gap-2">
+                <span
+                  class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold"
+                  [ngClass]="riskTheme.chip"
+                >
+                  {{ riskTabs[(activeRiskTab || 1) - 1] }}
+                </span>
+                <p class="text-xs text-slate-500 truncate">
+                  Pick one option from the list below
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              (click)="closeRiskPopup()"
+              class="h-10 w-10 shrink-0 rounded-full grid place-items-center
+                     hover:bg-slate-100 active:scale-95 transition"
+              aria-label="Close"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-600"
+                   viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clip-rule="evenodd"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="px-5 pt-4">
+          <div
+            class="flex gap-2 p-1.5 rounded-2xl ring-1"
+            [ngClass]="riskTheme.bg + ' ' + riskTheme.ring"
+          >
+            <button
+              *ngFor="let tab of riskTabs; let i=index"
+              type="button"
+              (click)="activeRiskTab = (i + 1)"
+              class="flex-1 text-xs sm:text-sm font-semibold rounded-xl px-3 py-2
+                     transition-all duration-200 active:scale-[0.99]"
+              [ngClass]="activeRiskTab === (i + 1)
+                ? (riskTheme.pillActive + ' shadow-sm')
+                : 'text-slate-700 hover:bg-white/60'"
+            >
+              {{ tab }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Scroll area (IMPORTANT) -->
+        <div class="flex-1 overflow-y-auto px-5 pt-4 pb-5">
+          <div class="space-y-2">
+            <button
+              *ngFor="let item of (riskList[activeRiskTab || 1] || [])"
+              type="button"
+              (click)="selectRisk(item)"
+              class="w-full text-left rounded-2xl border px-4 py-3
+                     flex items-start justify-between gap-3
+                     transition-all duration-200 active:scale-[0.99]
+                     focus:outline-none focus:ring-4"
+              [ngClass]="selectedRiskCategory === item
+                ? (riskTheme.itemActive + ' focus:ring-white/20')
+                : ('border-slate-200 bg-white text-slate-800 ' + riskTheme.itemHover + ' ' + riskTheme.focusRing)"
+            >
+              <div class="min-w-0">
+                <p class="text-sm font-semibold leading-5">
+                  {{ item }}
+                </p>
+                <p class="text-xs mt-1"
+                   [ngClass]="selectedRiskCategory === item ? 'text-white/80' : 'text-slate-500'">
+                  Tap to select this designation
+                </p>
+              </div>
+
+              <span
+                class="shrink-0 mt-0.5 h-9 w-9 rounded-full grid place-items-center
+                       transition-all duration-200"
+                [ngClass]="selectedRiskCategory === item ? 'bg-white/15' : 'bg-slate-100'"
+              >
+                <svg *ngIf="selectedRiskCategory === item"
+                     xmlns="http://www.w3.org/2000/svg"
+                     class="h-5 w-5 text-white"
+                     viewBox="0 0 20 20"
+                     fill="currentColor">
+                  <path fill-rule="evenodd"
+                        d="M16.704 5.29a1 1 0 010 1.415l-7.2 7.2a1 1 0 01-1.415 0l-3.2-3.2a1 1 0 011.415-1.415l2.493 2.493 6.493-6.493a1 1 0 011.414 0z"
+                        clip-rule="evenodd"/>
+                </svg>
+
+                <span *ngIf="selectedRiskCategory !== item"
+                      class="h-2.5 w-2.5 rounded-full bg-slate-300"></span>
+              </span>
+            </button>
+
+            <!-- Footer -->
+            <div class="pt-3 flex justify-end">
+              <button
+                type="button"
+                (click)="closeRiskPopup()"
+                class="px-5 py-2.5 rounded-full text-sm font-semibold
+                       border border-slate-200 text-slate-700
+                       hover:bg-slate-50 active:scale-[0.99] transition"
+              >
+                Close
+              </button>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </div>
+
   </div>
 </div>
-
-<app-footer></app-footer>

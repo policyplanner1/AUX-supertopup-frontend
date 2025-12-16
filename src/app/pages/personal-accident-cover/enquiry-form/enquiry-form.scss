@@ -4,14 +4,12 @@
   display: block;
 }
 
-/* Smooth transitions */
+/* Keep your existing styles */
 * {
   transition: all 0.25s ease;
 }
 
-/* =====================================
-   EXISTING GLOBAL STYLES (Restored)
-===================================== */
+/* Existing global styles (keep as is) */
 .gradient-border {
   border-width: 2px;
   border-style: solid;
@@ -42,10 +40,7 @@ button[disabled] {
   cursor: not-allowed;
 }
 
-/* =====================================
-      FORM FIELDS (Restored)
-===================================== */
-
+/* FORM FIELDS (keep) */
 .pp-label {
   display: block;
   color: #006d8d;
@@ -77,9 +72,7 @@ button[disabled] {
   color: #dc2626;
 }
 
-/* =====================================
-   BUTTONS (Restored)
-===================================== */
+/* BUTTONS (keep) */
 .pp-btn-primary {
   background: #006d8d;
   color: white;
@@ -108,125 +101,7 @@ button[disabled] {
   background: #f0f8fa;
 }
 
-/* =====================================
-      RISK CATEGORY POPUP (Updated)
-===================================== */
-
-.popup-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.3);
-  backdrop-filter: blur(3px);
-  z-index: 98;
-}
-
-/* Main Popup Box */
-.risk-popup {
-  position: fixed;
-  background: #fff;
-  width: 480px;
-  max-width: 92%;
-  max-height: 80%;
-  overflow-y: auto;
-  border-radius: 18px;
-  padding: 20px;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.18);
-  z-index: 99;
-}
-
-/* Mobile Bottom Sheet */
-@media (max-width: 640px) {
-  .risk-popup {
-    width: 100%;
-    left: 0;
-    bottom: 0;
-    top: auto;
-    transform: none;
-    border-radius: 18px 18px 0 0;
-  }
-}
-
-/* Popup animation */
-.animate-popup {
-  animation: popIn 0.22s ease-out;
-}
-
-@keyframes popIn {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -44%);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%);
-  }
-}
-
-/* Tabs */
-.popup-tabs {
-  display: flex;
-  justify-content: center;
-  border-bottom: 1px solid #e5e7eb;
-  gap: 10px;
-}
-
-.popup-tab {
-  padding: 8px 18px;
-  font-size: 13px;
-  color: #006d8d;
-  font-weight: 600;
-  border-bottom: 2px solid transparent;
-}
-
-.popup-tab.active {
-  border-color: #006d8d;
-}
-
 /* Remove arrow from custom select */
 select[onmousedown]::-ms-expand {
   display: none;
-}
-
-/* =====================================
-      RISK LIST ROW (Updated)
-===================================== */
-
-
-.popup-row {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;  /* left aligned */
-  gap: 12px !important;
-  background: #f9fafb;
-  padding: 12px 14px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 14px;
-  color: #374151;
-}
-
-.popup-row:hover {
-  background: #e7f5fa;
-}
-
-/* Default bullet dot */
-.bullet-dot {
-  width: 8px;
-  height: 8px;
-  background: #111;   /* black dot */
-  border-radius: 50%;
-}
-
-/* On selected row -> make text white + bullet white */
-.popup-row.selected {
-  background: #006d8d !important;
-  color: white !important;
-  font-weight: 600;
-}
-
-.popup-row.selected .bullet-dot {
-  background: #ffffff;
 }
