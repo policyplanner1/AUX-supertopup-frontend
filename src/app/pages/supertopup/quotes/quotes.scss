@@ -1,4 +1,6 @@
-
+/* =========================
+   FILTER BUTTONS
+========================= */
 .filter-btn {
   padding: 0.4rem 1rem;
   background: #fff;
@@ -14,7 +16,6 @@
   cursor: pointer;
   transition: all 0.2s ease;
 }
-
 .filter-btn:hover {
   background: #f9fafb; /* gray-50 */
 }
@@ -28,8 +29,9 @@
   scrollbar-width: none;
 }
 
-/* ========= EXPORT MODE: used only while creating PDF ========= */
-
+/* =========================
+   EXPORT MODE: PDF ONLY
+========================= */
 #compareWrapper {
   color-scheme: light;
 }
@@ -60,7 +62,6 @@
   overflow: visible !important;
 }
 
-
 /* Hide top header inside PDF */
 #compareWrapper.export-pdf .cmp-screen__header {
   display: none !important;
@@ -70,6 +71,7 @@
 #compareWrapper.export-pdf .cmp-table-wrapper {
   overflow: visible !important;
   max-height: none !important;
+  height: auto !important;
 }
 
 /* Slightly tighter top strip in PDF */
@@ -77,207 +79,111 @@
   padding: 4px 12px !important;
 }
 
+/* =========================
+   COMPARE HEADER – DESKTOP
+========================= */
+.cmp-logo-wrapper {
+  width: 96px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 
-/* ==========================================================
-   FULL MOBILE RESPONSIVENESS FOR COMPARISON TABLE
-   EXACTLY LIKE HEALTH INSURANCE VERSION
-   WITHOUT TOUCHING DESKTOP VIEW
-=========================================================== */
+.cmp-company-logo {
+  width: 96px;
+  height: 56px;
+  object-fit: contain;
+  display: block;
+  /* helps white logos (like Bajaj) become visible */
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.18));
+}
+
+.cmp-company-name {
+  font-weight: 700;
+  font-size: 15px;
+  color: #222;
+  line-height: 1.2;
+  margin-bottom: 3px;
+  word-break: break-word;
+}
+
+.cmp-product-name {
+  font-size: 13px;
+  color: #667085;
+  line-height: 1.2;
+}
+
+/* Cover/Deductible row (desktop default) */
+.cmp-metrics {
+  width: 100%;
+  margin-top: 6px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.cmp-metric {
+  text-align: center;
+  padding: 6px 6px;
+  border-top: 1px dashed #eef2f5;
+}
+
+.cmp-metric-label {
+  font-size: 12px;
+  color: #667085;
+  line-height: 1.1;
+  margin-bottom: 3px;
+}
+
+.cmp-metric-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #222;
+  line-height: 1.1;
+}
+
+/* =========================
+   MOBILE: FULL COMPARE TABLE + HEADER
+   (Horizontal swipe + sticky left)
+========================= */
 @media (max-width: 768px) {
-
-  /* FULL SCREEN WRAPPER */
+  /* Give space if needed because bottom bar exists */
   #compareWrapper {
     padding-bottom: 70px;
   }
 
-  /* TABLE SCROLL */
+  /* Smooth mobile horizontal scrolling */
   .cmp-table-wrapper {
     overflow-x: auto !important;
-    overflow-y: visible !important;
+    overflow-y: auto !important;
     white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
   }
 
-  /* GRID turns into horizontally scrollable cards */
+  /* Header row becomes inline-flex to allow swipe */
   .cmp-top {
     display: inline-flex !important;
     width: auto !important;
     min-width: 100% !important;
   }
 
-  /* LEFT FEATURES COLUMN → FIXED LEFT */
-  .cmp-features-col {
-    position: sticky;
-    left: 0;
-    z-index: 20;
-    min-width: 160px !important;
-    background: #f1f7fb;
-    border-right: 1px solid #dce3eb;
-  }
-
-  /* PLAN COLUMNS BECOME CARDS */
-  .cmp-plan-col {
-    min-width: 260px !important;
-    max-width: 260px !important;
-    flex-shrink: 0 !important;
-    border-right: 1px solid #eaeaea;
-    background: white;
-    padding: 12px !important;
-  }
-
-  .cmp-company-logo {
-    width: 48px !important;
-    height: 48px !important;
-  }
-
-  .cmp-company-name {
-    font-size: 14px !important;
-    line-height: 1.2;
-  }
-
-  .cmp-product-name {
-    font-size: 12px !important;
-  }
-
-  /* BUY NOW BUTTON */
-  .cmp-buy-now-btn {
-    font-size: 12px !important;
-    padding: 8px 10px !important;
-    min-height: 32px !important;
-    width: 100%;
-  }
-
-  /* BODY ROWS ALSO SLIDE HORIZONTALLY */
-
-
-
-.cmp-cover-section, .cmp-deductible-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.cmp-cover-value, .cmp-deductible-value {
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.cmp-cover-label, .cmp-deductible-label {
-  font-size: 14px;
-  color: #667085;
-}
-
+  /* Body rows become inline-flex to match header */
   .cmp-row {
     display: inline-flex !important;
     width: auto !important;
     min-width: 100% !important;
   }
 
-  .cmp-feature-col {
-    position: sticky;
-    left: 0;
-    min-width: 160px !important;
-    max-width: 160px !important;
-    background: #f8fafc;
-    z-index: 10;
-    border-right: 1px solid #ddd;
-  }
-
-  .cmp-data-col {
-    min-width: 260px !important;
-    max-width: 260px !important;
-    flex-shrink: 0 !important;
-    text-align: center;
-    padding: 12px !important;
-  }
-
-  /* HEART IMAGE SMALLER */
-  .cmp-heart-icon {
-    width: 70px !important;
-    height: 70px !important;
-  }
-
-  /* HEADER TEXT */
-  .cmp-features-title {
-    font-size: 12px !important;
-  }
-
-  /* BACK BUTTON + HEADER */
-  .cmp-screen__header {
-    padding: 10px !important;
-    font-size: 14px !important;
-  }
-
-  /* FIX COMPARE BAR ON MOBILE */
-  .compare-bar,
-  .fixed.bottom-0 {
-    padding: 10px !important;
-  }
-
-  .compare-inner {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .chips {
-    overflow-x: scroll;
-    white-space: nowrap;
-    padding-bottom: 6px;
-  }
-
-  .chip {
-    min-width: 180px !important;
-  }
-
-  .actions {
-    width: 100%;
-    display: flex;
-    gap: 10px;
-  }
-
-  .actions .btn {
-    flex: 1;
-    font-size: 14px;
-  }
-
-  @media (max-width: 768px) {
-  .cmp-top {
-    grid-template-columns: 1fr; /* Stack all columns vertically */
-    // gap: 15px;
-  }
-
-  .cmp-cover-section, .cmp-deductible-section {
-    margin-bottom: 10px;
-  }
-}
-
-/* ==========================================================
-   PERFECT RESPONSIVE COMPARISON TABLE (MOBILE ≤ 768px)
-   Works for all phones — no overlap, proper alignment
-   ========================================================== */
-@media (max-width: 768px) {
-
-  /* Allow horizontal scroll */
-  #compareWrapper,
-  .cmp-table-wrapper {
-    overflow-x: auto !important;
-    overflow-y: visible !important;
-    white-space: nowrap !important;
-  }
-
-  /* Force header & body rows into horizontal flex */
+  /* Force grid-template-columns not to interfere in mobile */
   .cmp-top,
   .cmp-row {
-    display: inline-flex !important;
-    width: auto !important;
-    min-width: 100% !important;
+    grid-template-columns: none !important;
   }
 
-  /* -----------------------------
-     LEFT STICKY FEATURE COLUMN
-     ----------------------------- */
-  .cmp-features-col,
-  .cmp-feature-col {
+  /* Sticky left summary/feature columns */
+  .cmp-features-col {
     position: sticky;
     left: 0;
     z-index: 30;
@@ -285,74 +191,216 @@
     max-width: 165px !important;
     background: #f1f7fb !important;
     border-right: 1px solid #d7e1ea !important;
-    white-space: normal !important; /* TEXT WRAPS CORRECTLY */
+    white-space: normal !important;
   }
 
-  /* Feature label text */
+  .cmp-feature-col {
+    position: sticky;
+    left: 0;
+    z-index: 25;
+    min-width: 165px !important;
+    max-width: 165px !important;
+    background: #f8fafc !important;
+    border-right: 1px solid #d7e1ea !important;
+    white-space: normal !important;
+  }
+
   .cmp-feature-name {
     font-size: 13px !important;
     line-height: 1.3 !important;
     white-space: normal !important;
+    word-break: break-word !important;
   }
 
-  /* -----------------------------
-     PLAN COLUMN (Right Side)
-     ----------------------------- */
-  .cmp-plan-col,
+  /* Plan columns become swipeable cards */
+  .cmp-plan-col {
+    min-width: 260px !important;
+    max-width: 260px !important;
+    flex-shrink: 0 !important;
+    background: #fff !important;
+    border-right: 1px solid #eaeaea !important;
+    padding: 12px !important;
+    gap: 10px !important;
+    white-space: normal !important;
+  }
+
   .cmp-data-col {
     min-width: 260px !important;
     max-width: 260px !important;
     flex-shrink: 0 !important;
-    white-space: normal !important;  /* FIX TEXT BREAKING */
-    text-align: center !important;
+    background: #fff !important;
+    border-right: 1px solid #eef2f5 !important;
     padding: 12px !important;
-    background: #fff;
+    text-align: center !important;
+    white-space: normal !important;
+    word-break: break-word !important;
   }
 
-  /* Company logo */
-  .cmp-company-logo {
-    width: 48px !important;
-    height: 48px !important;
-  }
-
-  /* Values (Cover / Deductible) */
-  .cmp-cover-value,
-  .cmp-deductible-value {
-    font-size: 18px !important;
-    font-weight: 600 !important;
-  }
-
-  .cmp-cover-label,
-  .cmp-deductible-label {
-    font-size: 13px !important;
-    color: #64748b !important;
-  }
-
-  /* BUY NOW */
-  .cmp-buy-now-btn {
-    width: 100% !important;
-    font-size: 12px !important;
-    padding: 8px !important;
-    min-height: 32px !important;
-  }
-
-  /* HEART ICON (summary image) */
+  /* Heart image smaller */
   .cmp-heart-icon {
     width: 70px !important;
     height: 70px !important;
   }
 
-  /* Header */
+  .cmp-features-title {
+    font-size: 12px !important;
+  }
+
+  /* Header bar tighter */
   .cmp-screen__header {
     padding: 10px !important;
     font-size: 14px !important;
   }
 
-  /* Force grid-template-columns to NOT break in mobile */
-  .cmp-top,
-  .cmp-row {
-    grid-template-columns: none !important;
-    }
+  /* Logo sizes for mobile */
+  .cmp-logo-wrapper {
+    width: 72px;
+    height: 44px;
   }
 
+  .cmp-company-logo {
+    width: 72px;
+    height: 44px;
+  }
+
+  /* Logo + title row spacing */
+  .cmp-logo-name-row {
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+
+  .cmp-company-name {
+    font-size: 14px !important;
+    line-height: 1.2 !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+  }
+
+  .cmp-product-name {
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+  }
+
+  /* ✅ Make Cover/Deductible "one after one" (stacked) */
+  .cmp-metrics {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    margin-top: 6px !important;
+  }
+
+  .cmp-metric {
+    text-align: left !important;
+    padding: 8px 6px !important;
+    border-top: 1px dashed #eef2f5 !important;
+  }
+
+  .cmp-metric-label {
+    font-size: 12px !important;
+  }
+
+  .cmp-metric-value {
+    font-size: 15px !important;
+    margin-top: 2px !important;
+  }
+
+  /* Buy button full width */
+  .cmp-buy-now-btn {
+    width: 100% !important;
+    font-size: 12px !important;
+    padding: 8px 10px !important;
+    min-height: 32px !important;
+  }
+}
+
+/* =========================
+   BOTTOM COMPARE BAR – MOBILE RESPONSIVE
+   (Swipe chips + full width buttons)
+========================= */
+@media (max-width: 768px) {
+  /* main bar padding smaller */
+  .fixed.left-0.right-0.bottom-0 {
+    padding: 10px 0 !important;
+  }
+
+  /* container becomes column */
+  .fixed.left-0.right-0.bottom-0 .max-w-7xl {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  /* chips strip: horizontal scroll */
+  .fixed.left-0.right-0.bottom-0 .no-scrollbar {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    white-space: nowrap !important;
+    padding-bottom: 6px !important;
+  }
+
+  /* each chip slightly smaller but readable */
+  .fixed.left-0.right-0.bottom-0 .no-scrollbar > div {
+    min-width: 210px !important;
+    padding: 10px 12px !important;
+  }
+
+  /* actions: full width */
+  .fixed.left-0.right-0.bottom-0 .flex.items-center.gap-3.flex-shrink-0 {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+
+  .fixed.left-0.right-0.bottom-0 .flex.items-center.gap-3.flex-shrink-0 button {
+    flex: 1 !important;
+    height: 44px !important;
+    font-size: 14px !important;
+  }
+}
+/* =========================
+   COMPARE HEADER TOP – MOBILE STACK (ONE BY ONE)
+========================= */
+@media (max-width: 768px) {
+  .cmp-screen__header {
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    padding: 10px 12px !important;
+  }
+
+  /* Back to list */
+  .cmp-screen__header > button {
+    order: 1 !important;
+    width: 100% !important;
+text-align: center !important;
+    font-size: 14px !important;
+    padding: 0 !important;
+  }
+
+  /* Title */
+  .cmp-screen__header > div.flex-1 {
+    order: 2 !important;
+    width: 100% !important;
+    flex: none !important;
+    text-align: left !important; /* or center if you want */
+    font-size: 15px !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+  }
+
+  /* Download button container */
+  .cmp-screen__header > div.ml-auto {
+    order: 3 !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+    justify-content: flex-start !important;
+  }
+
+  /* Download button full width */
+  .cmp-download-btn {
+    width: 100% !important;
+    min-width: 100% !important;
+    height: 42px !important;
+    justify-content: center !important;
+  }
 }

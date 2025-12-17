@@ -316,7 +316,9 @@
       <div
         class="flex items-center gap-3 px-4 py-3 border-2 border-slate-200 rounded-xl bg-white flex-shrink-0 min-w-[180px] hover:border-[#0b5cff] hover:shadow"
         *ngFor="let p of compare; trackBy: trackByPlanId">
-        <img [src]="p.logo" [alt]="p.insurerName" class="w-8 h-8 object-contain rounded-md" />
+        <img [src]="p.logo" [alt]="p.insurerName"
+
+            class="w-10 h-10 object-contain rounded-md" />
         <div class="flex-1 min-w-0">
           <p class="text-sm font-semibold text-slate-900 truncate">{{ p.insurerName }}</p>
           <p class="text-xs text-slate-500 truncate">{{ p.productName }}</p>
@@ -427,39 +429,43 @@
               ✕
             </button>
 
-            <div class="cmp-logo-name-row flex items-center gap-3 w-full">
-              <div class="cmp-logo-wrapper flex-shrink-0">
-                <img [src]="p.logo" [alt]="p.insurerName" class="cmp-company-logo w-[60px] h-[60px] object-contain" />
-              </div>
-              <div class="cmp-name-wrapper flex-1">
-                <div class="cmp-company-name font-semibold text-[16px] text-[#222] leading-[1.2] mb-1">
-                  {{ p.productName }}
-                </div>
-                <div class="cmp-product-name text-[14px] text-[#666] leading-[1.2]">
-                  {{ p.insurerName }}
-                </div>
-              </div>
-            </div>
+             <div class="cmp-logo-name-row flex items-start gap-3 w-full pr-8 min-w-0">
+  <div class="cmp-logo-wrapper">
+    <img
+      [src]="p.logo"
+      [alt]="p.insurerName"
+      class="cmp-company-logo"
+    />
+  </div>
 
-            <div class="cmp-cover-section text-center w-full py-1">
-              <div class="cmp-cover-label text-[14px] text-[#667085] mb-2">
-                Cover Amount
-              </div>
-              <div class="cmp-cover-value font-semibold text-[18px] text-[#222]">
-                ₹ {{ p.coverAmount | number : '1.0-0' : 'en-IN' }}
-              </div>
-            </div>
+  <div class="cmp-name-wrapper flex-1 min-w-0">
+    <div class="cmp-company-name">
+      {{ p.productName }}
+    </div>
+    <div class="cmp-product-name">
+      {{ p.insurerName }}
+    </div>
+  </div>
+</div>
 
-              <div class="cmp-deductible-section text-center w-full py-1">
-              <div class="cmp-deductible-label text-[14px] text-[#667085] mb-2">
-                Deductible Amount
-              </div>
-              <div class="cmp-deductible-value font-semibold text-[18px] text-[#222]">
-                ₹ {{ p.deductible | number : '1.0-0' : 'en-IN' }}
-              </div>
-            </div>
+<!-- ✅ Cover + Deductible in one compact row -->
+<div class="cmp-metrics">
+  <div class="cmp-metric">
+    <div class="cmp-metric-label">Cover Amount</div>
+   <div class="cmp-metric-value">
+  ₹ {{ formatIndianCurrency(p.coverAmount) }}
+</div>
+  </div>
 
-            <button type="button"
+  <div class="cmp-metric">
+    <div class="cmp-metric-label">Deductible Amount</div>
+    <div class="cmp-metric-value">
+  ₹ {{ formatIndianCurrency(p.deductible) }}
+</div>
+  </div>
+</div>
+
+<button type="button"
               class="cmp-buy-now-btn bg-[#006D8D] text-white border-0 px-3 py-2 rounded text-[13px] font-semibold mt-auto min-w-[140px] min-h-[32px] flex items-center justify-center self-center shadow hover:bg-[#005a75]"
               (click)="goToProposal(p.sourcePlan || p)">
               Buy now for ₹{{ p.monthlyPrice | number : '1.0-0' : 'en-IN' }}

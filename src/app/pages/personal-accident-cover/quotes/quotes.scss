@@ -14,6 +14,23 @@
   transition: all 0.2s ease;
 }
 
+.cmp-logo-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cmp-company-logo {
+  max-width: 120px;
+  max-height: 120px;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.cmp-company-logo {
+  transform: scale(1.08);
+}
+
 .filter-btn:hover {
   background: #f9fafb; /* gray-50 */
 }
@@ -25,6 +42,25 @@
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* MOBILE SAFETY FIX */
+@media (max-width: 768px) {
+
+  .cmp-company-logo {
+    width: 56px !important;
+    height: 56px !important;
+  }
+
+  .cmp-remove-round {
+    top: 6px !important;
+    right: 6px !important;
+    z-index: 40;
+  }
+
+  .cmp-logo-name-row {
+    padding-right: 32px; /* space for X button */
+  }
 }
 
 /* ========= EXPORT MODE: used only while creating PDF ========= */

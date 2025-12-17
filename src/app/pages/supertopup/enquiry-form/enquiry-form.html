@@ -242,10 +242,18 @@
             <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
               First Name <span class="text-red-500">*</span>
             </label>
-            <input type="text" formControlName="firstName" class="w-full border-0 border-b border-gray-400 bg-transparent py-2
+            <input
+              type="text"
+              formControlName="firstName"
+              class="w-full border-0 border-b border-gray-400 bg-transparent py-2
                     text-gray-700 text-sm focus:outline-none focus:border-[#006D8D]"
-              [ngClass]="{ 'invalid-field': isInvalid('firstName') }" placeholder="Enter your first name"
-              (keypress)="allowOnlyLetters($event)" (input)="onNameInput('firstName')" autocomplete="given-name" />
+              [ngClass]="{ 'invalid-field': isInvalid('firstName') }"
+              placeholder="Enter your first name"
+              (keydown)="allowOnlyLetters($event)"
+              (input)="onNameInputUpper('firstName')"
+              autocomplete="given-name"
+            />
+
             <div *ngIf="isInvalid('firstName')" class="form-error">
               <span *ngIf="f['firstName'].errors?.['required']">
                 First name is required.
@@ -263,10 +271,18 @@
             <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
               Last Name <span class="text-red-500">*</span>
             </label>
-            <input type="text" formControlName="lastName" class="w-full border-0 border-b border-gray-400 bg-transparent py-2
+            <input
+              type="text"
+              formControlName="lastName"
+              class="w-full border-0 border-b border-gray-400 bg-transparent py-2
                     text-gray-700 text-sm focus:outline-none focus:border-[#006D8D]"
-              [ngClass]="{ 'invalid-field': isInvalid('lastName') }" placeholder="Enter your last name"
-              (keypress)="allowOnlyLetters($event)" (input)="onNameInput('lastName')" autocomplete="family-name" />
+              [ngClass]="{ 'invalid-field': isInvalid('lastName') }"
+              placeholder="Enter your last name"
+              (keydown)="allowOnlyLetters($event)"
+              (input)="onNameInputUpper('lastName')"
+              autocomplete="family-name"
+            />
+
             <div *ngIf="isInvalid('lastName')" class="form-error">
               <span *ngIf="f['lastName'].errors?.['required']">
                 Last name is required.

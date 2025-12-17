@@ -1,0 +1,497 @@
+<!-- ============================
+     PROPOSAL FORM (STEP 1 + STEP 2)
+============================== -->
+<div class="max-w-[1200px] mx-auto mt-4 sm:mt-5 px-3 sm:px-4 pb-8">
+
+  <!-- HEADER + STEPPER -->
+  <div class="tw-stepper-container">
+    <div class="tw-header-left">
+      <button class="tw-back-btn" type="button" (click)="goBack()" aria-label="Go back">
+        <svg width="26" height="26" viewBox="0 0 24 24">
+          <path d="M15 18l-6-6 6-6" stroke-width="2" stroke="currentColor" fill="none"></path>
+        </svg>
+      </button>
+      <div class="min-w-0">
+        <h2 class="tw-stepper-title">Proposal Form</h2>
+        <p class="tw-stepper-subtitle">Fill details & submit</p>
+      </div>
+    </div>
+
+    <div class="tw-header-center">
+      <div class="tw-step-indicators">
+
+        <div class="tw-step" [class.active]="currentStep === 1" [class.completed]="currentStep > 1">
+          <div class="tw-step-number">1</div>
+          <span class="tw-step-label">Proposal</span>
+        </div>
+
+        <div class="tw-step" [class.active]="currentStep === 2">
+          <div class="tw-step-number">2</div>
+          <span class="tw-step-label">Summary</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================
+        STEP 1 : PROPOSAL
+  ============================ -->
+  <div *ngIf="currentStep === 1" class="tw-step-content">
+
+    <!-- PRODUCT DETAILS -->
+    <div class="tw-section-card">
+      <h4 class="tw-section-title">Product Details</h4>
+
+      <div class="tw-row-4">
+        <div class="tw-field">
+          <label>Product Name <span class="tw-required">*</span></label>
+          <input class="tw-input tw-readonly" [value]="proposalData.productName" readonly />
+          <div class="tw-error" *ngIf="fieldErrors.productName as err">{{ err }}</div>
+        </div>
+
+        <div class="tw-field">
+          <label>Product Type <span class="tw-required">*</span></label>
+
+          <div class="tw-radio-row">
+            <label class="tw-radio-label">
+              <input type="radio" name="ptype" value="new" [(ngModel)]="proposalData.productType" />
+              New
+            </label>
+
+            <label class="tw-radio-label">
+              <input type="radio" name="ptype" value="portability" [(ngModel)]="proposalData.productType" />
+              Portability
+            </label>
+          </div>
+
+          <div class="tw-error" *ngIf="fieldErrors.productType as err">{{ err }}</div>
+        </div>
+
+        <div class="tw-field">
+          <label>Pincode <span class="tw-required">*</span></label>
+          <input class="tw-input tw-readonly" maxlength="6" [(ngModel)]="proposalData.pincode" readonly />
+          <div class="tw-error" *ngIf="fieldErrors.pincode as err">{{ err }}</div>
+        </div>
+
+        <div class="tw-field">
+          <label>City & State <span class="tw-required">*</span></label>
+          <input class="tw-input tw-readonly" [value]="proposalData.cityState" readonly />
+          <div class="tw-error" *ngIf="fieldErrors.cityState as err">{{ err }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSURED DETAILS -->
+    <div class="tw-section-card">
+      <h4 class="tw-section-title">Insured Details</h4>
+
+      <div class="tw-row-4">
+        <div class="tw-field">
+          <label>First Name <span class="tw-required">*</span></label>
+          <input class="tw-input tw-readonly" [(ngModel)]="proposalData.firstName" readonly />
+          <div class="tw-error" *ngIf="fieldErrors.firstName as err">{{ err }}</div>
+        </div>
+
+        <div class="tw-field">
+          <label>Last Name <span class="tw-required">*</span></label>
+          <input class="tw-input tw-readonly" [(ngModel)]="proposalData.lastName" readonly />
+          <div class="tw-error" *ngIf="fieldErrors.lastName as err">{{ err }}</div>
+        </div>
+
+        <div class="tw-field">
+          <label>Gender <span class="tw-required">*</span></label>
+          <select class="tw-input tw-select" [(ngModel)]="proposalData.gender">
+            <option value="" disabled>Select gender</option>
+            <option *ngFor="let g of genderOptions" [value]="g.value">{{ g.label }}</option>
+          </select>
+          <div class="tw-error" *ngIf="fieldErrors.gender as err">{{ err }}</div>
+        </div>
+
+        <div class="tw-field">
+          <label>Date of Birth <span class="tw-required">*</span></label>
+          <input type="date" class="tw-input" [(ngModel)]="proposalData.dob" />
+          <div class="tw-error" *ngIf="fieldErrors.dob as err">{{ err }}</div>
+        </div>
+
+        <div class="tw-field">
+          <label>Mobile Number <span class="tw-required">*</span></label>
+          <input maxlength="10" class="tw-input tw-readonly" [(ngModel)]="proposalData.mobile" readonly />
+          <div class="tw-error" *ngIf="fieldErrors.mobile as err">{{ err }}</div>
+        </div>
+
+        <div class="tw-field">
+          <label>Pincode <span class="tw-required">*</span></label>
+          <input maxlength="6" class="tw-input tw-readonly" [(ngModel)]="proposalData.insuredPincode" readonly />
+          <div class="tw-error" *ngIf="fieldErrors.insuredPincode as err">{{ err }}</div>
+        </div>
+
+        <div class="tw-field">
+          <label>City <span class="tw-required">*</span></label>
+          <input class="tw-input tw-readonly" [(ngModel)]="proposalData.city" readonly />
+          <div class="tw-error" *ngIf="fieldErrors.city as err">{{ err }}</div>
+        </div>
+
+        <!-- ✅ Editable + Prefilled from enquiry -->
+        <div class="tw-field">
+          <label>Occupation of Insured <span class="tw-required">*</span></label>
+          <select class="tw-input tw-select" [(ngModel)]="proposalData.occupation">
+            <option value="" disabled>Select occupation</option>
+            <option *ngFor="let o of occupationOptions" [value]="o.value">{{ o.label }}</option>
+          </select>
+          <p class="tw-hint" *ngIf="proposalData.occupation">
+            Selected: <b>{{ getOccupationText(proposalData.occupation) }}</b>
+          </p>
+          <div class="tw-error" *ngIf="fieldErrors.occupation as err">{{ err }}</div>
+        </div>
+
+        <!-- ✅ Editable + Prefilled from enquiry -->
+        <div class="tw-field">
+          <label>Annual Income <span class="tw-required">*</span></label>
+          <select class="tw-input tw-select" [(ngModel)]="proposalData.annualIncome">
+            <option value="" disabled>Select annual income</option>
+            <option *ngFor="let a of incomeOptions" [value]="a.value">{{ a.label }}</option>
+          </select>
+          <p class="tw-hint" *ngIf="proposalData.annualIncome">
+            Selected: <b>{{ getIncomeRangeText(proposalData.annualIncome) }}</b>
+          </p>
+          <div class="tw-error" *ngIf="fieldErrors.annualIncome as err">{{ err }}</div>
+        </div>
+
+        <!-- ✅ Designation (Editable + Prefilled) -->
+        <div class="tw-field">
+          <label>Nature of Work / Designation <span class="tw-required">*</span></label>
+
+          <button
+            type="button"
+            (click)="openRiskPopup()"
+            class="tw-picker-btn"
+          >
+            <span class="truncate" [class.tw-picker-muted]="!proposalData.designation">
+              {{ proposalData.designation || 'Select Nature of Work / Designation' }}
+            </span>
+
+            <svg xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 text-slate-500"
+              viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd"
+                    d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
+                    clip-rule="evenodd" />
+            </svg>
+          </button>
+
+          <div class="tw-error" *ngIf="fieldErrors.designation as err">{{ err }}</div>
+        </div>
+
+        <div class="tw-field">
+          <label>Cover Amount <span class="tw-required">*</span></label>
+          <input
+            class="tw-input"
+            [(ngModel)]="proposalData.coverAmount"
+            (keydown)="blockNonDigits($event)"
+            (paste)="blockNonDigitPaste($event)"
+            placeholder="Eg: 500000"
+          />
+          <div class="tw-error" *ngIf="fieldErrors.coverAmount as err">{{ err }}</div>
+        </div>
+
+        <!-- Additional Covers -->
+          <div class="tw-field tw-span-full">
+          <label>Additional Covers</label>
+
+          <div class="tw-check-grid">
+            <label class="tw-check">
+              <input type="checkbox" [(ngModel)]="proposalData.ptdBase" />
+              <span>Permanent Total Disablement (PTD) Benefit (Base)</span>
+            </label>
+
+            <label class="tw-check">
+              <input type="checkbox" [(ngModel)]="proposalData.ppdBase" />
+              <span>Permanent Partial Disablement (PPD) Benefit (Base)</span>
+            </label>
+
+            <label class="tw-check">
+              <input type="checkbox" [(ngModel)]="proposalData.ttdBase" />
+              <span>Temporary Total Disablement (TTD) Benefit (Base)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="tw-nav-btns">
+        <button type="button" class="tw-btn-secondary" disabled>Previous</button>
+        <button type="button" class="tw-btn-primary" (click)="nextStep()">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================
+        STEP 2 : SUMMARY
+  ============================ -->
+  <div *ngIf="currentStep === 2" class="tw-step-content">
+
+    <!-- Proposal Summary -->
+    <div class="tw-section-card">
+      <div class="tw-section-head">
+        <h4 class="tw-section-title">Proposal Summary</h4>
+      </div>
+
+      <div class="tw-summary-grid">
+        <div class="tw-summary-item">
+          <span class="tw-summary-label">Product Name</span>
+          <span class="tw-summary-value">{{ proposalData.productName || 'Not Provided' }}</span>
+        </div>
+
+        <div class="tw-summary-item">
+          <span class="tw-summary-label">Product Type</span>
+          <span class="tw-summary-value">{{ proposalData.productType === 'new' ? 'New' : 'Portability' }}</span>
+        </div>
+
+        <div class="tw-summary-item">
+          <span class="tw-summary-label">Pincode</span>
+          <span class="tw-summary-value">{{ proposalData.pincode || 'Not Provided' }}</span>
+        </div>
+
+        <div class="tw-summary-item">
+          <span class="tw-summary-label">City & State</span>
+          <span class="tw-summary-value">{{ proposalData.cityState || 'Not Provided' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Insured Details -->
+    <div class="tw-section-card">
+      <div class="tw-section-head">
+        <h4 class="tw-section-title">Insured Details</h4>
+      </div>
+
+      <div class="tw-summary-grid">
+        <div class="tw-summary-item">
+          <span class="tw-summary-label">First Name</span>
+          <span class="tw-summary-value">{{ proposalData.firstName || 'Not Provided' }}</span>
+        </div>
+
+        <div class="tw-summary-item">
+          <span class="tw-summary-label">Last Name</span>
+          <span class="tw-summary-value">{{ proposalData.lastName || 'Not Provided' }}</span>
+        </div>
+
+        <div class="tw-summary-item">
+          <span class="tw-summary-label">Gender</span>
+          <span class="tw-summary-value">{{ proposalData.gender || 'Not Provided' }}</span>
+        </div>
+
+        <div class="tw-summary-item">
+          <span class="tw-summary-label">Date of Birth</span>
+          <span class="tw-summary-value">{{ formatDate(proposalData.dob) }}</span>
+        </div>
+
+        <div class="tw-summary-item">
+          <span class="tw-summary-label">Mobile</span>
+          <span class="tw-summary-value">{{ proposalData.mobile || 'Not Provided' }}</span>
+        </div>
+
+        <div class="tw-summary-item">
+          <span class="tw-summary-label">Insured Pincode</span>
+          <span class="tw-summary-value">{{ proposalData.insuredPincode || 'Not Provided' }}</span>
+        </div>
+
+        <div class="tw-summary-item">
+          <span class="tw-summary-label">City</span>
+          <span class="tw-summary-value">{{ proposalData.city || 'Not Provided' }}</span>
+        </div>
+
+        <div class="tw-summary-item">
+          <span class="tw-summary-label">Nature of Work / Designation</span>
+          <span class="tw-summary-value">{{ proposalData.designation || 'Not Provided' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coverage -->
+    <div class="tw-section-card">
+      <div class="tw-section-head">
+        <h4 class="tw-section-title">Coverage</h4>
+      </div>
+
+      <div class="tw-summary-grid">
+        <div class="tw-summary-item">
+          <span class="tw-summary-label">Occupation</span>
+          <span class="tw-summary-value">{{ getOccupationText(proposalData.occupation) }}</span>
+        </div>
+
+        <div class="tw-summary-item">
+          <span class="tw-summary-label">Annual Income</span>
+          <span class="tw-summary-value">{{ getIncomeRangeText(proposalData.annualIncome) }}</span>
+        </div>
+
+        <div class="tw-summary-item">
+          <span class="tw-summary-label">Cover Amount</span>
+          <span class="tw-summary-value">₹ {{ proposalData.coverAmount || '0' }}</span>
+        </div>
+
+        <div class="tw-summary-item">
+          <span class="tw-summary-label">Additional Covers</span>
+          <span class="tw-summary-value">{{ getSelectedCoversText() }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="tw-nav-btns">
+      <button type="button" class="tw-btn-secondary" (click)="previousStep()">Previous</button>
+      <button type="button" class="tw-btn-primary" (click)="submitProposal($event)">
+        Submit Proposal
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ========= NATURE OF WORK POPUP (Your existing popup can stay same) ========= -->
+<!-- Keep your popup code exactly as you already have it -->
+
+
+<!-- ================== NATURE OF WORK POPUP (AS YOU HAVE) ================== -->
+<!-- (no change required in popup markup - yours is already responsive) -->
+
+<!-- Overlay -->
+<div
+  class="fixed inset-0 z-[98] bg-slate-900/40 backdrop-blur-[2px]
+         transition-opacity duration-300 ease-out"
+  [ngClass]="showRiskPopup ? 'opacity-100' : 'opacity-0 pointer-events-none'"
+  (click)="closeRiskPopup()"
+></div>
+
+<!-- Wrapper -->
+<div
+  class="fixed inset-x-0 bottom-0 z-[99]
+         sm:inset-0 sm:flex sm:items-center sm:justify-center
+         transition-all duration-300 ease-out"
+  [ngClass]="showRiskPopup
+    ? 'opacity-100 translate-y-0'
+    : 'opacity-0 translate-y-full sm:translate-y-0 pointer-events-none'"
+  (click)="$event.stopPropagation()"
+>
+  <div
+    class="w-full sm:w-[420px] sm:max-w-[420px]
+           bg-white shadow-2xl ring-1 ring-black/5
+           rounded-t-3xl sm:rounded-3xl overflow-hidden
+           max-h-[85dvh] sm:max-h-[80vh]
+           flex flex-col
+           pb-[env(safe-area-inset-bottom)]"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="sm:hidden flex justify-center pt-2">
+      <span class="h-1.5 w-12 rounded-full bg-slate-300"></span>
+    </div>
+
+    <div class="px-5 pt-4 pb-4 border-b border-slate-100">
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <p class="text-[15px] font-semibold text-slate-900 leading-5">
+            Select Nature of Work / Designation
+          </p>
+
+          <div class="mt-2 flex items-center gap-2">
+            <span
+              class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold"
+              [ngClass]="riskTheme.chip"
+            >
+              {{ riskTabs[(activeRiskTab || 1) - 1] }}
+            </span>
+            <p class="text-xs text-slate-500 truncate">
+              Pick one option from the list below
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          (click)="closeRiskPopup()"
+          class="h-10 w-10 shrink-0 rounded-full grid place-items-center
+                 hover:bg-slate-100 active:scale-95 transition"
+          aria-label="Close"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-600"
+               viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clip-rule="evenodd"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="px-5 pt-4">
+      <div class="flex gap-2 p-1.5 rounded-2xl ring-1"
+           [ngClass]="riskTheme.bg + ' ' + riskTheme.ring">
+        <button
+          *ngFor="let tab of riskTabs; let i=index"
+          type="button"
+          (click)="activeRiskTab = (i + 1)"
+          class="flex-1 text-xs sm:text-sm font-semibold rounded-xl px-3 py-2
+                 transition-all duration-200 active:scale-[0.99]"
+          [ngClass]="activeRiskTab === (i + 1)
+            ? (riskTheme.pillActive + ' shadow-sm')
+            : 'text-slate-700 hover:bg-white/60'"
+        >
+          {{ tab }}
+        </button>
+      </div>
+    </div>
+
+    <div class="flex-1 overflow-y-auto px-5 pt-4 pb-5">
+      <div class="space-y-2">
+        <button
+          *ngFor="let item of (riskList[activeRiskTab || 1] || [])"
+          type="button"
+          (click)="selectRisk(item)"
+          class="w-full text-left rounded-2xl border px-4 py-3
+                 flex items-start justify-between gap-3
+                 transition-all duration-200 active:scale-[0.99]
+                 focus:outline-none focus:ring-4"
+          [ngClass]="proposalData.designation === item
+            ? (riskTheme.itemActive + ' focus:ring-white/20')
+            : ('border-slate-200 bg-white text-slate-800 ' + riskTheme.itemHover + ' ' + riskTheme.focusRing)"
+        >
+          <div class="min-w-0">
+            <p class="text-sm font-semibold leading-5">{{ item }}</p>
+            <p class="text-xs mt-1"
+              [ngClass]="proposalData.designation === item ? 'text-white/80' : 'text-slate-500'">
+              Tap to select this designation
+            </p>
+          </div>
+
+          <span class="shrink-0 mt-0.5 h-9 w-9 rounded-full grid place-items-center transition-all duration-200"
+                [ngClass]="proposalData.designation === item ? 'bg-white/15' : 'bg-slate-100'">
+            <svg *ngIf="proposalData.designation === item"
+                 xmlns="http://www.w3.org/2000/svg"
+                 class="h-5 w-5 text-white"
+                 viewBox="0 0 20 20"
+                 fill="currentColor">
+              <path fill-rule="evenodd"
+                    d="M16.704 5.29a1 1 0 010 1.415l-7.2 7.2a1 1 0 01-1.415 0l-3.2-3.2a1 1 0 011.415-1.415l2.493 2.493 6.493-6.493a1 1 0 011.414 0z"
+                    clip-rule="evenodd"/>
+            </svg>
+            <span *ngIf="proposalData.designation !== item"
+                  class="h-2.5 w-2.5 rounded-full bg-slate-300"></span>
+          </span>
+        </button>
+
+        <div class="pt-3 flex justify-end">
+          <button
+            type="button"
+            (click)="closeRiskPopup()"
+            class="px-5 py-2.5 rounded-full text-sm font-semibold
+                   border border-slate-200 text-slate-700
+                   hover:bg-slate-50 active:scale-[0.99] transition"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { SuperTopupService } from '../../../services/super-topup.service';
-import { toPng } from 'html-to-image';
+import { toCanvas } from 'html-to-image';
 import jsPDF from 'jspdf';
 import { HostListener } from '@angular/core';
 
@@ -396,9 +396,9 @@ export class Quotes implements OnInit {
           insurerName: plan.insurerName || plan.tag,
           productName: plan.name,
           logo: plan.logo,
-          coverAmount: plan.coverAmountNumber,
+          coverAmount: Number(plan.coverAmountNumber || 0),
           monthlyPrice: plan.priceNumber,
-          deductible: plan.deductibleNumber,
+          deductible: Number(plan.deductibleNumber || 0),
           otherDetails: JSON.parse(plan.otherDetails),
           sourcePlan: plan,
         });
@@ -545,110 +545,168 @@ export class Quotes implements OnInit {
 
   /* -------------------- PDF Download (same logic) -------------------- */
 
-  downloadPDF() {
-    const wrapper = document.getElementById('compareWrapper') as HTMLElement | null;
-    if (!wrapper) return;
+async downloadPDF() {
+  const wrapper = document.getElementById("compareWrapper") as HTMLElement | null;
+  if (!wrapper) return;
 
-    const userStrip = wrapper.querySelector('.cmp-user-strip') as HTMLElement | null;
-    const cmpRootOriginal = wrapper.querySelector('.cmp-pdf-root') as HTMLElement | null;
-    if (!cmpRootOriginal) return;
+  const userStrip = wrapper.querySelector(".cmp-user-strip") as HTMLElement | null;
+  const cmpRootOriginal = wrapper.querySelector(".cmp-pdf-root") as HTMLElement | null;
+  if (!cmpRootOriginal) return;
 
-    /* ---------------------------------------------------
-     1) BUILD CLEAN EXPORT (no scroll, no fixed heights)
-  ----------------------------------------------------*/
-    const exportBox = document.createElement('div');
-    exportBox.id = 'cmpPdfExport';
-    exportBox.style.position = 'absolute';
-    exportBox.style.left = '0';
-    exportBox.style.top = '0';
-    exportBox.style.width = '100%';
-    exportBox.style.zIndex = '-9999';
-    exportBox.style.background = '#ffffff';
-    exportBox.style.padding = '0';
-    exportBox.style.margin = '0';
-    exportBox.style.overflow = 'visible';
-    document.body.appendChild(exportBox);
+  const nextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
 
-    if (userStrip) {
-      exportBox.appendChild(userStrip.cloneNode(true));
+  const normalizeStyles = (root: HTMLElement) => {
+    const all = root.querySelectorAll("*") as NodeListOf<HTMLElement>;
+    all.forEach((el) => {
+      el.style.position = "static";
+      el.style.transform = "none";
+      el.style.filter = "none";
+      el.style.zIndex = "auto";
+      el.style.maxHeight = "none";
+      el.style.height = "auto";
+      el.style.minHeight = "0";
+      el.style.overflow = "visible";
+    });
+
+    const tableWrap = root.querySelector(".cmp-table-wrapper") as HTMLElement | null;
+    if (tableWrap) {
+      tableWrap.style.overflow = "visible";
+      tableWrap.style.maxHeight = "none";
+      tableWrap.style.height = "auto";
+    }
+  };
+
+  const waitForImages = async (root: HTMLElement) => {
+    const imgs = Array.from(root.querySelectorAll("img")) as HTMLImageElement[];
+    await Promise.all(
+      imgs.map(
+        (img) =>
+          new Promise<void>((resolve) => {
+            if (img.complete && img.naturalWidth > 0) return resolve();
+            img.onload = () => resolve();
+            img.onerror = () => resolve(); // don't remove; just resolve
+          })
+      )
+    );
+  };
+
+  // ✅ simplest: make assets/... absolute so fetch works everywhere
+ const makeAbsoluteSrc = (src: string) => {
+  if (!src) return src;
+  if (src.startsWith("data:")) return src;
+  if (src.startsWith("http://") || src.startsWith("https://")) return src;
+  if (src.startsWith("//")) return window.location.protocol + src;
+
+  // ✅ IMPORTANT: always resolve from site root (origin), not current route (/supertopup)
+  const clean = src.startsWith("/") ? src : `/${src}`;
+  return `${window.location.origin}${clean}`;
+};
+
+
+  // ✅ KEY FIX: inline all <img> as base64 so mobile canvas ALWAYS draws it
+  const inlineAllImages = async (root: HTMLElement) => {
+    const imgs = Array.from(root.querySelectorAll("img")) as HTMLImageElement[];
+
+    for (const img of imgs) {
+      try {
+        const original = img.getAttribute("src") || "";
+        if (!original || original.startsWith("data:")) continue;
+
+        const abs = makeAbsoluteSrc(original);
+        img.setAttribute("crossorigin", "anonymous"); // safe for canvas
+        img.src = abs;
+
+        // fetch -> blob -> base64
+        const res = await fetch(abs, { cache: "no-store" });
+        if (!res.ok) continue;
+
+        const blob = await res.blob();
+        const dataUrl: string = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(String(reader.result || ""));
+          reader.readAsDataURL(blob);
+        });
+
+        if (dataUrl.startsWith("data:")) {
+          img.src = dataUrl;
+        }
+      } catch {
+        // ignore image failures; pdf will still generate
+      }
+    }
+  };
+
+  // ✅ Export container (same as your logic)
+  const exportBox = document.createElement("div");
+  exportBox.style.position = "absolute";
+  exportBox.style.left = "0";
+  exportBox.style.top = "0";
+  exportBox.style.background = "#ffffff";
+  exportBox.style.width = "max-content";
+  exportBox.style.padding = "0";
+  exportBox.style.margin = "0";
+
+  document.body.appendChild(exportBox);
+
+  try {
+    if (userStrip) exportBox.appendChild(userStrip.cloneNode(true));
+
+    const clone = cmpRootOriginal.cloneNode(true) as HTMLElement;
+    exportBox.appendChild(clone);
+
+    normalizeStyles(exportBox);
+
+    await nextFrame();
+    await nextFrame();
+
+    // wait for fonts
+    if ((document as any).fonts?.ready) {
+      await (document as any).fonts.ready;
     }
 
-    const cmpClone = cmpRootOriginal.cloneNode(true) as HTMLElement;
-    exportBox.appendChild(cmpClone);
+    // ✅ NEW: inline images before canvas (fixes mobile logo missing)
+    await inlineAllImages(exportBox);
 
-    /* ---------------------------------------------------
-     2) REMOVE FLEX/SCROLL/CUTTING
-  ----------------------------------------------------*/
-    const all = exportBox.querySelectorAll('*') as NodeListOf<HTMLElement>;
-    all.forEach((el) => {
-      el.style.maxHeight = 'none';
-      el.style.height = 'auto';
-      el.style.overflow = 'visible';
-      el.style.flex = 'unset';
-      el.style.display = el.style.display === 'flex' ? 'block' : el.style.display;
-    });
+    await waitForImages(exportBox);
+    await nextFrame();
 
-    /* ---------------------------------------------------
-     3) AUTO-FULL WIDTH (important for many columns)
-  ----------------------------------------------------*/
-    const totalColumns = this.compare.length + 1; // +1 left label column
-    const approxWidth = totalColumns * 380; // ~380px per column for safe capture
-    exportBox.style.width = approxWidth + 'px';
+    const canvas = await toCanvas(exportBox, {
+      backgroundColor: "#ffffff",
+      pixelRatio: 3,
+      cacheBust: true, // ✅ helps on mobile
+    } as any);
 
-    /* ---------------------------------------------------
-     4) CAPTURE WITH FULL HEIGHT + WIDTH
-  ----------------------------------------------------*/
-    requestAnimationFrame(() => {
-      const fullWidth = exportBox.scrollWidth;
-      const fullHeight = exportBox.scrollHeight;
+    const pdf = new jsPDF("l", "mm", "a4");
+    const pdfW = pdf.internal.pageSize.getWidth();
+    const pdfH = pdf.internal.pageSize.getHeight();
 
-      toPng(exportBox, {
-        cacheBust: true,
-        width: fullWidth,
-        height: fullHeight,
-        style: {
-          width: fullWidth + 'px',
-          height: fullHeight + 'px',
-          transform: 'scale(1)',
-        } as any,
-      })
-        .then((img) => {
-          const pdf = new jsPDF('p', 'mm', 'a4');
+    const imgW = pdfW;
+    const imgH = (canvas.height * imgW) / canvas.width;
 
-          const pdfW = pdf.internal.pageSize.getWidth();
-          const pdfH = pdf.internal.pageSize.getHeight();
+    let heightLeft = imgH;
+    let y = 0;
 
-          const imgProps = pdf.getImageProperties(img);
+    const imgData = canvas.toDataURL("image/png");
 
-          const imgW = pdfW;
-          const imgH = (imgProps.height * imgW) / imgProps.width;
+    pdf.addImage(imgData, "PNG", 0, y, imgW, imgH);
+    heightLeft -= pdfH;
 
-          let heightLeft = imgH;
-          let position = 0;
+    while (heightLeft > 0) {
+      y -= pdfH;
+      pdf.addPage();
+      pdf.addImage(imgData, "PNG", 0, y, imgW, imgH);
+      heightLeft -= pdfH;
+    }
 
-          // first page
-          pdf.addImage(img, 'PNG', 0, position, imgW, imgH);
-          heightLeft -= pdfH;
-
-          // more pages
-          while (heightLeft > 0) {
-            position -= pdfH;
-            pdf.addPage();
-            pdf.addImage(img, 'PNG', 0, position, imgW, imgH);
-            heightLeft -= pdfH;
-          }
-
-          pdf.save('comparison.pdf');
-        })
-        .catch((err) => {
-          console.error(err);
-          alert('Unable to export PDF. Please try again.');
-        })
-        .finally(() => {
-          document.body.removeChild(exportBox);
-        });
-    });
+    pdf.save("comparison.pdf");
+  } catch (e) {
+    console.error("PDF error:", e);
+    alert("PDF export failed");
+  } finally {
+    exportBox.remove();
   }
+}
+
 
   /* -------------------- Grid template for compare table -------------------- */
 

@@ -704,6 +704,27 @@ export class EnquiryForm {
     this.stopResendTimer();
   }
 
+
+onNameInputUpper(controlName: string) {
+  const ctrl = this.basicForm.get(controlName);
+  if (!ctrl) return;
+
+  const raw = ((ctrl.value || '') as string);
+
+  // keep only letters + space
+  let sanitized = raw.replace(/[^A-Za-z ]/g, '');
+
+  // convert to ALL CAPS
+  sanitized = sanitized.toUpperCase();
+
+  // optional: avoid multiple spaces
+  sanitized = sanitized.replace(/\s{2,}/g, ' ');
+
+  if (sanitized !== raw) {
+    ctrl.setValue(sanitized, { emitEvent: false });
+  }
+}
+
   // -------------------------
   // ✅ Restore/Clear helpers
   // -------------------------

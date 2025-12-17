@@ -219,26 +219,26 @@ get riskTheme() {
   const tab = Number(this.activeRiskTab || 1);
   if (tab === 2) {
     return {
-      brand: "text-amber-700",
-      bg: "bg-amber-50",
-      ring: "ring-amber-200",
-      pillActive: "bg-amber-600 text-white",
-      itemActive: "bg-amber-600 text-white border-amber-600",
-      itemHover: "hover:border-amber-300 hover:bg-amber-50",
-      focusRing: "focus:ring-amber-200",
-      chip: "bg-amber-100 text-amber-700",
+     brand: "text-[#006D8D]",
+      bg: "bg-[#EAF6FA]",
+      ring: "ring-[#006D8D]/15",
+      pillActive: "bg-[#006D8D] text-white",
+      itemActive: "bg-[#006D8D] text-white border-[#006D8D]",
+      itemHover: "hover:border-[#006D8D]/30 hover:bg-[#006D8D]/5",
+      focusRing: "focus:ring-[#006D8D]/20",
+      chip: "bg-[#006D8D]/10 text-[#006D8D]",
     };
   }
   if (tab === 3) {
     return {
-      brand: "text-rose-700",
-      bg: "bg-rose-50",
-      ring: "ring-rose-200",
-      pillActive: "bg-rose-600 text-white",
-      itemActive: "bg-rose-600 text-white border-rose-600",
-      itemHover: "hover:border-rose-300 hover:bg-rose-50",
-      focusRing: "focus:ring-rose-200",
-      chip: "bg-rose-100 text-rose-700",
+     brand: "text-[#006D8D]",
+    bg: "bg-[#EAF6FA]",
+    ring: "ring-[#006D8D]/15",
+    pillActive: "bg-[#006D8D] text-white",
+    itemActive: "bg-[#006D8D] text-white border-[#006D8D]",
+    itemHover: "hover:border-[#006D8D]/30 hover:bg-[#006D8D]/5",
+    focusRing: "focus:ring-[#006D8D]/20",
+    chip: "bg-[#006D8D]/10 text-[#006D8D]",
     };
   }
   // Category 1 (default)

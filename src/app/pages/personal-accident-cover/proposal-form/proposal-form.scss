@@ -1,0 +1,220 @@
+@use "tailwindcss";
+
+.tw-required { color: #dc2626; }
+
+/* =========================
+   HEADER + STEPPER
+========================= */
+.tw-stepper-container {
+  @apply w-full bg-white rounded-xl px-4 sm:px-5 py-4
+         shadow-[0_6px_16px_rgba(0,0,0,0.06)]
+         flex flex-col md:flex-row md:items-center md:justify-between gap-3;
+}
+
+.tw-header-left { @apply flex items-center gap-3 min-w-0; }
+.tw-back-btn { @apply p-2 bg-transparent border-none cursor-pointer; }
+
+.tw-stepper-title { @apply text-[18px] sm:text-[22px] font-extrabold text-[#0f2430] leading-6; }
+.tw-stepper-subtitle { @apply text-[12px] sm:text-[13px] text-slate-500 mt-0.5; }
+
+.tw-header-center { @apply flex-1 flex justify-center; }
+
+.tw-step-indicators {
+  @apply relative flex items-center justify-center;
+  gap: clamp(18px, 6vw, 56px);
+  padding: 0 12px;
+}
+
+.tw-step-indicators::before {
+  content: "";
+  position: absolute;
+  top: 17px;
+  left: 26px;
+  right: 26px;
+  height: 2px;
+  background: #d3d9de;
+  z-index: 0;
+}
+
+.tw-step { @apply flex flex-col items-center relative z-10; }
+
+.tw-step-number {
+  @apply w-[34px] h-[34px] rounded-full bg-[#f6f7f8]
+         border-2 border-[#d3d9de] flex items-center justify-center
+         text-[#7d8a94] font-bold text-[14px];
+}
+.tw-step.active .tw-step-number { @apply bg-[#0b6a7e] border-[#0b6a7e] text-white; }
+
+.tw-step.completed .tw-step-number {
+  @apply bg-[#eafff0] border-[#6ad58b] text-transparent relative;
+}
+.tw-step.completed .tw-step-number::before {
+  content: "✔";
+  color: #34b66f;
+  font-size: 14px;
+  font-weight: 800;
+  position: absolute;
+}
+
+.tw-step-label { @apply mt-1 text-[12px] sm:text-[13px] text-[#7d8a94]; }
+.tw-step.active .tw-step-label { @apply text-[#0b6a7e] font-semibold; }
+
+/* =========================
+   PAGE CONTENT
+========================= */
+.tw-step-content {
+  @apply bg-white p-4 sm:p-6 rounded-xl shadow-[0_6px_18px_rgba(0,0,0,0.05)] mb-5;
+}
+
+.tw-section-card {
+  @apply bg-[#f2fbff] border border-[#dbeff7] rounded-xl p-4 sm:p-5 mb-5;
+}
+
+.tw-section-title { @apply text-[15px] sm:text-[16px] font-semibold text-[#0b6a7e]; }
+.tw-section-head { @apply flex items-center justify-between mb-4; }
+
+/* =========================
+   ✅ RESPONSIVE GRID (NO implicit cols)
+========================= */
+.tw-row-4{
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 992px){
+  .tw-row-4{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 600px){
+  .tw-row-4{ grid-template-columns: 1fr; gap: 14px; }
+}
+
+/* ✅ Full-width inside any grid size */
+.tw-span-full{
+  grid-column: 1 / -1;
+}
+
+/* =========================
+   FIELD + INPUTS
+========================= */
+.tw-field{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0; /* super important */
+}
+
+/* ✅ stop letter-by-letter breaking */
+.tw-field label{
+  font-size: 13px;
+  font-weight: 700;
+  color: #24343c;
+  line-height: 1.25;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.tw-input{
+  width: 100%;
+  height: 44px;
+  border: 1px solid #d3dbdf;
+  border-radius: 12px;
+  padding: 0 12px;
+  font-size: 14px;
+  min-width: 0;
+  background: #fff;
+}
+
+.tw-input:focus{
+  outline: none;
+  border-color: #0b6a7e;
+  box-shadow: 0 0 0 3px rgba(11,106,126,0.15);
+}
+
+.tw-readonly{ background: #f1f5f9; }
+.tw-input::placeholder{ color: #9ca3af; }
+
+.tw-error{ font-size: 12px; color: #dc2626; margin-top: 2px; }
+.tw-hint{ font-size: 12px; color: #64748b; margin-top: 2px; }
+
+/* Picker button */
+.tw-picker-btn{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: #334155;
+}
+.tw-picker-muted{ color: #94a3b8; }
+
+/* =========================
+   RADIO / CHECKS
+========================= */
+.tw-radio-row{ display: flex; flex-wrap: wrap; gap: 12px; }
+.tw-radio-label{ display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: #334155; }
+
+.tw-check-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 10px;
+}
+@media (max-width: 600px){
+  .tw-check-grid{ grid-template-columns: 1fr; }
+}
+
+.tw-check{ display: flex; gap: 10px; font-size: 13px; color: #334155; line-height: 1.35; }
+
+/* =========================
+   SUMMARY GRID
+========================= */
+.tw-summary-grid{
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+@media (max-width: 992px){
+  .tw-summary-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px){
+  .tw-summary-grid{ grid-template-columns: 1fr; gap: 14px; }
+}
+
+.tw-summary-item{
+  @apply bg-white/80 border border-[#dbeff7] rounded-2xl px-4 py-3
+         flex flex-col gap-1 min-h-[70px];
+}
+
+.tw-summary-label{ @apply text-[12px] font-semibold text-[#0b6a7e]; }
+.tw-summary-value{ @apply text-[14px] text-[#0f2430] leading-5 break-words; }
+
+/* =========================
+   BUTTONS
+========================= */
+.tw-nav-btns{ @apply flex justify-between gap-3 mt-4 flex-wrap; }
+
+.tw-btn-primary{
+  @apply min-w-[160px] h-11 bg-[#0b6a7e] text-white font-bold rounded-xl
+         flex items-center justify-center transition-colors hover:bg-[#094d5c];
+}
+
+.tw-btn-secondary{
+  @apply min-w-[160px] h-11 bg-[#e8eef2] text-[#24343c] font-bold rounded-xl
+         flex items-center justify-center transition-colors hover:bg-[#dfe7ec];
+}
+
+@media (max-width: 600px){
+  .tw-step-indicators::before{ top: 14px; }
+  .tw-step-number{ @apply w-[28px] h-[28px] text-[12px]; }
+  .tw-step-label{ @apply text-[10px]; }
+
+  .tw-btn-primary, .tw-btn-secondary{ @apply min-w-full; }
+}

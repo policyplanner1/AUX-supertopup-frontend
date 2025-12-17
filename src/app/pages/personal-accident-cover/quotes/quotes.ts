@@ -414,11 +414,12 @@ export class PAQuotesComponent implements OnInit {
   }
 
 
-  goToProposal(plan: any) {
-    this.router.navigate(['supertopup/proposal-form'], {
-      state: { selectedPlan: plan },
-    });
-  }
+    goToProposal(plan: any) {
+      this.router.navigate(['personal-accident/proposal-form'], {
+        state: { selectedPlan: plan },
+      });
+    }
+
 
   /* -------------------- PDF Download (same logic) -------------------- */
 
