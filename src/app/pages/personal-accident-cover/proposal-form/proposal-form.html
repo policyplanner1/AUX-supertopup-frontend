@@ -75,7 +75,7 @@
         </div>
 
         <div class="tw-field">
-          <label>City & State <span class="tw-required">*</span></label>
+          <label>City <span class="tw-required">*</span></label>
           <input class="tw-input tw-readonly" [value]="proposalData.cityState" readonly />
           <div class="tw-error" *ngIf="fieldErrors.cityState as err">{{ err }}</div>
         </div>
@@ -120,17 +120,17 @@
           <div class="tw-error" *ngIf="fieldErrors.mobile as err">{{ err }}</div>
         </div>
 
-        <div class="tw-field">
+        <!-- <div class="tw-field">
           <label>Pincode <span class="tw-required">*</span></label>
           <input maxlength="6" class="tw-input tw-readonly" [(ngModel)]="proposalData.insuredPincode" readonly />
           <div class="tw-error" *ngIf="fieldErrors.insuredPincode as err">{{ err }}</div>
-        </div>
+        </div> -->
 
-        <div class="tw-field">
+        <!-- <div class="tw-field">
           <label>City <span class="tw-required">*</span></label>
           <input class="tw-input tw-readonly" [(ngModel)]="proposalData.city" readonly />
           <div class="tw-error" *ngIf="fieldErrors.city as err">{{ err }}</div>
-        </div>
+        </div> -->
 
         <!-- ✅ Editable + Prefilled from enquiry -->
         <div class="tw-field">
@@ -338,18 +338,23 @@
     </div>
 
     <!-- Buttons -->
-    <div class="tw-nav-btns">
-      <button type="button" class="tw-btn-secondary" (click)="previousStep()">Previous</button>
-      <button type="button" class="tw-btn-primary" (click)="submitProposal($event)">
-        Submit Proposal
-      </button>
-    </div>
-  </div>
+<div class="tw-nav-btns">
+  <button type="button" class="tw-btn-secondary" (click)="previousStep()">Previous</button>
+
+  <button
+  type="button"
+  class="tw-btn-primary"
+  [disabled]="isSubmitting"
+  (click)="submitProposal($event)"
+>
+  {{ isSubmitting ? 'Submitting...' : 'Submit Proposal' }}
+</button>
 
 </div>
 
-<!-- ========= NATURE OF WORK POPUP (Your existing popup can stay same) ========= -->
-<!-- Keep your popup code exactly as you already have it -->
+  </div>
+
+</div>
 
 
 <!-- ================== NATURE OF WORK POPUP (AS YOU HAVE) ================== -->
@@ -493,5 +498,27 @@
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- =========================
+    SUBMIT POPUP (Like SuperTopup)
+========================= -->
+<div *ngIf="popupOpen" class="tw-popup-overlay">
+  <div class="tw-popup-card animate-fadeIn">
+
+    <img src="assets/popup.svg" class="tw-popup-img" alt="verifying" />
+
+    <h3 class="text-[18px] font-bold text-[#0b6a7e] mb-2">
+      We’re verifying your KYC details
+    </h3>
+
+    <p class="text-[14px] text-[#3a4a53] mb-4">
+      Sit tight! Once your verification is complete, we’ll send a secure payment link to your registered email.
+    </p>
+
+    <button class="tw-btn-primary mx-auto mt-2" (click)="closePopup()">
+      Go Back
+    </button>
   </div>
 </div>

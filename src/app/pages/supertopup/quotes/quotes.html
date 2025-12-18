@@ -371,12 +371,17 @@
     </div>
 
     <div class="ml-auto flex items-center">
-      <button type="button"
-        class="cmp-download-btn inline-flex items-center justify-center gap-1 rounded bg-[#006D8D] text-white text-[13px] font-semibold px-4 py-2 shadow min-w-[140px]"
-        (click)="downloadPDF()">
-        <i class="bi bi-download text-[14px]"></i>
-        Download PDF
-      </button>
+      <button
+      type="button"
+      class="cmp-download-btn inline-flex items-center justify-center gap-1 rounded bg-[#006D8D] text-white text-[13px] font-semibold px-4 py-2 shadow min-w-[140px]"
+      [disabled]="isPdfDownloading"
+      [attr.aria-busy]="isPdfDownloading ? 'true' : null"
+      (click)="downloadPDF()"
+    >
+      <i class="bi" [ngClass]="isPdfDownloading ? 'bi-hourglass-split' : 'bi-download'"></i>
+      {{ isPdfDownloading ? 'Generating…' : 'Download PDF' }}
+    </button>
+
     </div>
   </div>
 

@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { PAService } from '../../../services/pa.service';
 
 type ProductType = 'new' | 'portability';
-
 type OccupationType = 'salaried' | 'self_employed' | 'other_sources';
 type AnnualIncomeType =
   | '3-5'
@@ -34,9 +34,11 @@ interface ProposalData {
   occupation: OccupationType | '';
   annualIncome: AnnualIncomeType | '';
 
+  // ✅ Your UI selection from risk list (occupation name like Doctors/Drivers)
   designation: string;
   coverAmount: string;
 
+  // Additional Covers
   ptdBase: boolean;
   ppdBase: boolean;
   ttdBase: boolean;
@@ -86,6 +88,9 @@ export class PAProposalForm implements OnInit {
 
   fieldErrors: FieldErrors = {};
 
+  popupOpen: boolean = false;
+  isSubmitting: boolean = false;
+
   genderOptions = [
     { value: 'Male' as GenderType, label: 'Male' },
     { value: 'Female' as GenderType, label: 'Female' },
@@ -107,109 +112,92 @@ export class PAProposalForm implements OnInit {
     { value: '41+' as AnnualIncomeType, label: '41 and above' },
   ];
 
-  // ✅ readonly label -> editable toggles
-  isEditingOccupation = false;
-  isEditingIncome = false;
-
   // Risk popup
   riskError = false;
   showRiskPopup = false;
-  activeRiskTab = 0;
+
+  // ✅ IMPORTANT: store 1/2/3 (not 0)
+  activeRiskTab = 1;
   riskTabs = ['Category 1', 'Category 2', 'Category 3'];
 
   riskList: Record<number, string[]> = {
     1: [
-      'Doctors',
-      'Lawyers',
-      'Accountants',
-      'Architects/Consulting engineers',
-      'Teachers',
-      'Bankers',
-      'Clerical/administrative functions',
-      'BFSI professional',
-      'Businessman not working on factory floors',
-      'Homemaker',
-      'Student',
+      'Doctors', 'Lawyers', 'Accountants', 'Architects/Consulting engineers',
+      'Teachers', 'Bankers', 'Clerical/administrative functions', 'BFSI professional',
+      'Businessman not working on factory floors', 'Homemaker', 'Student',
     ],
     2: [
-      'Builders/Contractors',
-      'Engineers on site',
-      'Veterinary Doctors',
-      'Mechanics',
+      'Builders/Contractors', 'Engineers on site', 'Veterinary Doctors', 'Mechanics',
       'Manual labourers not working in mines, explosive industry, electrical intallations and such hazardous industries',
       'Business working on factory floors',
     ],
     3: [
-      'Working in mines/explosives',
-      'Electrical installations',
-      'Racer',
+      'Working in mines/explosives', 'Electrical installations', 'Racer',
       'Circus artist or engaged in such other occupation',
       'Engaged full time/ part time in any adventurous activities',
-      'Professional sportsperson',
-      'Professional adventurer/trekker/mountaineer',
-      'Defense services',
-      'Drivers',
+      'Professional sportsperson', 'Professional adventurer/trekker/mountaineer',
+      'Defense services', 'Drivers',
     ],
   };
 
-ngOnInit(): void {
-  this.selectedPlan = (history.state as any)?.selectedPlan || null;
+  constructor(private api: PAService) {}
 
-  if (this.selectedPlan) {
-    const company = this.selectedPlan?.tag || this.selectedPlan?.insurerName || '';
-    const planName = this.selectedPlan?.name || this.selectedPlan?.planName || '';
-    this.proposalData.productName = `${company} ${planName}`.trim();
-  }
+  ngOnInit(): void {
+    this.selectedPlan = (history.state as any)?.selectedPlan || null;
 
-  // ✅ Restore from enquiry localStorage
-  const saved = localStorage.getItem(this.ENQUIRY_KEY);
-  if (saved) {
-    try {
-      const payload = JSON.parse(saved);
-      const gender = payload?.gender || '';
-      const details = payload?.details || {};
-
-      this.proposalData.firstName = details.firstName || '';
-      this.proposalData.lastName = details.lastName || '';
-      this.proposalData.gender = (gender as any) || '';
-      this.proposalData.mobile = details.mobile || '';
-      this.proposalData.dob = this.toDateInput(details.dob || '');
-
-      this.proposalData.pincode = details.pincode || '';
-      this.proposalData.cityState = details.cityState || details.city || '';
-
-      this.proposalData.insuredPincode = details.pincode || '';
-      this.proposalData.city = details.city || '';
-
-      // ✅ IMPORTANT: occupation + income restored and editable
-      this.proposalData.occupation = this.normalizeOccupation(details.occupation || '');
-      this.proposalData.annualIncome = this.normalizeIncome(details.incomeRange || '');
-
-      this.proposalData.coverAmount = String(details.coverAmount || '');
-
-      // ✅ designation restored and editable via popup
-      this.proposalData.designation = details.selectedRiskCategory || '';
-      this.activeRiskTab = Number(details.activeRiskTab || 1);
-
-    } catch (e) {
-      console.error('Failed to parse pa_enquiry', e);
+    if (this.selectedPlan) {
+      const company = this.selectedPlan?.tag || this.selectedPlan?.insurerName || '';
+      const planName = this.selectedPlan?.name || this.selectedPlan?.planName || '';
+      this.proposalData.productName = `${company} ${planName}`.trim();
     }
+
+    const saved = localStorage.getItem(this.ENQUIRY_KEY);
+    if (saved) {
+      try {
+        const payload = JSON.parse(saved);
+        const gender = payload?.gender || '';
+        const details = payload?.details || {};
+
+        this.proposalData.firstName = details.firstName || '';
+        this.proposalData.lastName = details.lastName || '';
+        this.proposalData.gender = (gender as any) || '';
+        this.proposalData.mobile = details.mobile || '';
+        this.proposalData.dob = this.toDateInput(details.dob || '');
+
+        this.proposalData.pincode = details.pincode || '';
+        this.proposalData.cityState = details.cityState || details.city || '';
+
+        this.proposalData.insuredPincode = details.pincode || '';
+        this.proposalData.city = details.city || '';
+
+        this.proposalData.occupation = this.normalizeOccupation(details.occupation || '');
+        this.proposalData.annualIncome = this.normalizeIncome(details.incomeRange || '');
+
+        this.proposalData.coverAmount = String(details.coverAmount || '');
+
+        // ✅ risk: keep separate
+        // details.selectedRiskCategory = occupation name (Doctors/Drivers)
+        this.proposalData.designation = details.selectedRiskCategory || '';
+
+        // ✅ stored tab should be 1/2/3
+        const tab = Number(details.activeRiskTab || 1);
+        this.activeRiskTab = tab >= 1 && tab <= 3 ? tab : 1;
+      } catch (e) {
+        console.error('Failed to parse pa_enquiry', e);
+      }
+    }
+
+    const selectedProduct = localStorage.getItem('selectedProductName');
+    if (selectedProduct) this.proposalData.productName = selectedProduct;
+
+    const cover = this.selectedPlan?.coverAmount || this.selectedPlan?.sumInsured;
+    if (cover && !this.proposalData.coverAmount) this.proposalData.coverAmount = String(cover);
   }
-
-  const selectedProduct = localStorage.getItem('selectedProductName');
-  if (selectedProduct) this.proposalData.productName = selectedProduct;
-
-  const cover = this.selectedPlan?.coverAmount || this.selectedPlan?.sumInsured;
-  if (cover && !this.proposalData.coverAmount) this.proposalData.coverAmount = String(cover);
-}
 
   goBack() {
     window.history.back();
   }
 
-  /* =========================
-      STEP NAVIGATION (2 steps)
-  ========================= */
   nextStep() {
     if (this.currentStep === 1) {
       if (!this.validateStep1()) {
@@ -226,24 +214,6 @@ ngOnInit(): void {
       this.currentStep--;
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }
-
-  /* =========================
-      ✅ Occupation/Income edit control
-  ========================= */
-  startEdit(which: 'occupation' | 'annualIncome') {
-    if (which === 'occupation') {
-      this.isEditingOccupation = true;
-      this.isEditingIncome = false;
-    } else {
-      this.isEditingIncome = true;
-      this.isEditingOccupation = false;
-    }
-  }
-
-  stopEdit(which: 'occupation' | 'annualIncome') {
-    if (which === 'occupation') this.isEditingOccupation = false;
-    if (which === 'annualIncome') this.isEditingIncome = false;
   }
 
   /* =========================
@@ -270,6 +240,7 @@ ngOnInit(): void {
     if (!this.proposalData.occupation) this.fieldErrors.occupation = 'Select occupation';
     if (!this.proposalData.annualIncome) this.fieldErrors.annualIncome = 'Select annual income';
 
+    // ✅ Risk occupation is required
     if (!this.proposalData.designation) {
       this.fieldErrors.designation = 'Please select Nature of work/Designation';
       this.riskError = true;
@@ -280,34 +251,139 @@ ngOnInit(): void {
     return Object.keys(this.fieldErrors).length === 0;
   }
 
+  /* =========================
+      ✅ SUBMIT (Same as SuperTopup flow)
+      ✅ Now sends NEW DB columns
+  ========================= */
+  submitProposal(event?: Event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  if (this.isSubmitting) return;
+
+  const step1Ok = this.validateStep1();
+  if (!step1Ok) {
+    this.currentStep = 1;
+    this.showValidationAlert('Please correct errors in Step 1.');
+    return;
+  }
+
+  // ✅ OPEN POPUP IMMEDIATELY (same as supertopup)
+  this.popupOpen = true;
+  this.isSubmitting = true;
+  document.body.style.overflow = 'hidden';
+
+  // ✅ FINAL payload (SUPER TOPUP NAMING + NEW DB LABELS)
+  const payload: any = {
+    ...this.proposalData,
+
+    // ✅ IMPORTANT: backend controller expects selectedProductType (not productType)
+    selectedProductType: this.proposalData.productType,
+
+    // ✅ DB required columns
+    plan_type: 'pa',
+    proposer_occupation_type: this.getOccupationText(this.proposalData.occupation), // Salaried / Self Employment / Income from Other Sources
+    proposer_risk_category: this.activeRiskTab, // 1/2/3
+    proposer_risk_occupation: this.proposalData.designation, // Doctors/Drivers/...
+
+    // ✅ if DB column is TEXT/JSON -> send object (controller will stringify)
+    additional_covers: {
+      ptdBase: !!this.proposalData.ptdBase,
+      ppdBase: !!this.proposalData.ppdBase,
+      ttdBase: !!this.proposalData.ttdBase,
+    },
+
+    submittedAt: new Date().toISOString(),
+  };
+
+  console.log('Submitting PA proposal payload:', payload);
+
+  // ✅ CALL SAME METHOD NAME AS SUPERTOPUP FLOW
+  this.api.saveHealthProposal(payload).subscribe({
+    next: () => {
+      this.isSubmitting = false;
+      // popup stays open (same behavior)
+    },
+    error: (err) => {
+      console.log('PA submit error:', err);
+      this.isSubmitting = false;
+      this.popupOpen = false;
+      document.body.style.overflow = '';
+      this.showValidationAlert('Failed to submit proposal. Please try again.');
+    },
+  });
+}
+
+
+  closePopup() {
+    this.popupOpen = false;
+    this.isSubmitting = false;
+    document.body.style.overflow = '';
+  }
+
+  openPopup() {
+    this.popupOpen = true;
+  }
+
+  // ✅ Needed because HTML uses (keydown)="blockNonDigits($event)"
+  blockNonDigits(event: KeyboardEvent) {
+    const allowed = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
+    if (allowed.includes(event.key)) return;
+
+    if (!/^[0-9]$/.test(event.key)) {
+      event.preventDefault();
+    }
+  }
+
+  // ✅ Needed because HTML uses (paste)="blockNonDigitPaste($event)"
+  blockNonDigitPaste(event: ClipboardEvent) {
+    const pasted = event.clipboardData?.getData('text') || '';
+    if (!/^[0-9]+$/.test(pasted)) {
+      event.preventDefault();
+    }
+  }
+
+  /* =========================
+      HELPERS
+  ========================= */
+
+  private getOccupationDbValue(v: OccupationType | ''): string {
+    const map: Record<string, string> = {
+      salaried: 'Salaried',
+      self_employed: 'Self Employment',
+      other_sources: 'Income from Other Sources',
+    };
+    return map[v as any] || '';
+  }
+
   private normalizeOccupation(raw: any): any {
-  const v = String(raw || "").trim().toLowerCase();
-  if (!v) return "";
-  if (v.includes("salaried")) return "salaried";
-  if (v.includes("self")) return "self_employed";
-  if (v.includes("other")) return "other_sources";
-  return (raw as any); // if already saved as enum value
-}
+    const v = String(raw || '').trim().toLowerCase();
+    if (!v) return '';
+    if (v.includes('salaried')) return 'salaried';
+    if (v.includes('self')) return 'self_employed';
+    if (v.includes('other')) return 'other_sources';
+    return raw as any;
+  }
 
-private normalizeIncome(raw: any): any {
-  const v = String(raw || "").trim();
-  if (!v) return "";
+  private normalizeIncome(raw: any): any {
+    const v = String(raw || '').trim();
+    if (!v) return '';
 
-  // If already enum like "3-5"
-  if (/^\d{1,2}-\d{1,2}$/.test(v) || v === "41+") return v;
+    if (/^\d{1,2}-\d{1,2}$/.test(v) || v === '41+') return v;
 
-  // If saved as label like "₹3 Lakh – ₹5 Lakh"
-  const low = v.toLowerCase().replace(/\s+/g, "");
-  if (low.includes("3lakh") && low.includes("5lakh")) return "3-5";
-  if (low.includes("6lakh") && low.includes("8lakh")) return "6-8";
-  if (low.includes("9lakh") && low.includes("12lakh")) return "9-12";
-  if (low.includes("13lakh") && low.includes("18lakh")) return "13-18";
-  if (low.includes("19lakh") && low.includes("25lakh")) return "19-25";
-  if (low.includes("26lakh") && low.includes("40lakh")) return "26-40";
-  if (low.includes("41lakh")) return "41+";
+    const low = v.toLowerCase().replace(/\s+/g, '');
+    if (low.includes('3lakh') && low.includes('5lakh')) return '3-5';
+    if (low.includes('6lakh') && low.includes('8lakh')) return '6-8';
+    if (low.includes('9lakh') && low.includes('12lakh')) return '9-12';
+    if (low.includes('13lakh') && low.includes('18lakh')) return '13-18';
+    if (low.includes('19lakh') && low.includes('25lakh')) return '19-25';
+    if (low.includes('26lakh') && low.includes('40lakh')) return '26-40';
+    if (low.includes('41lakh')) return '41+';
 
-  return "";
-}
+    return '';
+  }
 
   private isPincodeValid(v: string): boolean {
     return /^[1-9][0-9]{5}$/.test((v || '').trim());
@@ -349,56 +425,6 @@ private normalizeIncome(raw: any): any {
     return `${yyyy}-${mm}-${dd}`;
   }
 
-  /* =========================
-      INPUT HELPERS
-  ========================= */
-  blockNonDigits(event: KeyboardEvent) {
-    const allowed = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Home', 'End'];
-    if (allowed.includes(event.key)) return;
-    if (!/^[0-9]$/.test(event.key)) event.preventDefault();
-  }
-
-  blockNonDigitPaste(event: ClipboardEvent) {
-    const pasted = event.clipboardData?.getData('text') || '';
-    if (!/^[0-9]+$/.test(pasted)) event.preventDefault();
-  }
-
-  /* =========================
-      RISK POPUP
-  ========================= */
-  openRiskPopup() {
-    if (!this.activeRiskTab || this.activeRiskTab < 1) this.activeRiskTab = 1;
-    this.showRiskPopup = true;
-    this.riskError = false;
-  }
-
-  closeRiskPopup() {
-    this.showRiskPopup = false;
-  }
-
-  selectRisk(item: string) {
-    this.proposalData.designation = item;
-    delete this.fieldErrors.designation;
-    this.riskError = false;
-    this.showRiskPopup = false;
-  }
-
-  get riskTheme() {
-    return {
-      brand: 'text-[#006D8D]',
-      bg: 'bg-[#EAF6FA]',
-      ring: 'ring-[#006D8D]/15',
-      pillActive: 'bg-[#006D8D] text-white',
-      itemActive: 'bg-[#006D8D] text-white border-[#006D8D]',
-      itemHover: 'hover:border-[#006D8D]/30 hover:bg-[#006D8D]/5',
-      focusRing: 'focus:ring-[#006D8D]/20',
-      chip: 'bg-[#006D8D]/10 text-[#006D8D]',
-    };
-  }
-
-  /* =========================
-      SUMMARY HELPERS
-  ========================= */
   formatDate(dateString: string): string {
     if (!dateString) return 'Not Provided';
     const d = new Date(dateString);
@@ -436,51 +462,55 @@ private normalizeIncome(raw: any): any {
     return covers.length ? covers.join(', ') : 'None';
   }
 
-  /* =========================
-      SUBMIT
-  ========================= */
-  isSubmitting = false;
-
-  submitProposal(event?: Event) {
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-
-    if (this.isSubmitting) return;
-
-    const step1Ok = this.validateStep1();
-    if (!step1Ok) {
-      this.currentStep = 1;
-      this.showValidationAlert('Please correct errors in Step 1.');
-      return;
-    }
-
-    this.isSubmitting = true;
-
-    const payload = {
-      ...this.proposalData,
-      submittedAt: new Date().toISOString(),
-    };
-
-    console.log('✅ PA Proposal payload:', payload);
-
-    this.isSubmitting = false;
-    this.showValidationAlert('✅ Proposal submitted (demo). Connect API to finalize.');
+  openRiskPopup() {
+    if (!this.activeRiskTab || this.activeRiskTab < 1) this.activeRiskTab = 1;
+    this.showRiskPopup = true;
+    this.riskError = false;
   }
 
-  /* =========================
-      ALERT
-  ========================= */
+  closeRiskPopup() {
+    this.showRiskPopup = false;
+  }
+
+  selectRisk(item: string) {
+    this.proposalData.designation = item;
+
+    // ✅ remove error once selected
+    delete this.fieldErrors.designation;
+    this.riskError = false;
+    this.showRiskPopup = false;
+  }
+
+  get riskTheme() {
+    return {
+      brand: 'text-[#006D8D]',
+      bg: 'bg-[#EAF6FA]',
+      ring: 'ring-[#006D8D]/15',
+      pillActive: 'bg-[#006D8D] text-white',
+      itemActive: 'bg-[#006D8D] text-white border-[#006D8D]',
+      itemHover: 'hover:border-[#006D8D]/30 hover:bg-[#006D8D]/5',
+      focusRing: 'focus:ring-[#006D8D]/20',
+      chip: 'bg-[#006D8D]/10 text-[#006D8D]',
+    };
+  }
+
   showValidationAlert(message: string) {
     const alertDiv = document.createElement('div');
     alertDiv.className =
       'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded shadow-lg z-50';
-    alertDiv.textContent = message;
+    alertDiv.innerHTML = `
+      <div class="flex items-center">
+        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>${message}</span>
+      </div>
+    `;
     document.body.appendChild(alertDiv);
 
     setTimeout(() => {
       if (document.body.contains(alertDiv)) document.body.removeChild(alertDiv);
-    }, 3500);
+    }, 5000);
   }
 }

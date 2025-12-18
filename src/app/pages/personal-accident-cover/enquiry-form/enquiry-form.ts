@@ -9,6 +9,10 @@ import {
 } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
+/* ✅ Firebase (same as SuperTopup) */
+import { addDoc, collection } from 'firebase/firestore';
+import { db } from '../../../../firebaseConfig'; // ✅ keep same path style as SuperTopup (adjust if needed)
+
 @Component({
   selector: 'app-pa-enquiry',
   standalone: true,
@@ -24,7 +28,7 @@ export class PAEnquiryFormComponent {
   femaleIcon = 'assets/spouse.svg';
   youIcon = this.maleIcon;
 
-  // ✅ SuperTopup-style restore keys (ONLY for restore behavior)
+  // ✅ restore keys (same pattern)
   private readonly ENQUIRY_KEY = 'pa_enquiry';
   private readonly RESTORE_FLAG = 'pa_enquiry_restore_ok';
   private readonly PAGE_KEY = 'pa_last_page';
@@ -85,7 +89,7 @@ export class PAEnquiryFormComponent {
   }
 
   ngOnInit(): void {
-    // ✅ Detect refresh on pa-enquiry-form ONLY -> clear everything (SuperTopup style)
+    // ✅ Detect refresh on this page only -> clear everything
     const lastPage = sessionStorage.getItem(this.PAGE_KEY);
     sessionStorage.setItem(this.PAGE_KEY, this.PAGE_NAME);
 
@@ -115,7 +119,7 @@ export class PAEnquiryFormComponent {
   }
 
   // ---------------------------
-  // ✅ Back Journey (same as SuperTopup)
+  // ✅ Back Journey
   // ---------------------------
   goBack() {
     if (this.step > 1) {
@@ -151,7 +155,6 @@ export class PAEnquiryFormComponent {
       );
 
       this.validateDOB();
-
       if (this.dobFormatError || this.dobError) return;
 
       const s2Invalid =
@@ -189,7 +192,7 @@ export class PAEnquiryFormComponent {
 
       if (hasError) return;
 
-      // ✅ Save payload to localStorage (SuperTopup style)
+      // ✅ Save payload to localStorage (keep your restore logic same)
       const payload = this.buildPayload();
       localStorage.setItem(this.ENQUIRY_KEY, JSON.stringify(payload));
 
@@ -199,6 +202,51 @@ export class PAEnquiryFormComponent {
       // ✅ mark current page (used for refresh detection)
       sessionStorage.setItem(this.PAGE_KEY, this.PAGE_NAME);
 
+      // ✅ FIRESTORE SAVE (same style as SuperTopup)
+      const details = this.basicForm.getRawValue();
+
+      // ✅ store BOTH: (1) your PA field names, (2) backend-friendly alias keys
+      const leadDoc: any = {
+        // ---- original PA field names (as asked)
+        gender: this.gender,
+        firstName: details.firstName ?? '',
+        lastName: details.lastName ?? '',
+        dob: details.dob ?? '',
+        mobile: details.mobile ?? '',
+        pincode: details.pincode ?? '',
+        city: details.city ?? '',
+        occupation: details.occupation ?? '',
+        incomeRange: details.incomeRange ?? '',
+        coverAmount: details.coverAmount ?? '',
+        selectedRiskCategory: this.selectedRiskCategory ?? '',
+        activeRiskTab: this.activeRiskTab || 1,
+
+        // ---- alias keys (same pattern as SuperTopup keys)
+        cust_fname: details.firstName ?? '',
+        cust_lname: details.lastName ?? '',
+        cust_mobile: details.mobile ?? '',
+        cust_Pincode: details.pincode ?? '',
+        cust_city: details.city ?? '',
+        cover_amount: details.coverAmount ?? '',
+        occupation_of_insured: details.occupation ?? '',
+        income_range: details.incomeRange ?? '',
+        risk_category: this.selectedRiskCategory ?? '',
+        risk_tab: String(this.activeRiskTab || 1),
+
+        // ---- identifiers
+        lead_type: 'personal-accident',
+        plan_type: 'pa',
+        created_at: new Date().toISOString(),
+      };
+
+      try {
+        await addDoc(collection(db, 'AUX_enquiry_leads'), leadDoc);
+        console.log('🔥 PA Lead Saved in Firestore Successfully');
+      } catch (err) {
+        console.error('❌ Firebase Save Error (PA)', err);
+      }
+
+      // ✅ go to quotes
       this.router.navigate(['/personal-accident/quotes']);
     }
   }
@@ -214,45 +262,45 @@ export class PAEnquiryFormComponent {
       },
     };
   }
-// ✅ Risk theme (changes automatically for Category 1/2/3)
-get riskTheme() {
-  const tab = Number(this.activeRiskTab || 1);
-  if (tab === 2) {
+
+  // ✅ Risk theme (same)
+  get riskTheme() {
+    const tab = Number(this.activeRiskTab || 1);
+    if (tab === 2) {
+      return {
+        brand: 'text-[#006D8D]',
+        bg: 'bg-[#EAF6FA]',
+        ring: 'ring-[#006D8D]/15',
+        pillActive: 'bg-[#006D8D] text-white',
+        itemActive: 'bg-[#006D8D] text-white border-[#006D8D]',
+        itemHover: 'hover:border-[#006D8D]/30 hover:bg-[#006D8D]/5',
+        focusRing: 'focus:ring-[#006D8D]/20',
+        chip: 'bg-[#006D8D]/10 text-[#006D8D]',
+      };
+    }
+    if (tab === 3) {
+      return {
+        brand: 'text-[#006D8D]',
+        bg: 'bg-[#EAF6FA]',
+        ring: 'ring-[#006D8D]/15',
+        pillActive: 'bg-[#006D8D] text-white',
+        itemActive: 'bg-[#006D8D] text-white border-[#006D8D]',
+        itemHover: 'hover:border-[#006D8D]/30 hover:bg-[#006D8D]/5',
+        focusRing: 'focus:ring-[#006D8D]/20',
+        chip: 'bg-[#006D8D]/10 text-[#006D8D]',
+      };
+    }
     return {
-     brand: "text-[#006D8D]",
-      bg: "bg-[#EAF6FA]",
-      ring: "ring-[#006D8D]/15",
-      pillActive: "bg-[#006D8D] text-white",
-      itemActive: "bg-[#006D8D] text-white border-[#006D8D]",
-      itemHover: "hover:border-[#006D8D]/30 hover:bg-[#006D8D]/5",
-      focusRing: "focus:ring-[#006D8D]/20",
-      chip: "bg-[#006D8D]/10 text-[#006D8D]",
+      brand: 'text-[#006D8D]',
+      bg: 'bg-[#EAF6FA]',
+      ring: 'ring-[#006D8D]/15',
+      pillActive: 'bg-[#006D8D] text-white',
+      itemActive: 'bg-[#006D8D] text-white border-[#006D8D]',
+      itemHover: 'hover:border-[#006D8D]/30 hover:bg-[#006D8D]/5',
+      focusRing: 'focus:ring-[#006D8D]/20',
+      chip: 'bg-[#006D8D]/10 text-[#006D8D]',
     };
   }
-  if (tab === 3) {
-    return {
-     brand: "text-[#006D8D]",
-    bg: "bg-[#EAF6FA]",
-    ring: "ring-[#006D8D]/15",
-    pillActive: "bg-[#006D8D] text-white",
-    itemActive: "bg-[#006D8D] text-white border-[#006D8D]",
-    itemHover: "hover:border-[#006D8D]/30 hover:bg-[#006D8D]/5",
-    focusRing: "focus:ring-[#006D8D]/20",
-    chip: "bg-[#006D8D]/10 text-[#006D8D]",
-    };
-  }
-  // Category 1 (default)
-  return {
-    brand: "text-[#006D8D]",
-    bg: "bg-[#EAF6FA]",
-    ring: "ring-[#006D8D]/15",
-    pillActive: "bg-[#006D8D] text-white",
-    itemActive: "bg-[#006D8D] text-white border-[#006D8D]",
-    itemHover: "hover:border-[#006D8D]/30 hover:bg-[#006D8D]/5",
-    focusRing: "focus:ring-[#006D8D]/20",
-    chip: "bg-[#006D8D]/10 text-[#006D8D]",
-  };
-}
 
   // ---------------------------
   // Gender / Icons
@@ -369,12 +417,11 @@ get riskTheme() {
   // ---------------------------
   // Risk popup logic
   // ---------------------------
-openRiskPopup() {
-  if (!this.activeRiskTab || this.activeRiskTab < 1) this.activeRiskTab = 1;
-  this.showRiskPopup = true;
-  this.riskError = false;
-}
-
+  openRiskPopup() {
+    if (!this.activeRiskTab || this.activeRiskTab < 1) this.activeRiskTab = 1;
+    this.showRiskPopup = true;
+    this.riskError = false;
+  }
 
   closeRiskPopup() {
     this.showRiskPopup = false;
@@ -387,7 +434,7 @@ openRiskPopup() {
   }
 
   // -------------------------
-  // ✅ Restore / Clear helpers (SuperTopup style)
+  // ✅ Restore / Clear helpers
   // -------------------------
   private isReloadNavigation(): boolean {
     try {
