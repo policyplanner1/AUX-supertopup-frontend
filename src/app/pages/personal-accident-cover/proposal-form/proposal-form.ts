@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PAService } from '../../../services/pa.service';
+import { Router } from '@angular/router';
 
 type ProductType = 'new' | 'portability';
 type OccupationType = 'salaried' | 'self_employed' | 'other_sources';
@@ -87,6 +88,7 @@ export class PAProposalForm implements OnInit {
   };
 
   fieldErrors: FieldErrors = {};
+  showCoverDropdown: boolean = false;
 
   popupOpen: boolean = false;
   isSubmitting: boolean = false;
@@ -112,6 +114,22 @@ export class PAProposalForm implements OnInit {
     { value: '41+' as AnnualIncomeType, label: '41 and above' },
   ];
 
+   // ✅ Cover Amount dropdown options (value = number string)
+  coverAmountOptions: Array<{ value: string; label: string }> = [
+    { value: '1000000', label: '10 Lakhs' },
+    { value: '1500000', label: '15 Lakhs' },
+    { value: '2000000', label: '20 Lakhs' },
+    { value: '2500000', label: '25 Lakhs' },
+    { value: '3000000', label: '30 Lakhs' },
+    { value: '3500000', label: '35 Lakhs' },
+    { value: '5000000', label: '50 Lakhs' },
+    { value: '7500000', label: '75 Lakhs' },
+    { value: '10000000', label: '1 Crore' },
+    { value: '20000000', label: '2 Crores' },
+    { value: '30000000', label: '3 Crores' },
+    { value: '40000000', label: '4 Crores' },
+    { value: '50000000', label: '5 Crores' },
+  ];
   // Risk popup
   riskError = false;
   showRiskPopup = false;
@@ -140,7 +158,7 @@ export class PAProposalForm implements OnInit {
     ],
   };
 
-  constructor(private api: PAService) {}
+constructor(private api: PAService, private router: Router) {}
 
   ngOnInit(): void {
     this.selectedPlan = (history.state as any)?.selectedPlan || null;
@@ -173,7 +191,10 @@ export class PAProposalForm implements OnInit {
         this.proposalData.occupation = this.normalizeOccupation(details.occupation || '');
         this.proposalData.annualIncome = this.normalizeIncome(details.incomeRange || '');
 
-        this.proposalData.coverAmount = String(details.coverAmount || '');
+        // ✅ enquiry might store coverAmount as number or text; normalize to dropdown value
+        const normalizedCover = this.normalizeCoverAmount(details.coverAmount);
+        if (normalizedCover) this.proposalData.coverAmount = normalizedCover;
+
 
         // ✅ risk: keep separate
         // details.selectedRiskCategory = occupation name (Doctors/Drivers)
@@ -190,13 +211,32 @@ export class PAProposalForm implements OnInit {
     const selectedProduct = localStorage.getItem('selectedProductName');
     if (selectedProduct) this.proposalData.productName = selectedProduct;
 
+   // ✅ if plan has cover amount and enquiry didn't set it, normalize
     const cover = this.selectedPlan?.coverAmount || this.selectedPlan?.sumInsured;
-    if (cover && !this.proposalData.coverAmount) this.proposalData.coverAmount = String(cover);
+    if (cover && !this.proposalData.coverAmount) {
+      const normalized = this.normalizeCoverAmount(cover);
+      if (normalized) this.proposalData.coverAmount = normalized;
+    }
   }
+
 
   goBack() {
     window.history.back();
   }
+
+  backToQuotes() {
+  // If user opened popup, close it first
+  if (this.popupOpen) {
+    this.closePopup();
+    return;
+  }
+
+  // Close dropdown if open (avoids overlay blocking clicks)
+  this.showCoverDropdown = false;
+
+  // ✅ go back to Quotes page using browser history
+  window.history.go(-1);
+}
 
   nextStep() {
     if (this.currentStep === 1) {
@@ -216,6 +256,23 @@ export class PAProposalForm implements OnInit {
     }
   }
 
+
+toggleCoverDropdown() {
+  this.showCoverDropdown = !this.showCoverDropdown;
+}
+
+closeCoverDropdown() {
+  this.showCoverDropdown = false;
+}
+
+selectCoverAmount(val: string) {
+  this.proposalData.coverAmount = val;
+
+  // remove error when selected
+  delete this.fieldErrors.coverAmount;
+
+  this.showCoverDropdown = false;
+}
   /* =========================
       VALIDATION STEP 1
   ========================= */
@@ -246,7 +303,10 @@ export class PAProposalForm implements OnInit {
       this.riskError = true;
     }
 
-    if (!this.isCoverAmountValid(this.proposalData.coverAmount)) this.fieldErrors.coverAmount = 'Enter valid cover amount';
+    // ✅ must be one of dropdown options now
+    if (!this.isCoverAmountValid(this.proposalData.coverAmount)) {
+      this.fieldErrors.coverAmount = 'Please select a valid cover amount';
+    }
 
     return Object.keys(this.fieldErrors).length === 0;
   }
@@ -345,18 +405,63 @@ export class PAProposalForm implements OnInit {
     }
   }
 
+    /* =========================
+      COVER AMOUNT HELPERS ✅
+  ========================= */
+
+  // ✅ returns label for current selected value
+  getCoverAmountLabel(v: string): string {
+    const found = this.coverAmountOptions.find((x) => x.value === String(v || '').trim());
+    return found?.label || 'Not Provided';
+  }
+
+  // ✅ normalize enquiry/plan coverAmount into dropdown value
+  private normalizeCoverAmount(raw: any): string {
+    if (raw === null || raw === undefined) return '';
+
+    // number like 1000000
+    const asNum = Number(String(raw).replace(/,/g, '').trim());
+    if (Number.isFinite(asNum) && asNum > 0) {
+      const match = this.coverAmountOptions.find((x) => Number(x.value) === asNum);
+      return match ? match.value : '';
+    }
+
+    // text like "10 lakhs", "1 crore", "2 crorers" (typo-safe)
+    const text = String(raw).toLowerCase().replace(/\s+/g, ' ').trim();
+
+    const mapTextToValue: Array<{ rx: RegExp; value: string }> = [
+      { rx: /\b10\s*lakh(s)?\b/, value: '1000000' },
+      { rx: /\b15\s*lakh(s)?\b/, value: '1500000' },
+      { rx: /\b20\s*lakh(s)?\b/, value: '2000000' },
+      { rx: /\b25\s*lakh(s)?\b/, value: '2500000' },
+      { rx: /\b30\s*lakh(s)?\b/, value: '3000000' },
+      { rx: /\b35\s*lakh(s)?\b/, value: '3500000' },
+      { rx: /\b50\s*lakh(s)?\b/, value: '5000000' },
+      { rx: /\b75\s*lakh(s)?\b/, value: '7500000' },
+      { rx: /\b1\s*cr(o)?re(r)?(s)?\b|\bone\s*cr(o)?re\b/, value: '10000000' },
+      { rx: /\b2\s*cr(o)?re(r)?(s)?\b/, value: '20000000' },
+      { rx: /\b3\s*cr(o)?re(s)?\b/, value: '30000000' },
+      { rx: /\b4\s*cr(o)?re(s)?\b/, value: '40000000' },
+      { rx: /\b5\s*cr(o)?re(s)?\b/, value: '50000000' },
+    ];
+
+    for (const m of mapTextToValue) {
+      if (m.rx.test(text)) return m.value;
+    }
+
+    return '';
+  }
+
+  private isCoverAmountValid(v: string): boolean {
+    const val = String(v || '').trim();
+    if (!val) return false;
+    return this.coverAmountOptions.some((x) => x.value === val);
+  }
   /* =========================
       HELPERS
   ========================= */
 
-  private getOccupationDbValue(v: OccupationType | ''): string {
-    const map: Record<string, string> = {
-      salaried: 'Salaried',
-      self_employed: 'Self Employment',
-      other_sources: 'Income from Other Sources',
-    };
-    return map[v as any] || '';
-  }
+
 
   private normalizeOccupation(raw: any): any {
     const v = String(raw || '').trim().toLowerCase();
@@ -403,10 +508,7 @@ export class PAProposalForm implements OnInit {
     return !!(s && /^[A-Za-z .'-]{2,}$/.test(s));
   }
 
-  private isCoverAmountValid(v: string): boolean {
-    const n = Number(String(v || '').trim());
-    return Number.isFinite(n) && n > 0;
-  }
+
 
   private isDateInputValid(v: string): boolean {
     if (!v) return false;

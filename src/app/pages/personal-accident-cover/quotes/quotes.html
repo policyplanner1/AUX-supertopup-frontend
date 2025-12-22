@@ -218,6 +218,11 @@
                 Download Brochure
                 <img class="w-4 h-4" src="assets/quote/download.svg" alt="" />
               </a>
+               <a *ngIf="p.onePager" [href]="p.onePager" download target="_blank"
+                class="mt-3 md:mt-4 text-sm text-[#006D8D] flex items-center justify-center gap-1">
+                One Pager
+                <img class="w-4 h-4" src="assets/quote/download.svg" alt="" />
+              </a>
 
             </div>
           </div>

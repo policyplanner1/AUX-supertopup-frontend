@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal, computed, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormsModule,
@@ -11,7 +11,11 @@ import { Router, RouterModule } from '@angular/router';
 
 /* ✅ Firebase (same as SuperTopup) */
 import { addDoc, collection } from 'firebase/firestore';
-import { db } from '../../../../firebaseConfig'; // ✅ keep same path style as SuperTopup (adjust if needed)
+import { db } from '../../../../firebaseConfig';
+
+/* ✅ OTP API Service */
+import { PAService } from '../../../services/pa.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-pa-enquiry',
@@ -69,7 +73,25 @@ export class PAEnquiryFormComponent {
     ],
   };
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  // =========================
+  // ✅ OTP STATE (Signals) - SAME AS SUPERTOPUP
+  // =========================
+  otpModalOpenSignal: WritableSignal<boolean> = signal(false);
+  otpDigitsSignal: WritableSignal<string[]> = signal(['', '', '', '']);
+  otpErrorSignal: WritableSignal<string | null> = signal(null);
+  otpSentSignal: WritableSignal<boolean> = signal(false);
+  resendTimerSignal: WritableSignal<number> = signal(0);
+  otpValueSignal = computed(() => this.otpDigitsSignal().join(''));
+  mobileVerifiedSignal: WritableSignal<boolean> = signal(false);
+
+  private resendIntervalId: any = null;
+  private readonly resendCooldown = 30;
+
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private paService: PAService
+  ) {
     this.basicForm = this.fb.group({
       // Step 2
       firstName: ['', [Validators.required, Validators.pattern(/^[A-Za-z ]+$/)]],
@@ -116,6 +138,16 @@ export class PAEnquiryFormComponent {
     } else {
       this.applyGenderIcons();
     }
+
+    // ✅ IMPORTANT: If mobile changes, reset verification (same as SuperTopup)
+    this.basicForm.get('mobile')?.valueChanges.subscribe(() => {
+      this.mobileVerifiedSignal.set(false);
+      this.otpErrorSignal.set(null);
+      this.otpDigitsSignal.set(['', '', '', '']);
+      this.otpSentSignal.set(false);
+      this.stopResendTimer();
+      this.resendTimerSignal.set(0);
+    });
   }
 
   // ---------------------------
@@ -167,6 +199,13 @@ export class PAEnquiryFormComponent {
 
       if (s2Invalid) return;
 
+      // ✅ Must be verified BEFORE moving to step 3 (same UX as you want)
+      if (!this.mobileVerifiedSignal()) {
+        this.otpErrorSignal.set('Please verify your mobile number first.');
+        await this.openOtpModal();
+        return;
+      }
+
       this.step = 3;
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
@@ -192,6 +231,13 @@ export class PAEnquiryFormComponent {
 
       if (hasError) return;
 
+      // ✅ Safety check: still verified
+      if (!this.mobileVerifiedSignal()) {
+        this.otpErrorSignal.set('Please verify your mobile number first.');
+        await this.openOtpModal();
+        return;
+      }
+
       // ✅ Save payload to localStorage (keep your restore logic same)
       const payload = this.buildPayload();
       localStorage.setItem(this.ENQUIRY_KEY, JSON.stringify(payload));
@@ -205,23 +251,10 @@ export class PAEnquiryFormComponent {
       // ✅ FIRESTORE SAVE (same style as SuperTopup)
       const details = this.basicForm.getRawValue();
 
-      // ✅ store BOTH: (1) your PA field names, (2) backend-friendly alias keys
       const leadDoc: any = {
-        // ---- original PA field names (as asked)
-        gender: this.gender,
-        firstName: details.firstName ?? '',
-        lastName: details.lastName ?? '',
-        dob: details.dob ?? '',
-        mobile: details.mobile ?? '',
-        pincode: details.pincode ?? '',
-        city: details.city ?? '',
-        occupation: details.occupation ?? '',
-        incomeRange: details.incomeRange ?? '',
-        coverAmount: details.coverAmount ?? '',
-        selectedRiskCategory: this.selectedRiskCategory ?? '',
-        activeRiskTab: this.activeRiskTab || 1,
+        // ---- original PA field names
 
-        // ---- alias keys (same pattern as SuperTopup keys)
+        // ---- alias keys
         cust_fname: details.firstName ?? '',
         cust_lname: details.lastName ?? '',
         cust_mobile: details.mobile ?? '',
@@ -230,7 +263,7 @@ export class PAEnquiryFormComponent {
         cover_amount: details.coverAmount ?? '',
         occupation_of_insured: details.occupation ?? '',
         income_range: details.incomeRange ?? '',
-        risk_category: this.selectedRiskCategory ?? '',
+        riskcategory: this.selectedRiskCategory ?? '',
         risk_tab: String(this.activeRiskTab || 1),
 
         // ---- identifiers
@@ -238,6 +271,8 @@ export class PAEnquiryFormComponent {
         plan_type: 'pa',
         created_at: new Date().toISOString(),
       };
+
+      console.log("payload to save PA Lead:", leadDoc);
 
       try {
         await addDoc(collection(db, 'AUX_enquiry_leads'), leadDoc);
@@ -252,16 +287,27 @@ export class PAEnquiryFormComponent {
   }
 
   private buildPayload() {
-    return {
-      step: 3,
-      gender: this.gender,
-      details: {
-        ...this.basicForm.getRawValue(),
-        selectedRiskCategory: this.selectedRiskCategory,
-        activeRiskTab: this.activeRiskTab,
-      },
-    };
-  }
+  const details = this.basicForm.getRawValue();
+
+  return {
+    step: 3,
+    gender: this.gender,
+    details: {
+      ...details,
+
+      // ✅ keep existing (string)
+      selectedRiskCategory: this.selectedRiskCategory,
+
+      // ✅ keep existing (tab 1/2/3)
+      activeRiskTab: this.activeRiskTab,
+
+      // ✅ ADD THIS: numeric category for APIs
+      riskCategory: Number(this.activeRiskTab || 1),
+    },
+    mobileVerified: this.mobileVerifiedSignal(),
+  };
+}
+
 
   // ✅ Risk theme (same)
   get riskTheme() {
@@ -338,6 +384,17 @@ export class PAEnquiryFormComponent {
     const formatted = raw.toUpperCase();
 
     ctrl.setValue(formatted, { emitEvent: false });
+  }
+
+  onNumberInput(controlName: string, maxLength: number) {
+    const ctrl = this.basicForm.get(controlName);
+    if (!ctrl) return;
+
+    let raw = (ctrl.value || '') as string;
+    raw = raw.replace(/\D/g, '');
+    if (maxLength && raw.length > maxLength) raw = raw.slice(0, maxLength);
+
+    ctrl.setValue(raw, { emitEvent: false });
   }
 
   // ---------------------------
@@ -433,6 +490,184 @@ export class PAEnquiryFormComponent {
     this.showRiskPopup = false;
   }
 
+  // =========================
+  // ✅ OTP LOGIC (Backend) - SAME AS SUPERTOPUP
+  // =========================
+  async openOtpModal() {
+    this.initOtpState();
+    this.otpModalOpenSignal.set(true);
+
+    const mobile = (this.basicForm.get('mobile')?.value || '').toString();
+    if (!mobile) {
+      this.otpErrorSignal.set('Mobile number missing');
+      return;
+    }
+
+    try {
+      await this.sendOtpToMobile(mobile);
+      setTimeout(() => {
+        const el = document.getElementById('otp-0') as HTMLInputElement | null;
+        el?.focus();
+      }, 50);
+    } catch (err: any) {
+      const errorMsg = err?.error?.message || err?.message || 'Failed to send OTP. Please try again.';
+      this.otpErrorSignal.set(errorMsg);
+    }
+  }
+
+  initOtpState() {
+    this.otpDigitsSignal.set(['', '', '', '']);
+    this.otpErrorSignal.set(null);
+    this.otpSentSignal.set(false);
+    this.stopResendTimer();
+    this.resendTimerSignal.set(0);
+  }
+
+  async sendOtpToMobile(mobile: string) {
+    try {
+      const resp: any = await firstValueFrom(this.paService.sendOtp(mobile));
+      if (resp && typeof resp.success !== 'undefined' && resp.success !== true) {
+        this.otpSentSignal.set(false);
+        throw new Error(resp.message || 'Failed to send OTP');
+      }
+      this.otpSentSignal.set(true);
+      this.startResendTimer();
+    } catch (err) {
+      this.otpSentSignal.set(false);
+      throw err;
+    }
+  }
+
+  startResendTimer() {
+    this.stopResendTimer();
+    this.resendTimerSignal.set(this.resendCooldown);
+
+    this.resendIntervalId = setInterval(() => {
+      this.resendTimerSignal.update((v) => {
+        const next = v - 1;
+        if (next <= 0) {
+          this.stopResendTimer();
+          return 0;
+        }
+        return next;
+      });
+    }, 1000);
+  }
+
+  stopResendTimer() {
+    if (this.resendIntervalId) {
+      clearInterval(this.resendIntervalId);
+      this.resendIntervalId = null;
+    }
+  }
+
+  onOtpInput(index: number, event: Event) {
+    const input = event.target as HTMLInputElement;
+    let val = (input.value || '').replace(/\D/g, '').slice(0, 1);
+
+    const arr = [...this.otpDigitsSignal()];
+    arr[index] = val;
+    this.otpDigitsSignal.set(arr);
+    input.value = val;
+
+    if (val && index < 3) {
+      const next = document.getElementById(`otp-${index + 1}`) as HTMLInputElement | null;
+      next?.focus();
+    }
+
+    if (index === 3 && this.otpDigitsSignal().join('').length === 4) {
+      this.submitOtp();
+    }
+  }
+
+  onOtpKeydown(index: number, event: KeyboardEvent) {
+    const key = event.key;
+
+    if (key === 'Backspace') {
+      if (!this.otpDigitsSignal()[index] && index > 0) {
+        const prev = document.getElementById(`otp-${index - 1}`) as HTMLInputElement | null;
+        prev?.focus();
+      } else {
+        const arr = [...this.otpDigitsSignal()];
+        arr[index] = '';
+        this.otpDigitsSignal.set(arr);
+      }
+    }
+  }
+
+  onOtpPaste(event: ClipboardEvent) {
+    const text = event.clipboardData?.getData('text') || '';
+    const digits = text.replace(/\D/g, '').slice(0, 4).split('');
+
+    if (digits.length > 0) {
+      const arr = [...this.otpDigitsSignal()];
+      for (let i = 0; i < 4; i++) {
+        arr[i] = digits[i] || '';
+        const el = document.getElementById(`otp-${i}`) as HTMLInputElement | null;
+        if (el) el.value = arr[i];
+      }
+      this.otpDigitsSignal.set(arr);
+      event.preventDefault();
+
+      if (digits.length === 4) {
+        this.submitOtp();
+      }
+    }
+  }
+
+  async submitOtp() {
+    this.otpErrorSignal.set(null);
+    const otp = this.otpDigitsSignal().join('');
+
+    if (otp.length !== 4) {
+      this.otpErrorSignal.set('Enter 4-digit OTP');
+      return;
+    }
+
+    const mobile = (this.basicForm.get('mobile')?.value || '').toString();
+
+    try {
+      const resp: any = await firstValueFrom(this.paService.verifyOtp(mobile, otp));
+      if (!resp || resp.valid !== true) {
+        const errorMsg = resp?.message || resp?.error || 'Invalid OTP. Please try again.';
+        this.otpErrorSignal.set(errorMsg);
+        return;
+      }
+
+      this.mobileVerifiedSignal.set(true);
+      this.closeOtpModal();
+    } catch (err: any) {
+      const errorMsg = err?.error?.message || err?.message || 'Invalid OTP. Please try again.';
+      this.otpErrorSignal.set(errorMsg);
+    }
+  }
+
+  async resendOtp() {
+    const mobile = (this.basicForm.get('mobile')?.value || '').toString();
+    if (!mobile) {
+      this.otpErrorSignal.set('Mobile number not available');
+      return;
+    }
+
+    try {
+      await this.sendOtpToMobile(mobile);
+      this.otpErrorSignal.set(null);
+      this.otpDigitsSignal.set(['', '', '', '']);
+
+      setTimeout(() => {
+        const el = document.getElementById('otp-0') as HTMLInputElement | null;
+        el?.focus();
+      }, 50);
+    } catch (err) {
+      this.otpErrorSignal.set('Failed to resend OTP');
+    }
+  }
+
+  closeOtpModal() {
+    this.otpModalOpenSignal.set(false);
+    this.stopResendTimer();
+  }
+
   // -------------------------
   // ✅ Restore / Clear helpers
   // -------------------------
@@ -473,6 +708,14 @@ export class PAEnquiryFormComponent {
     this.dobError = false;
     this.dobFormatError = false;
 
+    // ✅ reset otp
+    this.mobileVerifiedSignal.set(false);
+    this.otpErrorSignal.set(null);
+    this.otpDigitsSignal.set(['', '', '', '']);
+    this.otpSentSignal.set(false);
+    this.stopResendTimer();
+    this.resendTimerSignal.set(0);
+
     this.applyGenderIcons();
   }
 
@@ -505,6 +748,9 @@ export class PAEnquiryFormComponent {
         },
         { emitEvent: false }
       );
+
+      // ✅ if mobile exists, treat as verified (same as your SuperTopup restore behavior)
+      this.mobileVerifiedSignal.set(!!details.mobile);
 
       return true;
     } catch {

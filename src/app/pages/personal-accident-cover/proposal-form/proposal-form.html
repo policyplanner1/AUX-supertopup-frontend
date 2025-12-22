@@ -183,17 +183,60 @@
           <div class="tw-error" *ngIf="fieldErrors.designation as err">{{ err }}</div>
         </div>
 
-        <div class="tw-field">
-          <label>Cover Amount <span class="tw-required">*</span></label>
-          <input
-            class="tw-input"
-            [(ngModel)]="proposalData.coverAmount"
-            (keydown)="blockNonDigits($event)"
-            (paste)="blockNonDigitPaste($event)"
-            placeholder="Eg: 500000"
-          />
-          <div class="tw-error" *ngIf="fieldErrors.coverAmount as err">{{ err }}</div>
-        </div>
+     <div class="tw-field tw-cover-dd">
+  <label>Cover Amount <span class="tw-required">*</span></label>
+
+  <!-- Button -->
+  <button
+    type="button"
+    class="tw-picker-btn tw-cover-btn"
+    (click)="toggleCoverDropdown()"
+    [attr.aria-expanded]="showCoverDropdown"
+  >
+    <span class="truncate" [class.tw-picker-muted]="!proposalData.coverAmount">
+      {{ proposalData.coverAmount ? getCoverAmountLabel(proposalData.coverAmount) : 'Select cover amount' }}
+    </span>
+
+    <svg xmlns="http://www.w3.org/2000/svg"
+      class="h-4 w-4 text-slate-500"
+      viewBox="0 0 20 20" fill="currentColor">
+      <path fill-rule="evenodd"
+            d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
+            clip-rule="evenodd" />
+    </svg>
+  </button>
+
+  <!-- Dropdown (opens ONLY below) -->
+  <div
+    class="tw-cover-menu"
+    *ngIf="showCoverDropdown"
+  >
+    <button
+      type="button"
+      class="tw-cover-item"
+      *ngFor="let c of coverAmountOptions"
+      (click)="selectCoverAmount(c.value)"
+      [class.active]="proposalData.coverAmount === c.value"
+    >
+      <span class="tw-cover-label">{{ c.label }}</span>
+      <span class="tw-cover-check" *ngIf="proposalData.coverAmount === c.value">✔</span>
+    </button>
+  </div>
+
+  <p class="tw-hint" *ngIf="proposalData.coverAmount">
+    Selected: <b>{{ getCoverAmountLabel(proposalData.coverAmount) }}</b>
+  </p>
+
+  <div class="tw-error" *ngIf="fieldErrors.coverAmount as err">{{ err }}</div>
+</div>
+
+<!-- ✅ outside click overlay -->
+<div
+  *ngIf="showCoverDropdown"
+  class="tw-cover-overlay"
+  (click)="closeCoverDropdown()"
+></div>
+
 
         <!-- Additional Covers -->
           <div class="tw-field tw-span-full">
@@ -219,7 +262,7 @@
       </div>
 
       <div class="tw-nav-btns">
-        <button type="button" class="tw-btn-secondary" disabled>Previous</button>
+    <button type="button" class="tw-btn-secondary" (click)="backToQuotes()">Previous</button>
         <button type="button" class="tw-btn-primary" (click)="nextStep()">Next</button>
       </div>
     </div>

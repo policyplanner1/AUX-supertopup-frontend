@@ -65,6 +65,7 @@ export class PAQuotesComponent implements OnInit {
   constructor(private router: Router, private api: PAService, private zone: NgZone,
   private cdr: ChangeDetectorRef) { }
 
+
   ngOnInit(): void {
       // ✅ remember we are on quotes
     sessionStorage.setItem(this.PAGE_KEY, 'quotes');
@@ -85,6 +86,7 @@ export class PAQuotesComponent implements OnInit {
         const parsed = JSON.parse(savedData);
         const payload = this.buildPayloadFromLocal(parsed);
         this.basePayload = payload;
+        console.log("✅ PA Quotes Payload:", payload);
 
         const enquiry = parsed?.details ?? {};
         const members = parsed?.members ?? [];
@@ -136,7 +138,10 @@ export class PAQuotesComponent implements OnInit {
 
     return {
       coverAmount: this.toNum(enquiry.coverAmount, 0),
-      category: this.toNum(enquiry.riskCategory, 0),
+      category: this.toNum(
+      enquiry?.riskCategory ?? enquiry?.activeRiskTab ?? enquiry?.risk_tab ?? 0,
+  0
+),
 
       age: selfAge,                 // ✅ self age from DOB
       sage: this.numOrNull(spouse?.age), // Spouse age or null
@@ -251,6 +256,7 @@ export class PAQuotesComponent implements OnInit {
                     : ['No Key Features Available'],
 
                   brochure: p.brochureUrl || null,
+                  onePager: p.onePagerUrl || null,
 
                   // Compare helpers
                   planId: p.planId || `${p.plan}`,
