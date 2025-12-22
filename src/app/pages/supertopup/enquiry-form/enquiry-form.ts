@@ -56,6 +56,9 @@ export class EnquiryForm {
     { key: 'daughter', label: 'Daughter', iconPath: 'assets/daughter.svg', selected: false, count: 0 },
   ];
 
+  // ✅ Terms & Conditions checkbox
+  termsAcceptedSignal: WritableSignal<boolean> = signal(false);
+
   // ages / form
   selectedAges: Record<string, string> = {};
   adultAges: number[] = [];
@@ -145,6 +148,8 @@ export class EnquiryForm {
       this.otpSentSignal.set(false);
       this.stopResendTimer();
       this.resendTimerSignal.set(0);
+      this.termsAcceptedSignal.set(false);
+
     });
   }
 
@@ -429,7 +434,8 @@ export class EnquiryForm {
         id,
         age: this.selectedAges[id] || null,
       })),
-      details: { ...this.basicForm.getRawValue(), gender: this.gender },
+      details: { ...this.basicForm.getRawValue(), gender: this.gender,       termsAccepted: this.termsAcceptedSignal(), // ✅ ADD THIS
+ },
     };
   }
 
@@ -832,6 +838,7 @@ onNameInputUpper(controlName: string) {
 
       // ✅ if mobile exists, treat as verified (same behavior as old)
       this.mobileVerifiedSignal.set(!!details.mobile);
+      this.termsAcceptedSignal.set(!!details.termsAccepted);
 
       return true;
     } catch {

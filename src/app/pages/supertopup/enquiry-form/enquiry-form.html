@@ -25,7 +25,7 @@
           <!-- STEP 1 -->
           <div class="flex flex-col items-center">
             <div class="flex items-center justify-center rounded-full text-xs font-semibold
-                     w-8 h-8 sm:w-7 sm:h-7" [ngClass]="
+                    w-8 h-8 sm:w-7 sm:h-7" [ngClass]="
                 step === 1
                   ? 'bg-[#006D8D] text-white'
                   : 'bg-[#E4EDF1] text-[#006D8D]'
@@ -59,7 +59,7 @@
           <!-- STEP 3 -->
           <div class="flex flex-col items-center">
             <div class="flex items-center justify-center rounded-full text-xs font-semibold
-                     w-8 h-8 sm:w-7 sm:h-7" [ngClass]="
+                    w-8 h-8 sm:w-7 sm:h-7" [ngClass]="
                 step === 3
                   ? 'bg-[#006D8D] text-white'
                   : 'bg-[#E4EDF1] text-[#006D8D]'
@@ -105,13 +105,13 @@
       </h3>
 
       <div class="w-full max-w-md sm:max-w-3xl mx-auto grid grid-cols-2 md:grid-cols-4
-               gap-4 sm:gap-6 justify-items-center">
+              gap-4 sm:gap-6 justify-items-center">
         <ng-container *ngFor="let m of members">
           <div (click)="toggleMember(m.key)" class="relative flex flex-col items-center
-                   w-full max-w-[140px] sm:max-w-[170px]
-                   h-[160px] sm:h-[210px]
-                   rounded-[18px] border bg-white cursor-pointer
-                   shadow-card transition-transform duration-200 hover:-translate-y-1"
+                  w-full max-w-[140px] sm:max-w-[170px]
+                  h-[160px] sm:h-[210px]
+                  rounded-[18px] border bg-white cursor-pointer
+                  shadow-card transition-transform duration-200 hover:-translate-y-1"
             [ngClass]="m.selected ? 'gradient-border' : 'border-[#E6EEF5]'">
             <img [src]="m.iconPath" class="mt-5 sm:mt-6 w-14 h-14 sm:w-16 sm:h-16 object-contain" />
 
@@ -123,7 +123,7 @@
             <div *ngIf="m.key === 'son' || m.key === 'daughter'"
               class="mt-auto mb-3 sm:mb-4 pt-2 flex items-center justify-center gap-5">
               <button (click)="decrementChild(m.key); $event.stopPropagation()" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full border border-[#00A2C4]
-                       flex items-center justify-center text-[#00A2C4] text-sm" [disabled]="m.count === 0">
+                      flex items-center justify-center text-[#00A2C4] text-sm" [disabled]="m.count === 0">
                 –
               </button>
 
@@ -132,7 +132,7 @@
               </span>
 
               <button (click)="incrementChild(m.key); $event.stopPropagation()" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full border border-[#00A2C4]
-                       flex items-center justify-center text-[#00A2C4] text-sm"
+                      flex items-center justify-center text-[#00A2C4] text-sm"
                 [disabled]="getTotalChildren() >= maxChildren">
                 +
               </button>
@@ -143,12 +143,12 @@
 
       <div class="flex justify-center mt-4 sm:mt-8">
         <button
-  type="button"
-  (click)="next()"
-  class="nav-btn"
->
-  Next
-</button>
+          type="button"
+          (click)="next()"
+          class="nav-btn"
+        >
+          Next
+        </button>
 
       </div>
     </div>
@@ -163,7 +163,7 @@
       <div class="flex flex-wrap justify-center gap-6 sm:gap-10 mt-2 sm:mt-4">
         <ng-container *ngFor="let id of getFlatMemberList()">
           <div class="w-[180px] sm:w-[220px] bg-white rounded-xl border border-[#E5EFF4]
-                   shadow-card flex flex-col items-center text-center pt-6 sm:pt-8 pb-5 sm:pb-6">
+                  shadow-card flex flex-col items-center text-center pt-6 sm:pt-8 pb-5 sm:pb-6">
             <img [src]="getIconForId(id)" class="w-16 h-16 sm:w-20 sm:h-20 object-contain" />
 
             <p class="mt-3 sm:mt-4 text-sm sm:text-base font-medium text-gray-700">
@@ -229,9 +229,9 @@
 
       <!-- Soft banner instead of browser alert -->
       <div *ngIf="basicFormSubmitAttempted && basicForm.invalid" class="mt-2 mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-2
-             flex items-center gap-2 text-xs sm:text-sm text-red-700 justify-center">
+            flex items-center gap-2 text-xs sm:text-sm text-red-700 justify-center">
         <span class="inline-flex w-4 h-4 rounded-full bg-red-500 text-white
-                 text-[10px] items-center justify-center font-bold">!</span>
+                text-[10px] items-center justify-center font-bold">!</span>
         <span>Please check the highlighted fields and fill your basic details correctly.</span>
       </div>
 
@@ -305,7 +305,7 @@
               formControlName="mobile"
               maxlength="10"
               class="w-full border-0 border-b border-gray-400 bg-transparent py-2
-                     text-gray-700 text-sm focus:outline-none focus:border-[#006D8D]"
+                    text-gray-700 text-sm focus:outline-none focus:border-[#006D8D]"
               [ngClass]="{ 'invalid-field': isInvalid('mobile') }"
               placeholder="Enter 10-digit mobile number"
               (keypress)="allowOnlyDigits($event)"
@@ -322,10 +322,10 @@
             </div>
             <!-- Verify Number Button -->
             <button type="button" (click)="openOtpModal()" class="mt-2 text-xs sm:text-sm px-3 py-1 rounded
-                     bg-[#006D8D] text-white hover:bg-[#005B75] font-medium"
-             [disabled]="isInvalid('mobile') || mobileVerifiedSignal()">
-             {{ mobileVerifiedSignal() ? '✓ Verified' : 'Verify Number' }}
-           </button>
+                    bg-[#006D8D] text-white hover:bg-[#005B75] font-medium"
+            [disabled]="isInvalid('mobile') || mobileVerifiedSignal()">
+            {{ mobileVerifiedSignal() ? '✓ Verified' : 'Verify Number' }}
+          </button>
            <span *ngIf="mobileVerifiedSignal()" class="text-xs text-green-600 ml-2">Mobile verified</span>
           </div>
 
@@ -374,7 +374,7 @@
             </label>
             <div class="relative w-full">
               <select formControlName="coverAmount" class="w-full p-2 border-0 border-b border-gray-400 bg-transparent py-2
-                       text-gray-700 text-sm focus:outline-none focus:border-[#006D8D] appearance-none"
+                      text-gray-700 text-sm focus:outline-none focus:border-[#006D8D] appearance-none"
                 [ngClass]="{ 'invalid-field': isInvalid('coverAmount') }">
                 <option value="">Select cover amount</option>
                 <!-- <option value="300000">3 Lakh</option> -->
@@ -404,27 +404,50 @@
           </div>
         </div>
       </form>
+      <!-- ================= TERMS & CONDITIONS ================= -->
+      <div class="flex items-start justify-center gap-2 mt-6">
+      <input
+          type="checkbox"
+          id="terms"
+          class="mt-1 accent-[#006D8D]"
+          [checked]="termsAcceptedSignal()"
+          (change)="termsAcceptedSignal.set($any($event.target).checked)"
+        />
+
+
+        <label for="terms" class="text-xs sm:text-sm text-gray-600 leading-relaxed cursor-pointer">
+          I agree to the
+          <a href="https://policyplanner.com/#/terms" target="_blank" class="text-[#006D8D] underline">
+            Terms & Conditions
+          </a>
+          and
+          <a href="https://policyplanner.com/#/privacy" target="_blank" class="text-[#006D8D] underline">
+            Privacy Policy
+          </a>.
+        </label>
+      </div>
 
       <!-- Buttons -->
       <div class="flex justify-center gap-4 sm:gap-6 mt-4">
-  <button
-    type="button"
-    (click)="prev()"
-    class="nav-btn"
-  >
-    Previous
-  </button>
+      <button
+        type="button"
+        (click)="prev()"
+        class="nav-btn"
+      >
+        Previous
+      </button>
 
-  <button
-    type="button"
-    (click)="next()"
-    class="nav-btn"
-    [disabled]="!mobileVerifiedSignal()"
-  >
-    Submit
-  </button>
-</div>
-</div>
+      <button
+  type="button"
+  (click)="next()"
+  class="nav-btn"
+  [disabled]="!mobileVerifiedSignal() || !termsAcceptedSignal()"
+>
+  Submit
+    </button>
+
+    </div>
+    </div>
 
     <!-- OTP Modal (4-digit) -->
     <div *ngIf="otpModalOpenSignal()" class="fixed inset-0 z-40 flex items-center justify-center">
@@ -443,13 +466,13 @@
 
         <div class="flex justify-center gap-2 mb-3" (paste)="onOtpPaste($event)">
           <input id="otp-0" [value]="otpDigitsSignal()[0]" type="text" maxlength="1" inputmode="numeric" class="w-12 h-12 text-center rounded-lg border border-gray-200"
-                 (input)="onOtpInput(0, $event)" (keydown)="onOtpKeydown(0, $event)" />
+                (input)="onOtpInput(0, $event)" (keydown)="onOtpKeydown(0, $event)" />
           <input id="otp-1" [value]="otpDigitsSignal()[1]" type="text" maxlength="1" inputmode="numeric" class="w-12 h-12 text-center rounded-lg border border-gray-200"
-                 (input)="onOtpInput(1, $event)" (keydown)="onOtpKeydown(1, $event)" />
+                (input)="onOtpInput(1, $event)" (keydown)="onOtpKeydown(1, $event)" />
           <input id="otp-2" [value]="otpDigitsSignal()[2]" type="text" maxlength="1" inputmode="numeric" class="w-12 h-12 text-center rounded-lg border border-gray-200"
-                 (input)="onOtpInput(2, $event)" (keydown)="onOtpKeydown(2, $event)" />
+                (input)="onOtpInput(2, $event)" (keydown)="onOtpKeydown(2, $event)" />
           <input id="otp-3" [value]="otpDigitsSignal()[3]" type="text" maxlength="1" inputmode="numeric" class="w-12 h-12 text-center rounded-lg border border-gray-200"
-                 (input)="onOtpInput(3, $event)" (keydown)="onOtpKeydown(3, $event)" />
+                (input)="onOtpInput(3, $event)" (keydown)="onOtpKeydown(3, $event)" />
         </div>
 
         <div *ngIf="otpErrorSignal()" class="text-xs text-red-600 text-center mb-2">

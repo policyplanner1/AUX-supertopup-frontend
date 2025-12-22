@@ -45,6 +45,7 @@ export class PAEnquiryFormComponent {
   // DOB flags
   dobError = false;
   dobFormatError = false;
+  termsAcceptedSignal: WritableSignal<boolean> = signal(false);
 
   // Risk popup
   riskError = false;
@@ -147,6 +148,8 @@ export class PAEnquiryFormComponent {
       this.otpSentSignal.set(false);
       this.stopResendTimer();
       this.resendTimerSignal.set(0);
+      this.termsAcceptedSignal.set(false);
+
     });
   }
 
@@ -295,14 +298,14 @@ export class PAEnquiryFormComponent {
     details: {
       ...details,
 
-      // ✅ keep existing (string)
       selectedRiskCategory: this.selectedRiskCategory,
 
-      // ✅ keep existing (tab 1/2/3)
       activeRiskTab: this.activeRiskTab,
 
-      // ✅ ADD THIS: numeric category for APIs
       riskCategory: Number(this.activeRiskTab || 1),
+
+      termsAccepted: this.termsAcceptedSignal(),
+
     },
     mobileVerified: this.mobileVerifiedSignal(),
   };
@@ -751,6 +754,7 @@ export class PAEnquiryFormComponent {
 
       // ✅ if mobile exists, treat as verified (same as your SuperTopup restore behavior)
       this.mobileVerifiedSignal.set(!!details.mobile);
+      this.termsAcceptedSignal.set(!!details.termsAccepted);
 
       return true;
     } catch {

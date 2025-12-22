@@ -140,7 +140,7 @@
             <option *ngFor="let o of occupationOptions" [value]="o.value">{{ o.label }}</option>
           </select>
           <p class="tw-hint" *ngIf="proposalData.occupation">
-            Selected: <b>{{ getOccupationText(proposalData.occupation) }}</b>
+            <!-- Selected: <b>{{ getOccupationText(proposalData.occupation) }}</b> -->
           </p>
           <div class="tw-error" *ngIf="fieldErrors.occupation as err">{{ err }}</div>
         </div>
@@ -153,7 +153,7 @@
             <option *ngFor="let a of incomeOptions" [value]="a.value">{{ a.label }}</option>
           </select>
           <p class="tw-hint" *ngIf="proposalData.annualIncome">
-            Selected: <b>{{ getIncomeRangeText(proposalData.annualIncome) }}</b>
+            <!-- Selected: <b>{{ getIncomeRangeText(proposalData.annualIncome) }}</b> -->
           </p>
           <div class="tw-error" *ngIf="fieldErrors.annualIncome as err">{{ err }}</div>
         </div>
@@ -224,7 +224,7 @@
   </div>
 
   <p class="tw-hint" *ngIf="proposalData.coverAmount">
-    Selected: <b>{{ getCoverAmountLabel(proposalData.coverAmount) }}</b>
+    <!-- Selected: <b>{{ getCoverAmountLabel(proposalData.coverAmount) }}</b> -->
   </p>
 
   <div class="tw-error" *ngIf="fieldErrors.coverAmount as err">{{ err }}</div>
