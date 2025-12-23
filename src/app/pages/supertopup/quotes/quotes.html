@@ -157,7 +157,7 @@
 
             <!-- LEFT SECTION -->
             <div class="w-full md:w-[32%] p-3 md:p-6">
-              <img [src]="p.logo" class="h-12 mb-3" />
+              <img [src]="p.logo" class="h-20 mb-3" />
               <h3 class="text-lg font-semibold text-gray-800">{{ p.name }}</h3>
 
               <div class="mt-2 md:mt-3">
@@ -316,9 +316,7 @@
       <div
         class="flex items-center gap-3 px-4 py-3 border-2 border-slate-200 rounded-xl bg-white flex-shrink-0 min-w-[180px] hover:border-[#0b5cff] hover:shadow"
         *ngFor="let p of compare; trackBy: trackByPlanId">
-        <img [src]="p.logo" [alt]="p.insurerName"
-
-            class="w-10 h-10 object-contain rounded-md" />
+        <img [src]="p.logo" [alt]="p.insurerName"class="w-15 h-10 object-contain rounded-md" />
         <div class="flex-1 min-w-0">
           <p class="text-sm font-semibold text-slate-900 truncate">{{ p.insurerName }}</p>
           <p class="text-xs text-slate-500 truncate">{{ p.productName }}</p>
@@ -435,13 +433,13 @@
             </button>
 
              <div class="cmp-logo-name-row flex items-start gap-3 w-full pr-8 min-w-0">
-  <div class="cmp-logo-wrapper">
-    <img
-      [src]="p.logo"
-      [alt]="p.insurerName"
-      class="cmp-company-logo"
-    />
-  </div>
+            <div class="cmp-logo-wrapper">
+              <img
+                [src]="p.logo"
+                [alt]="p.insurerName"
+                class="cmp-company-logo"
+              />
+            </div>
 
   <div class="cmp-name-wrapper flex-1 min-w-0">
     <div class="cmp-company-name">

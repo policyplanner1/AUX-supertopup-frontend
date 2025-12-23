@@ -294,9 +294,8 @@ export class Quotes implements OnInit {
                     insurerName: p.companyName,
                     otherDetails: p.otherDetails,
 
-                    // IMPORTANT FOR FEATURES PAGE
-                    fullPlan: p, // <-- ADD THIS
-                    fullPremium: pm, // <-- ADD THIS
+                    fullPlan: p,
+                    fullPremium: pm,
                   };
                 });
               });

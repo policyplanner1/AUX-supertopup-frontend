@@ -268,7 +268,12 @@ export class PAQuotesComponent implements OnInit {
                   addonNumber: addonNum,
 
                   insurerName: p.company,
-                  otherDetails: p,
+                  otherDetails:
+                typeof p.otherDetails === 'string'
+                  ? JSON.parse(p.otherDetails)
+                  : (p.otherDetails || {}),
+
+
                 };
               });
 
@@ -316,7 +321,7 @@ export class PAQuotesComponent implements OnInit {
         event.target.checked = false;
         return;
       }
-if (!this.isSelected(plan)) {
+    if (!this.isSelected(plan)) {
         this.compare.push({
           key: plan.uniqueId,
           planId: plan.planId,
@@ -331,9 +336,11 @@ if (!this.isSelected(plan)) {
           base: Number(plan.baseNumber || 0),
           addon: Number(plan.addonNumber || 0),
 
-          otherDetails: plan.otherDetails || {},
+          otherDetails:plan.otherDetails,
+
           sourcePlan: plan,
         });
+        console.log("✅ Added to compare:", plan);
       }
     } else {
       this.compare = this.compare.filter((p) => p.key !== key);
@@ -345,8 +352,9 @@ if (!this.isSelected(plan)) {
   }
 
   getDetailsKeys(): string[] {
-    return Object.keys(this.compare[0]?.otherDetails || {});
-  }
+  return Object.keys(this.compare[0]?.otherDetails || {});
+}
+
 
   removeFromCompare(plan: any) {
     this.compare = this.compare.filter((p) => p.planId !== plan.planId);
@@ -641,7 +649,7 @@ async downloadPDF() {
 }
 
   getGridTemplateColumns(): string {
-    const planCount = this.compare?.length || 0;
-    return `300px repeat(${planCount || 1}, 1fr)`;
-  }
+  return `300px repeat(${this.compare.length || 1}, 1fr)`;
+}
+
 }
