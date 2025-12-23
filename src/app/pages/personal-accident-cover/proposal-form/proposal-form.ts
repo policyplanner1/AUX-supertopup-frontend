@@ -21,16 +21,13 @@ interface ProposalData {
   productName: string;
   productType: ProductType;
   pincode: string;
-  cityState: string;
 
-  firstName: string;
-  lastName: string;
+  proposerName: string;
   gender: GenderType | '';
   dob: string;
   mobile: string;
 
-  insuredPincode: string;
-  city: string;
+  cityState: '',
 
   occupation: OccupationType | '';
   annualIncome: AnnualIncomeType | '';
@@ -65,16 +62,13 @@ export class PAProposalForm implements OnInit {
     productName: '',
     productType: 'new',
     pincode: '',
-    cityState: '',
 
-    firstName: '',
-    lastName: '',
+    proposerName: '',
     gender: '',
     dob: '',
     mobile: '',
 
-    insuredPincode: '',
-    city: '',
+    cityState: '',
 
     occupation: '',
     annualIncome: '',
@@ -176,17 +170,15 @@ constructor(private api: PAService, private router: Router) {}
         const gender = payload?.gender || '';
         const details = payload?.details || {};
 
-        this.proposalData.firstName = details.firstName || '';
-        this.proposalData.lastName = details.lastName || '';
+       this.proposalData.proposerName = `${details.firstName || ''} ${details.lastName || ''}`.trim();
+
         this.proposalData.gender = (gender as any) || '';
         this.proposalData.mobile = details.mobile || '';
         this.proposalData.dob = this.toDateInput(details.dob || '');
 
         this.proposalData.pincode = details.pincode || '';
-        this.proposalData.cityState = details.cityState || details.city || '';
 
-        this.proposalData.insuredPincode = details.pincode || '';
-        this.proposalData.city = details.city || '';
+        this.proposalData.cityState = details.cityState || '';
 
         this.proposalData.occupation = this.normalizeOccupation(details.occupation || '');
         this.proposalData.annualIncome = this.normalizeIncome(details.incomeRange || '');
@@ -283,16 +275,13 @@ selectCoverAmount(val: string) {
     if (!this.proposalData.productName) this.fieldErrors.productName = 'Product name is required';
     if (!this.proposalData.productType) this.fieldErrors.productType = 'Select product type';
     if (!this.isPincodeValid(this.proposalData.pincode)) this.fieldErrors.pincode = 'Enter valid 6-digit pincode';
-    if (!this.proposalData.cityState) this.fieldErrors.cityState = 'City & State is required';
 
-    if (!this.isSimpleName(this.proposalData.firstName)) this.fieldErrors.firstName = 'Enter valid first name';
-    if (!this.isSimpleName(this.proposalData.lastName)) this.fieldErrors.lastName = 'Enter valid last name';
+    if (!this.isSimpleName(this.proposalData.proposerName)) this.fieldErrors.proposerName = 'Enter valid name';
     if (!this.proposalData.gender) this.fieldErrors.gender = 'Gender is required';
     if (!this.isDateInputValid(this.proposalData.dob)) this.fieldErrors.dob = 'Select valid date of birth';
 
     if (!this.isPhoneValid(this.proposalData.mobile)) this.fieldErrors.mobile = 'Enter valid 10-digit mobile number';
-    if (!this.isPincodeValid(this.proposalData.insuredPincode)) this.fieldErrors.insuredPincode = 'Enter valid 6-digit pincode';
-    if (!this.isCityValid(this.proposalData.city)) this.fieldErrors.city = 'Enter valid city';
+    if (!this.isCityValid(this.proposalData.cityState)) this.fieldErrors.cityState = 'Enter valid city';
 
     if (!this.proposalData.occupation) this.fieldErrors.occupation = 'Select occupation';
     if (!this.proposalData.annualIncome) this.fieldErrors.annualIncome = 'Select annual income';
@@ -348,12 +337,6 @@ selectCoverAmount(val: string) {
     proposer_risk_category: this.activeRiskTab, // 1/2/3
     proposer_risk_occupation: this.proposalData.designation, // Doctors/Drivers/...
 
-    // ✅ if DB column is TEXT/JSON -> send object (controller will stringify)
-    additional_covers: {
-      ptdBase: !!this.proposalData.ptdBase,
-      ppdBase: !!this.proposalData.ppdBase,
-      ttdBase: !!this.proposalData.ttdBase,
-    },
 
     submittedAt: new Date().toISOString(),
   };

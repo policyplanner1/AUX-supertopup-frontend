@@ -88,16 +88,16 @@
 
       <div class="tw-row-4">
         <div class="tw-field">
-          <label>First Name <span class="tw-required">*</span></label>
-          <input class="tw-input tw-readonly" [(ngModel)]="proposalData.firstName" readonly />
-          <div class="tw-error" *ngIf="fieldErrors.firstName as err">{{ err }}</div>
+          <label>Proposer Name <span class="tw-required">*</span></label>
+          <input class="tw-input tw-readonly" [(ngModel)]="proposalData.proposerName" readonly />
+          <div class="tw-error" *ngIf="fieldErrors.proposerName as err">{{ err }}</div>
         </div>
 
-        <div class="tw-field">
+        <!-- <div class="tw-field">
           <label>Last Name <span class="tw-required">*</span></label>
-          <input class="tw-input tw-readonly" [(ngModel)]="proposalData.lastName" readonly />
-          <div class="tw-error" *ngIf="fieldErrors.lastName as err">{{ err }}</div>
-        </div>
+          <input class="tw-input tw-readonly" [(ngModel)]="proposalData.proposerName" readonly />
+          <div class="tw-error" *ngIf="fieldErrors.proposerName as err">{{ err }}</div>
+        </div> -->
 
         <div class="tw-field">
           <label>Gender <span class="tw-required">*</span></label>
@@ -295,10 +295,7 @@
           <span class="tw-summary-value">{{ proposalData.pincode || 'Not Provided' }}</span>
         </div>
 
-        <div class="tw-summary-item">
-          <span class="tw-summary-label">City & State</span>
-          <span class="tw-summary-value">{{ proposalData.cityState || 'Not Provided' }}</span>
-        </div>
+
       </div>
     </div>
 
@@ -311,12 +308,12 @@
       <div class="tw-summary-grid">
         <div class="tw-summary-item">
           <span class="tw-summary-label">First Name</span>
-          <span class="tw-summary-value">{{ proposalData.firstName || 'Not Provided' }}</span>
+          <span class="tw-summary-value">{{ proposalData.proposerName || 'Not Provided' }}</span>
         </div>
 
         <div class="tw-summary-item">
           <span class="tw-summary-label">Last Name</span>
-          <span class="tw-summary-value">{{ proposalData.lastName || 'Not Provided' }}</span>
+          <span class="tw-summary-value">{{ proposalData.proposerName || 'Not Provided' }}</span>
         </div>
 
         <div class="tw-summary-item">
@@ -334,14 +331,11 @@
           <span class="tw-summary-value">{{ proposalData.mobile || 'Not Provided' }}</span>
         </div>
 
-        <div class="tw-summary-item">
-          <span class="tw-summary-label">Insured Pincode</span>
-          <span class="tw-summary-value">{{ proposalData.insuredPincode || 'Not Provided' }}</span>
-        </div>
+
 
         <div class="tw-summary-item">
           <span class="tw-summary-label">City</span>
-          <span class="tw-summary-value">{{ proposalData.city || 'Not Provided' }}</span>
+          <span class="tw-summary-value">{{ proposalData.cityState || 'Not Provided' }}</span>
         </div>
 
         <div class="tw-summary-item">

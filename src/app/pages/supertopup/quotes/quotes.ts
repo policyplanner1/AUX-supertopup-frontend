@@ -285,6 +285,7 @@ export class Quotes implements OnInit {
                             .filter(Boolean)
                         : ['No Key Features Available'],
                     brochure: pm.brochureUrl || p.brochureUrl || null,
+                    onePager: pm.onePagerUrl || p.onePagerUrl || null,
 
                     // Compare
                     planId: pm.planId || p.planId || `${p.planName}-${dedNum}-${premiumNum}`,
@@ -297,8 +298,11 @@ export class Quotes implements OnInit {
                     fullPlan: p,
                     fullPremium: pm,
                   };
+
                 });
               });
+
+              console.log('mappedPlans', mappedPlans);
 
             // 4️⃣ Sorting
             if (!this.selectedSort) {

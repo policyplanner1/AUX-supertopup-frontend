@@ -269,7 +269,7 @@ export class PAQuotesComponent implements OnInit {
 
                   insurerName: p.company,
                   otherDetails:
-                typeof p.otherDetails === 'string'
+                  typeof p.otherDetails === 'string'
                   ? JSON.parse(p.otherDetails)
                   : (p.otherDetails || {}),
 

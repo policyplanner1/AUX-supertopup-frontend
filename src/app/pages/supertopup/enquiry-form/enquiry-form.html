@@ -438,16 +438,15 @@
       </button>
 
       <button
-  type="button"
-  (click)="next()"
-  class="nav-btn"
-  [disabled]="!mobileVerifiedSignal() || !termsAcceptedSignal()"
->
-  Submit
-    </button>
-
-    </div>
-    </div>
+        type="button"
+        (click)="next()"
+        class="nav-btn"
+        [disabled]="!mobileVerifiedSignal() || !termsAcceptedSignal()"
+      >
+        Submit
+          </button>
+        </div>
+  </div>
 
     <!-- OTP Modal (4-digit) -->
     <div *ngIf="otpModalOpenSignal()" class="fixed inset-0 z-40 flex items-center justify-center">
