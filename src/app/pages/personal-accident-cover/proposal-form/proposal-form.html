@@ -76,7 +76,7 @@
 
         <div class="tw-field">
           <label>City <span class="tw-required">*</span></label>
-          <input class="tw-input tw-readonly" [value]="proposalData.cityState" readonly />
+          <input class="tw-input tw-readonly"  [(ngModel)]="proposalData.cityState" readonly />
           <div class="tw-error" *ngIf="fieldErrors.cityState as err">{{ err }}</div>
         </div>
       </div>

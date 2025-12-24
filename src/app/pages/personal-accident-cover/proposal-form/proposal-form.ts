@@ -27,7 +27,7 @@ interface ProposalData {
   dob: string;
   mobile: string;
 
-  cityState: '',
+  cityState: string;
 
   occupation: OccupationType | '';
   annualIncome: AnnualIncomeType | '';
@@ -59,6 +59,7 @@ export class PAProposalForm implements OnInit {
   private readonly ENQUIRY_KEY = 'pa_enquiry';
 
   proposalData: ProposalData = {
+
     productName: '',
     productType: 'new',
     pincode: '',
@@ -70,6 +71,7 @@ export class PAProposalForm implements OnInit {
 
     cityState: '',
 
+
     occupation: '',
     annualIncome: '',
 
@@ -80,6 +82,7 @@ export class PAProposalForm implements OnInit {
     ppdBase: false,
     ttdBase: false,
   };
+
 
   fieldErrors: FieldErrors = {};
   showCoverDropdown: boolean = false;
@@ -169,6 +172,10 @@ constructor(private api: PAService, private router: Router) {}
         const payload = JSON.parse(saved);
         const gender = payload?.gender || '';
         const details = payload?.details || {};
+
+        console.log('FULL enquiry payload:', payload);
+        console.log('DETAILS object:', details);
+        console.log('City from enquiry:', details.cityState);
 
        this.proposalData.proposerName = `${details.firstName || ''} ${details.lastName || ''}`.trim();
 
@@ -275,13 +282,13 @@ selectCoverAmount(val: string) {
     if (!this.proposalData.productName) this.fieldErrors.productName = 'Product name is required';
     if (!this.proposalData.productType) this.fieldErrors.productType = 'Select product type';
     if (!this.isPincodeValid(this.proposalData.pincode)) this.fieldErrors.pincode = 'Enter valid 6-digit pincode';
+    if (!this.isCityValid(this.proposalData.cityState)) this.fieldErrors.cityState = 'Enter valid city';
 
     if (!this.isSimpleName(this.proposalData.proposerName)) this.fieldErrors.proposerName = 'Enter valid name';
     if (!this.proposalData.gender) this.fieldErrors.gender = 'Gender is required';
     if (!this.isDateInputValid(this.proposalData.dob)) this.fieldErrors.dob = 'Select valid date of birth';
 
     if (!this.isPhoneValid(this.proposalData.mobile)) this.fieldErrors.mobile = 'Enter valid 10-digit mobile number';
-    if (!this.isCityValid(this.proposalData.cityState)) this.fieldErrors.cityState = 'Enter valid city';
 
     if (!this.proposalData.occupation) this.fieldErrors.occupation = 'Select occupation';
     if (!this.proposalData.annualIncome) this.fieldErrors.annualIncome = 'Select annual income';
@@ -333,9 +340,7 @@ selectCoverAmount(val: string) {
 
     // ✅ DB required columns
     plan_type: 'pa',
-    proposer_occupation_type: this.getOccupationText(this.proposalData.occupation), // Salaried / Self Employment / Income from Other Sources
     proposer_risk_category: this.activeRiskTab, // 1/2/3
-    proposer_risk_occupation: this.proposalData.designation, // Doctors/Drivers/...
 
 
     submittedAt: new Date().toISOString(),
@@ -599,3 +604,5 @@ selectCoverAmount(val: string) {
     }, 5000);
   }
 }
+
+

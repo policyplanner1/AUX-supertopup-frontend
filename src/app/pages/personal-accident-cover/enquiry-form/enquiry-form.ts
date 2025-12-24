@@ -289,27 +289,36 @@ export class PAEnquiryFormComponent {
     }
   }
 
-  private buildPayload() {
-  const details = this.basicForm.getRawValue();
+    private buildPayload() {
+      const raw = this.basicForm.getRawValue();
 
-  return {
-    step: 3,
-    gender: this.gender,
-    details: {
-      ...details,
+      return {
+        step: 3,
+        gender: this.gender,
+        details: {
+          firstName: raw.firstName,
+          lastName: raw.lastName,
+          dob: raw.dob,
+          mobile: raw.mobile,
+          pincode: raw.pincode,
 
-      selectedRiskCategory: this.selectedRiskCategory,
+          // ✅ MAP FIREBASE FIELD → PROPOSAL FIELD
+          cityState: raw.city,      // <-- THIS IS THE KEY FIX
 
-      activeRiskTab: this.activeRiskTab,
+          occupation: raw.occupation,
+          incomeRange: raw.incomeRange,
+          coverAmount: raw.coverAmount,
 
-      riskCategory: Number(this.activeRiskTab || 1),
+          selectedRiskCategory: this.selectedRiskCategory,
+          activeRiskTab: this.activeRiskTab,
+          riskCategory: Number(this.activeRiskTab || 1),
 
-      termsAccepted: this.termsAcceptedSignal(),
+          termsAccepted: this.termsAcceptedSignal(),
+        },
+        mobileVerified: this.mobileVerifiedSignal(),
+      };
+    }
 
-    },
-    mobileVerified: this.mobileVerifiedSignal(),
-  };
-}
 
 
   // ✅ Risk theme (same)
