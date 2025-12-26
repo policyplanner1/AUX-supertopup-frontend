@@ -144,155 +144,70 @@
   line-height: 1.1;
 }
 
+
 /* =========================
-   MOBILE: FULL COMPARE TABLE + HEADER
-   (Horizontal swipe + sticky left)
+   MOBILE: FULL TABLE SCROLL (INCLUDING LEFT COLUMN)
 ========================= */
 @media (max-width: 768px) {
-  /* Give space if needed because bottom bar exists */
-  #compareWrapper {
-    padding-bottom: 70px;
-  }
 
-  /* Smooth mobile horizontal scrolling */
+  /* Single horizontal scroll container */
   .cmp-table-wrapper {
     overflow-x: auto !important;
     overflow-y: auto !important;
-    white-space: nowrap !important;
     -webkit-overflow-scrolling: touch !important;
   }
 
-  /* Header row becomes inline-flex to allow swipe */
-  .cmp-top {
-    display: inline-flex !important;
-    width: auto !important;
-    min-width: 100% !important;
-  }
-
-  /* Body rows become inline-flex to match header */
+  /* Make header + body the SAME scrolling width */
+  .cmp-top,
   .cmp-row {
-    display: inline-flex !important;
-    width: auto !important;
-    min-width: 100% !important;
+    display: flex !important;
+    width: max-content !important;   /* 🔥 KEY */
   }
 
-  /* Force grid-template-columns not to interfere in mobile */
+  /* REMOVE grid behaviour on mobile */
   .cmp-top,
   .cmp-row {
     grid-template-columns: none !important;
   }
 
-  /* Sticky left summary/feature columns */
-  .cmp-features-col {
-    position: sticky;
-    left: 0;
-    z-index: 30;
-    min-width: 165px !important;
-    max-width: 165px !important;
-    background: #f1f7fb !important;
-    border-right: 1px solid #d7e1ea !important;
-    white-space: normal !important;
-  }
-
+  /* Left feature column scrolls WITH table */
+  .cmp-features-col,
   .cmp-feature-col {
-    position: sticky;
-    left: 0;
-    z-index: 25;
+    position: relative !important;   /* 🔥 remove sticky */
+    left: auto !important;
+    z-index: auto !important;
+
     min-width: 165px !important;
     max-width: 165px !important;
+    flex-shrink: 0 !important;
+
     background: #f8fafc !important;
     border-right: 1px solid #d7e1ea !important;
-    white-space: normal !important;
   }
 
-  .cmp-feature-name {
-    font-size: 13px !important;
-    line-height: 1.3 !important;
-    white-space: normal !important;
-    word-break: break-word !important;
-  }
-
-  /* Plan columns become swipeable cards */
-  .cmp-plan-col {
-    min-width: 260px !important;
-    max-width: 260px !important;
-    flex-shrink: 0 !important;
-    background: #fff !important;
-    border-right: 1px solid #eaeaea !important;
-    padding: 12px !important;
-    gap: 10px !important;
-    white-space: normal !important;
-  }
-
+  /* Plan columns */
+  .cmp-plan-col,
   .cmp-data-col {
     min-width: 260px !important;
     max-width: 260px !important;
     flex-shrink: 0 !important;
-    background: #fff !important;
-    border-right: 1px solid #eef2f5 !important;
-    padding: 12px !important;
-    text-align: center !important;
     white-space: normal !important;
-    word-break: break-word !important;
   }
 
-  /* Heart image smaller */
-  .cmp-heart-icon {
-    width: 70px !important;
-    height: 70px !important;
-  }
-
-  .cmp-features-title {
-    font-size: 12px !important;
-  }
-
-  /* Header bar tighter */
-  .cmp-screen__header {
-    padding: 10px !important;
-    font-size: 14px !important;
-  }
-
-  /* Logo sizes for mobile */
-  .cmp-logo-wrapper {
-    width: 72px;
-    height: 44px;
-  }
-
-  .cmp-company-logo {
-    width: 72px;
-    height: 44px;
-  }
-
-  /* Logo + title row spacing */
-  .cmp-logo-name-row {
-    align-items: flex-start !important;
-    gap: 10px !important;
-  }
-
-  .cmp-company-name {
-    font-size: 14px !important;
-    line-height: 1.2 !important;
-    white-space: normal !important;
-    word-break: break-word !important;
-  }
-
-  .cmp-product-name {
-    font-size: 12px !important;
-    line-height: 1.2 !important;
-    white-space: normal !important;
-    word-break: break-word !important;
-  }
-
-  /* ✅ Make Cover/Deductible "one after one" (stacked) */
   .cmp-metrics {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 8px !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;   /* 2 columns */
+    gap: 10px !important;
     margin-top: 6px !important;
   }
 
+  /* Make Add-on go full width & center */
+  .cmp-metric:nth-child(3) {
+    grid-column: 1 / -1;              /* 🔥 full row */
+    text-align: center !important;
+  }
+
   .cmp-metric {
-    text-align: left !important;
     padding: 8px 6px !important;
     border-top: 1px dashed #eef2f5 !important;
   }
@@ -305,15 +220,8 @@
     font-size: 15px !important;
     margin-top: 2px !important;
   }
-
-  /* Buy button full width */
-  .cmp-buy-now-btn {
-    width: 100% !important;
-    font-size: 12px !important;
-    padding: 8px 10px !important;
-    min-height: 32px !important;
-  }
 }
+
 
 /* =========================
    BOTTOM COMPARE BAR – MOBILE RESPONSIVE
@@ -372,7 +280,7 @@
   .cmp-screen__header > button {
     order: 1 !important;
     width: 100% !important;
-text-align: center !important;
+    text-align: left !important;
     font-size: 14px !important;
     padding: 0 !important;
   }
@@ -402,5 +310,30 @@ text-align: center !important;
     min-width: 100% !important;
     height: 42px !important;
     justify-content: center !important;
+  }
+}
+@media (max-width: 768px) {
+
+  .cmp-logo-name-row {
+    min-height: 76px !important; /* KEY FIX */
+    align-items: flex-start !important;
+  }
+
+  /* Ensure text wrapping doesn’t push height */
+  .cmp-company-name {
+    line-height: 1.15 !important;
+    max-height: 34px;
+    overflow: hidden;
+  }
+
+  .cmp-product-name {
+    line-height: 1.1 !important;
+    max-height: 28px;
+    overflow: hidden;
+  }
+
+  /* Make metrics start at SAME vertical point */
+  .cmp-metrics {
+    margin-top: 6px !important;
   }
 }

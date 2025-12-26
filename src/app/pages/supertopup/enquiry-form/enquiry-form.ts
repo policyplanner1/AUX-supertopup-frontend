@@ -1,5 +1,7 @@
 import { Component, HostListener, signal, computed, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Location } from '@angular/common';
+
 import {
   FormsModule,
   ReactiveFormsModule,
@@ -86,7 +88,8 @@ export class EnquiryForm {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private myApiService: SuperTopupService
+    private myApiService: SuperTopupService,
+    private location: Location
   ) {
     this.basicForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.maxLength(20), Validators.pattern(/^[A-Za-z ]+$/)]],
@@ -98,7 +101,26 @@ export class EnquiryForm {
     });
   }
 
+@HostListener('window:popstate', ['$event'])
+onBrowserBack(event: PopStateEvent) {
+  event.preventDefault();
+
+  // Same logic as clicking back icon
+  if (this.step > 1) {
+    this.step--;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Push state back so browser doesn't exit
+    history.pushState(null, '', location.href);
+  } else {
+    // Step 1 → landing page (same as goBack)
+    window.location.href = this.LANDING_URL;
+  }
+}
+
   ngOnInit(): void {
+  history.pushState(null, '', location.href);
+
     // fill ages
     if (this.adultAges.length === 0) {
       for (let a = 18; a <= 100; a++) this.adultAges.push(a);

@@ -150,7 +150,7 @@
 
             <!-- LEFT SECTION -->
             <div class="w-full md:w-[32%] p-3 md:p-6">
-              <img [src]="p.logo" class="h-12 mb-3" />
+              <img [src]="p.logo" class="h-18 mb-3" />
               <h3 class="text-lg font-semibold text-gray-800">{{ p.name }}</h3>
 
               <div class="mt-2 md:mt-3">
@@ -218,7 +218,7 @@
                 Download Brochure
                 <img class="w-4 h-4" src="assets/quote/download.svg" alt="" />
               </a>
-              
+
                <a *ngIf="p.onePager" [href]="p.onePager" download target="_blank"
                 class="mt-3 md:mt-4 text-sm text-[#006D8D] flex items-center justify-center gap-1">
                 One Pager
@@ -314,10 +314,10 @@
     <div class="flex gap-3 items-center flex-1 overflow-x-auto py-1 no-scrollbar">
       <!-- Selected plans -->
       <div
-        class="flex items-center gap-3 px-4 py-3 border-2 border-slate-200 rounded-xl bg-white flex-shrink-0 min-w-[180px] hover:border-[#0b5cff] hover:shadow"
+        class="flex items-center gap-2 px-4 py-3 border-2 border-slate-200 rounded-xl bg-white flex-shrink-0 min-w-[180px] hover:border-[#0b5cff] hover:shadow"
         *ngFor="let p of compare; trackBy: trackByPlanId">
           <img [src]="p.logo" [alt]="p.insurerName"
-          class="w-10 h-10 object-contain rounded-md" />
+          class="h-15 object-contain rounded-md" />
         <div class="flex-1 min-w-0">
           <p class="text-sm font-semibold text-slate-900 truncate">{{ p.insurerName }}</p>
           <p class="text-xs text-slate-500 truncate">{{ p.productName }}</p>
@@ -357,12 +357,23 @@
      FULL-SCREEN COMPARISON
 =========================== -->
 <div *ngIf="isCompareOpen" id="compareWrapper" class="fixed inset-0 z-[1400] flex flex-col bg-white overflow-hidden">
-  <!-- HEADER -->
-  <div class="cmp-screen__header flex items-center bg-white border-b border-slate-200 px-4 py-3 flex-shrink-0">
-    <button type="button" class="bg-transparent border-0 text-[#006d8d] font-semibold text-[15px] cursor-pointer"
-      (click)="closeCompare()">
-      ← Back to list
+      <div class="cmp-screen__header flex items-center bg-white border-b border-slate-200 px-4 py-3 flex-shrink-0">
+        <button
+      type="button"
+      (click)="closeCompare()"
+      class="flex items-center mr-1 flex-shrink-0 group"
+      aria-label="Go back"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg"
+          class="w-5 h-5 text-[#006D8D] group-hover:text-[#004b60] transition"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6" />
+      </svg>
     </button>
+
 
     <div class="flex-1 text-center font-bold text-[16px] text-[#222]">
       Compare Plans

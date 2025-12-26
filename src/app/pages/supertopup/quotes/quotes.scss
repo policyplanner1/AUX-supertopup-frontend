@@ -164,16 +164,14 @@
 
   /* Header row becomes inline-flex to allow swipe */
   .cmp-top {
-    display: inline-flex !important;
-    width: auto !important;
-    min-width: 100% !important;
+    display: flex !important;
+    width: max-content !important;
   }
 
   /* Body rows become inline-flex to match header */
   .cmp-row {
-    display: inline-flex !important;
-    width: auto !important;
-    min-width: 100% !important;
+    display: flex !important;
+    width: max-content !important;
   }
 
   /* Force grid-template-columns not to interfere in mobile */
@@ -184,25 +182,29 @@
 
   /* Sticky left summary/feature columns */
   .cmp-features-col {
-    position: sticky;
-    left: 0;
-    z-index: 30;
+    position: relative !important;
+    left: auto !important;
+    z-index: auto !important;
+
     min-width: 165px !important;
     max-width: 165px !important;
-    background: #f1f7fb !important;
+    flex-shrink: 0 !important;
+
+    background: #f8fafc !important;
     border-right: 1px solid #d7e1ea !important;
-    white-space: normal !important;
   }
 
   .cmp-feature-col {
-    position: sticky;
-    left: 0;
-    z-index: 25;
+     position: relative !important;
+    left: auto !important;
+    z-index: auto !important;
+
     min-width: 165px !important;
     max-width: 165px !important;
+    flex-shrink: 0 !important;
+
     background: #f8fafc !important;
     border-right: 1px solid #d7e1ea !important;
-    white-space: normal !important;
   }
 
   .cmp-feature-name {
@@ -285,24 +287,24 @@
 
   /* ✅ Make Cover/Deductible "one after one" (stacked) */
   .cmp-metrics {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 8px !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
     margin-top: 6px !important;
   }
 
   .cmp-metric {
-    text-align: left !important;
-    padding: 8px 6px !important;
-    border-top: 1px dashed #eef2f5 !important;
+    text-align: center !important;
+    padding: 6px 4px !important;
+
   }
 
   .cmp-metric-label {
-    font-size: 12px !important;
+    font-size: 11px !important;
   }
 
   .cmp-metric-value {
-    font-size: 15px !important;
+    font-size: 14px !important;
     margin-top: 2px !important;
   }
 
@@ -402,5 +404,59 @@ text-align: center !important;
     min-width: 100% !important;
     height: 42px !important;
     justify-content: center !important;
+  }
+}
+
+/* =========================
+   MOBILE: BOTTOM COMPARE BAR CHIP FIX
+========================= */
+@media (max-width: 768px) {
+
+  /* Compact compare chip */
+  .fixed.left-0.right-0.bottom-0 .no-scrollbar > div {
+    min-width: 190px !important;
+    padding: 8px 10px !important;
+    gap: 8px !important;
+  }
+
+  /* Logo size tighter */
+  .fixed.left-0.right-0.bottom-0 img {
+    width: 48px !important;
+    height: 28px !important;
+    object-fit: contain !important;
+  }
+
+  /* Text tighter */
+  .fixed.left-0.right-0.bottom-0 p.text-sm {
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+  }
+
+  .fixed.left-0.right-0.bottom-0 p.text-xs {
+    font-size: 11px !important;
+    line-height: 1.1 !important;
+  }
+
+  /* Close button perfectly centered */
+  .fixed.left-0.right-0.bottom-0 button.w-6 {
+    width: 22px !important;
+    height: 22px !important;
+    line-height: 22px !important;
+    font-size: 12px !important;
+  }
+}
+/* =========================
+   MOBILE FIX: SPACE BETWEEN METRICS & BUY NOW (MAIN QUOTE CARD)
+========================= */
+@media (max-width: 768px) {
+
+  /* Disable justify-between only on mobile */
+  .quote-card-cta {
+    justify-content: flex-start !important;
+  }
+
+  /* Add real spacing above Buy Now */
+  .quote-card-cta button {
+    margin-top: 16px !important;
   }
 }

@@ -1,5 +1,8 @@
 import { Component, signal, computed, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Location } from '@angular/common';
+import { HostListener } from '@angular/core';
+
 import {
   FormsModule,
   ReactiveFormsModule,
@@ -24,6 +27,8 @@ import { firstValueFrom } from 'rxjs';
   styleUrls: ['./enquiry-form.scss'],
   imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
 })
+
+
 export class PAEnquiryFormComponent {
   step = 1;
 
@@ -91,7 +96,9 @@ export class PAEnquiryFormComponent {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private paService: PAService
+    private paService: PAService,
+    private location: Location   // ✅ ADD
+
   ) {
     this.basicForm = this.fb.group({
       // Step 2
@@ -111,7 +118,25 @@ export class PAEnquiryFormComponent {
     this.applyGenderIcons();
   }
 
+  @HostListener('window:popstate', ['$event'])
+onBrowserBack(event: PopStateEvent) {
+  event.preventDefault();
+
+  if (this.step > 1) {
+    this.step--;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // ⛔ prevent actual page exit
+    history.pushState(null, '', location.href);
+  } else {
+    // Step 1 → landing (same as goBack)
+    window.location.href = this.LANDING_URL;
+  }
+}
+
   ngOnInit(): void {
+    history.pushState(null, '', location.href);
+
     // ✅ Detect refresh on this page only -> clear everything
     const lastPage = sessionStorage.getItem(this.PAGE_KEY);
     sessionStorage.setItem(this.PAGE_KEY, this.PAGE_NAME);
