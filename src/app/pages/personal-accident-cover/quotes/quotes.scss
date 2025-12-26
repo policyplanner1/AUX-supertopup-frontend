@@ -337,3 +337,23 @@
     margin-top: 6px !important;
   }
 }
+
+/* =========================
+   DESKTOP FIX: Center Add-on Premium
+========================= */
+@media (min-width: 769px) {
+  .cmp-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* Add-on Premium centered below */
+  .cmp-metric:nth-child(3) {
+    grid-column: 1 / -1;   /* span both columns */
+    justify-self: center; /* TRUE center */
+    text-align: center;
+    width: fit-content;   /* prevents full-width stretch */
+    min-width: 160px;     /* keeps visual balance */
+  }
+}
