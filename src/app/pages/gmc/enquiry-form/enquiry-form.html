@@ -1,0 +1,244 @@
+<div
+  class="w-full flex justify-center px-3 sm:px-6 py-6 sm:py-10 bg-[#F5FAFC]"
+>
+  <div
+    class="w-full max-w-5xl bg-white rounded-2xl shadow-lg px-4 sm:px-10 py-6 sm:py-10"
+  >
+  <!-- Back Arrow -->
+<button
+  type="button"
+  (click)="goBack()"
+  class="flex items-center mb-4 group"
+  aria-label="Go back"
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    class="w-5 h-5 text-[#006D8D] group-hover:text-[#004b60] transition"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    stroke-width="2"
+  >
+    <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6" />
+  </svg>
+</button>
+
+    <h2 class="text-center text-xl font-semibold text-[#006D8D] mb-8">
+      Group Medical Care Enquiry
+    </h2>
+
+    <form [formGroup]="enquiryForm" (ngSubmit)="submit()" novalidate>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Company Name -->
+        <div>
+          <label class="pp-label"
+            >Company Name <span class="text-red-600">*</span></label
+          >
+          <input
+            formControlName="companyName"
+            type="text"
+            class="pp-input"
+            placeholder="Enter company name"
+          />
+          <p *ngIf="isInvalid('companyName')" class="pp-error">
+            Enter valid company name
+          </p>
+        </div>
+
+        <!-- Contact Person -->
+        <div>
+          <label class="pp-label"
+            >Contact Person <span class="text-red-600">*</span></label
+          >
+          <select formControlName="contactPerson" class="pp-select">
+            <option value="" disabled>Select contact role</option>
+            <option value="HR">HR</option>
+            <option value="Owner">Owner</option>
+            <option value="Admin">Admin</option>
+            <!-- <option value="Other">Other</option> -->
+          </select>
+          <p *ngIf="isInvalid('contactPerson')" class="pp-error">
+            Please select contact person
+          </p>
+        </div>
+
+        <!-- Contact Number -->
+        <div>
+          <label class="pp-label"
+            >Contact Number <span class="text-red-600">*</span></label
+          >
+          <input
+          formControlName="contactNumber"
+          type="text"
+          class="pp-input"
+          maxlength="10"
+          placeholder="Enter contact number"
+          (keypress)="allowOnlyNumbers($event)"
+        />
+
+          <p *ngIf="isInvalid('contactNumber')" class="pp-error">
+            Enter valid 10-digit number
+          </p>
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label class="pp-label"
+            >Email ID <span class="text-red-600">*</span></label
+          >
+          <input
+            formControlName="email"
+            type="email"
+            class="pp-input"
+            placeholder="Enter email address"
+          />
+        <p *ngIf="isInvalid('email')" class="pp-error">
+          Enter valid email (example: name@company.com)
+        </p>
+
+      </div>
+
+        <!-- Company Size -->
+        <div>
+          <label class="pp-label"
+            >Company Size <span class="text-red-600">*</span></label
+          >
+          <select formControlName="companySize" class="pp-select">
+            <option value="" disabled>Select size</option>
+            <option value="1-50">1–50 employees</option>
+            <option value="51-200">51–200 employees</option>
+            <option value="201-500">201–500 employees</option>
+            <option value="501-1000">501–1000 employees</option>
+            <option value="1001+">1001+ employees</option>
+          </select>
+          <p *ngIf="isInvalid('companySize')" class="pp-error">
+            Please select company size
+          </p>
+        </div>
+
+        <!-- Industry Type -->
+        <div>
+          <label class="pp-label"
+            >Type of Industry <span class="text-red-600">*</span></label
+          >
+          <input
+            formControlName="industryType"
+            type="text"
+            class="pp-input"
+            placeholder="e.g. IT, Manufacturing"
+          />
+          <p *ngIf="isInvalid('industryType')" class="pp-error">
+            Enter industry type
+          </p>
+        </div>
+
+        <!-- City -->
+        <div>
+          <label class="pp-label"
+            >City <span class="text-red-600">*</span></label
+          >
+          <input
+          formControlName="city"
+          type="text"
+          class="pp-input"
+          placeholder="Enter city"
+          (keypress)="allowOnlyLetters($event)"
+        />
+
+          <p *ngIf="isInvalid('city')" class="pp-error">Enter valid city</p>
+        </div>
+
+
+        <!-- Coverage Amount -->
+        <div>
+          <label class="pp-label"
+            >Coverage Amount <span class="text-red-600">*</span></label
+          >
+          <select formControlName="coverageAmount" class="pp-select">
+            <option value="" disabled>Select coverage amount</option>
+              <option value="1000000">10 Lakh</option>
+              <option value="1500000">15 Lakh</option>
+              <option value="2000000">20 Lakh</option>
+              <option value="2500000">25 Lakh</option>
+              <option value="3000000">30 Lakh</option>
+              <option value="3500000">35 Lakh</option>
+              <option value="5000000">50 Lakh</option>
+              <option value="7500000">75 Lakh</option>
+              <option value="10000000">1 Crore</option>
+              <option value="20000000">2 Crore</option>
+              <option value="30000000">3 Crore</option>
+              <option value="40000000">4 Crore</option>
+              <option value="50000000">5 Crore</option>
+          </select>
+          <p *ngIf="isInvalid('coverageAmount')" class="pp-error">
+            Please select coverage amount
+          </p>
+        </div>
+
+        <!-- Demography -->
+        <div>
+          <label class="pp-label"
+            >Demography <span class="text-red-600">*</span></label
+          >
+          <select formControlName="demography" class="pp-select">
+            <option value="" disabled>Select demography</option>
+            <option value="employee">Only Employee</option>
+            <option value="employee+spouse">Employee + Spouse</option>
+            <option value="spouse+2kids"
+              >Employee + Spouse + 2 Kids</option
+            >
+            <option value="withParents"
+              >Employee + Spouse + 2 Kids + Parents</option
+            >
+          </select>
+          <p *ngIf="isInvalid('demography')" class="pp-error">
+            Please select demography
+          </p>
+        </div>
+
+
+      </div>
+
+      <!-- Terms and Submit -->
+      <div class="flex items-start gap-2 mt-8">
+        <input
+          type="checkbox"
+          id="terms"
+          class="mt-1 accent-[#006D8D]"
+          [checked]="termsAcceptedSignal()"
+          (change)="termsAcceptedSignal.set($any($event.target).checked)"
+        />
+        <label
+          for="terms"
+          class="text-xs sm:text-sm text-gray-600 leading-relaxed cursor-pointer"
+        >
+          I agree to the
+          <a
+            href="https://policyplanner.com/#/terms"
+            target="_blank"
+            class="text-[#006D8D] underline"
+            >Terms & Conditions</a
+          >
+          and
+          <a
+            href="https://policyplanner.com/#/privacy"
+            target="_blank"
+            class="text-[#006D8D] underline"
+            >Privacy Policy</a
+          >.
+        </label>
+      </div>
+
+      <div class="flex justify-end mt-6">
+        <button
+          type="submit"
+          class="pp-btn-primary"
+          (click)= "submit()"
+          [disabled]="!termsAcceptedSignal()"
+        >
+        Get Quotes
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

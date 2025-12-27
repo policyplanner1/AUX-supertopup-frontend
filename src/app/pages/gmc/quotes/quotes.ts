@@ -27,7 +27,7 @@ type PlanPayload = {
   templateUrl: './quotes.html',
   styleUrl: './quotes.scss',
 })
-export class PAQuotesComponent implements OnInit {
+export class GMCQuotesComponent implements OnInit {
 
     // ✅ SAME AS SUPERTOPUP (PA keys)
   private readonly ENQUIRY_KEY = 'pa_enquiry';
@@ -450,7 +450,7 @@ private calcAgeFromDob(dob: any): number {
   goBack() {
     localStorage.setItem(this.RESTORE_FLAG, '1');
 
-    this.router.navigate(['/personal-accident/enquiry-form'], {
+    this.router.navigate(['/gmc/enquiry-form'], {
       queryParams: { step: 3 },
       queryParamsHandling: 'merge',
     });

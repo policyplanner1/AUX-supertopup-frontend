@@ -8,7 +8,9 @@ import { NotFound } from './pages/not-found/not-found';
 import { PAEnquiryFormComponent } from './pages/personal-accident-cover/enquiry-form/enquiry-form';
 import { PAQuotesComponent } from './pages/personal-accident-cover/quotes/quotes';
 import { PAProposalForm } from './pages/personal-accident-cover/proposal-form/proposal-form';
-
+import { PAallFeatures } from './pages/personal-accident-cover/all-features/all-features';
+import { GMCEnquiryFormComponent } from './pages/gmc/enquiry-form/enquiry-form';
+import { GMCQuotesComponent } from './pages/gmc/quotes/quotes';
 
 export const routes: Routes = [
   {
@@ -25,9 +27,18 @@ export const routes: Routes = [
     path:'personal-accident',
     children: [
       { path: 'enquiry-form', component: PAEnquiryFormComponent },
+      { path: 'all-features', component: PAallFeatures},
       { path: 'quotes', component: PAQuotesComponent },
       { path: '', redirectTo: 'enquiry-form', pathMatch: 'full' },
       { path: 'proposal-form', component: PAProposalForm }
+
+    ]
+  },
+  {
+    path:'gmc',
+    children: [
+      { path: 'enquiry-form', component: GMCEnquiryFormComponent },
+      { path: 'quotes', component: GMCQuotesComponent },
 
     ]
   },

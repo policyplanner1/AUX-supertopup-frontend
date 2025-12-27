@@ -19,7 +19,7 @@ type PlanPayload = {
 
 @Component({
   selector: 'app-quotes',
-  standalone: true, // <-- ADD THIS
+  standalone: true, 
 
   imports: [CommonModule],
   templateUrl: './quotes.html',
