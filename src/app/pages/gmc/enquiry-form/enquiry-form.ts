@@ -226,6 +226,9 @@ allowOnlyNumbers(event: KeyboardEvent) {
 
     /* 1️⃣ Save to localStorage (PA style) */
     const payload = this.buildPayload();
+    console.log('🧾 GMC FORM RAW VALUE:', this.enquiryForm.getRawValue());
+    console.log('🧾 GMC PAYLOAD (LOCAL + FIREBASE):', payload);
+
     localStorage.setItem(this.ENQUIRY_KEY, JSON.stringify(payload));
 
     /* allow restore when coming back from quotes */
@@ -249,11 +252,15 @@ allowOnlyNumbers(event: KeyboardEvent) {
       // identifiers
       lead_type: 'group-medical-care',
       plan_type: 'gmc',
+      source: 'sat-web',
+
       created_at: new Date().toISOString(),
     };
 
+      console.log('🔥 GMC FIREBASE PAYLOAD:', leadDoc);
+
     try {
-      await addDoc(collection(db, 'GMC_enquiry_leads'), leadDoc);
+      await addDoc(collection(db, 'AUX_enquiry_leads'), leadDoc);
       console.log('🔥 GMC Lead saved successfully');
     } catch (err) {
       console.error('❌ GMC Firebase save error', err);
