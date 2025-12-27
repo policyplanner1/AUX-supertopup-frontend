@@ -216,86 +216,103 @@ export class PAQuotesComponent implements OnInit {
   /* -------------------- Fetch + Map all plans -------------------- */
 
   fetchAllPlans(payload: any) {
-    this.api.getHealthPlanEndpoints().subscribe({
-      next: (response) => {
-        const apiList = response?.data?.map((item: any) => item.api_type) || [];
+  this.api.getHealthPlanEndpoints().subscribe({
+    next: (response) => {
+      const apiList = response?.data?.map((item: any) => item.api_type) || [];
 
-        this.api.callAllPremiumApis(apiList, payload).subscribe({
-          next: (resArray) => {
-            const insurerNames: string[] = [];
-            resArray.forEach((res: any) => {
-              if (res?.company) insurerNames.push(res.company.trim());
+      this.api.callAllPremiumApis(apiList, payload).subscribe({
+        next: (resArray) => {
+          const insurerNames: string[] = [];
+          resArray.forEach((res: any) => {
+            if (res?.company) insurerNames.push(res.company.trim());
+          });
+          this.insurerList.set(Array.from(new Set(insurerNames)).sort());
+
+          const mappedPlans = resArray
+            .filter((res: any) => res && res.plan)
+            .flatMap((p: any) => {
+              if (this.selectedInsurer !== null) {
+                if (p.company !== this.selectedInsurer) return [];
+              }
+
+              const coverAmountNum = Number(p.coverAmount) || 0;
+              const baseNum = Number(p.base ?? 0) || 0;
+              const addonNum = Number(p.addon ?? 0) || 0;
+
+              // ✅ keep your otherDetails same, just make it safe (optional but recommended)
+              const otherDetailsObj =
+                typeof p.otherDetails === 'string'
+                  ? (() => {
+                      try { return JSON.parse(p.otherDetails); } catch { return {}; }
+                    })()
+                  : (p.otherDetails || {});
+
+              return {
+                uniqueId: crypto.randomUUID(),
+
+                logo: `assets/quote/${p.logoUrl}`,
+                name: p.plan,
+                tag: p.company,
+                cover: `₹ ${this.formatIndianCurrency(coverAmountNum)}`,
+                base: `₹ ${this.formatIndianCurrency(baseNum)}`,
+                addon: `₹ ${this.formatIndianCurrency(addonNum)}`,
+
+                features: Array.isArray(p.features) && p.features.length
+                  ? p.features
+                      .map((f: any) => (typeof f === 'string' ? f : f?.includes || ''))
+                      .filter(Boolean)
+                  : ['No Key Features Available'],
+
+                brochure: p.brochureUrl || null,
+                onePager: p.onePagerUrl || null,
+
+                planId: p.planId || `${p.plan}`,
+                coverAmountNumber: coverAmountNum,
+
+                priceNumber: baseNum,
+                baseNumber: baseNum,
+                addonNumber: addonNum,
+
+                insurerName: p.company,
+
+                otherDetails: otherDetailsObj,
+
+                // ✅ ADD THESE TWO LINES RIGHT HERE (this fixes goToAllFeatures crash)
+                fullPlan: {
+                  ...p,
+                  coverAmount: coverAmountNum,
+                  base: baseNum,
+                  addon: addonNum,
+                  otherDetails: otherDetailsObj,
+                },
+
+                fullPremium: {
+                  premium: baseNum,     // goToAllFeatures reads fullPremium.premium
+                  discount: 0,
+                  base: baseNum,
+                  addon: addonNum,
+                },
+              };
             });
-            this.insurerList.set(Array.from(new Set(insurerNames)).sort());
 
-            const mappedPlans = resArray
-              .filter((res: any) => res && res.plan)
-              .flatMap((p: any) => {
-                if (this.selectedInsurer !== null) {
-                  if (p.company !== this.selectedInsurer) return [];
-                }
+          if (!this.selectedSort) this.selectedSort = 'low';
 
-                const coverAmountNum = Number(p.coverAmount) || 0;
-                const baseNum = Number(p.base ?? 0) || 0;
-                const addonNum = Number(p.addon ?? 0) || 0;
+          if (this.selectedSort === 'low') {
+            mappedPlans.sort((a: any, b: any) => a.priceNumber - b.priceNumber);
+          } else if (this.selectedSort === 'high') {
+            mappedPlans.sort((a: any, b: any) => b.priceNumber - a.priceNumber);
+          }
 
-                return {
-                  uniqueId: crypto.randomUUID(),
+          console.log('🔥 SORTED PA Plans:', mappedPlans);
+          this.plans.set(mappedPlans);
+        },
+        error: (err) => console.error('Error calling premium APIs:', err),
+      });
+    },
+    error: (err) => console.error('Error fetching endpoints:', err),
+  });
+}
 
-                  logo: `assets/quote/${p.logoUrl}`,
-                  name: p.plan,
-                  tag: p.company,
-                  cover: `₹ ${this.formatIndianCurrency(coverAmountNum)}`,
-                  base: `₹ ${this.formatIndianCurrency(baseNum)}`,
-                  addon: `₹ ${this.formatIndianCurrency(addonNum)}`,
-
-                  features: Array.isArray(p.features) && p.features.length
-                    ? p.features
-                        .map((f: any) => (typeof f === 'string' ? f : f?.includes || ''))
-                        .filter(Boolean)
-                    : ['No Key Features Available'],
-
-                  brochure: p.brochureUrl || null,
-                  onePager: p.onePagerUrl || null,
-
-                  // Compare helpers
-                  planId: p.planId || `${p.plan}`,
-                  coverAmountNumber: coverAmountNum,
-
-                  // ✅ IMPORTANT: use base as "price" for sorting + compare label
-                  priceNumber: baseNum,
-                  baseNumber: baseNum,
-                  addonNumber: addonNum,
-
-                  insurerName: p.company,
-                  otherDetails:
-                  typeof p.otherDetails === 'string'
-                  ? JSON.parse(p.otherDetails)
-                  : (p.otherDetails || {}),
-
-
-                };
-              });
-
-            // ✅ same default sorting behavior
-            if (!this.selectedSort) this.selectedSort = 'low';
-
-            if (this.selectedSort === 'low') {
-              mappedPlans.sort((a: any, b: any) => a.priceNumber - b.priceNumber);
-            } else if (this.selectedSort === 'high') {
-              mappedPlans.sort((a: any, b: any) => b.priceNumber - a.priceNumber);
-            }
-
-            console.log('🔥 SORTED PA Plans:', mappedPlans);
-
-            this.plans.set(mappedPlans);
-          },
-          error: (err) => console.error('Error calling premium APIs:', err),
-        });
-      },
-      error: (err) => console.error('Error fetching endpoints:', err),
-    });
-  }
 
 
 
@@ -466,19 +483,21 @@ private calcAgeFromDob(dob: any): number {
   //   window.open(url, '_blank');
   // }
   goToAllFeatures(plan: any) {
+
+    console.log("➡️ Navigating to PA All Features with plan (raw):", plan);
     const combined = {
-      ...plan.fullPlan,
-      premiums: [plan.fullPremium],
+      // ...plan.fullPlan,
+      // premiums: [plan.fullPremium],
 
       totalBasePremium: Number(plan.fullPremium.premium) || 0,
       totalDiscount: Number(plan.fullPremium.discount) || 0,
       totalPayablePremium: Number(plan.fullPremium.premium) || 0,
 
-      base: Number(plan.fullPremium.base ?? plan.fullPlan.base ?? 0) || 0,
-      addon: Number(plan.fullPremium.addon ?? plan.fullPlan.addon ?? 0) || 0,
-      coverAmount: plan.fullPlan.coverAmount,
+      base: Number(plan.base ?? plan.fullPlan.base ?? 0) || 0,
+      addon: Number(plan.addon ?? plan.fullPlan.addon ?? 0) || 0,
+      // coverAmount: plan.coverAmount,
     };
-
+console.log("➡️ Navigating to PA All Features with plan:", combined);
     this.router.navigate(['personal-accident/all-features'], {
       state: { selectedPlan: combined }
     });

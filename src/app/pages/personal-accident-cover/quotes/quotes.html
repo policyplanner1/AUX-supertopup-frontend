@@ -173,7 +173,7 @@
                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   </span>
-                  {{ f }}
+              {{ (f?.length > 50) ? (f | slice:0:50) + '...' : f }}
                 </li>
               </ul>
 
