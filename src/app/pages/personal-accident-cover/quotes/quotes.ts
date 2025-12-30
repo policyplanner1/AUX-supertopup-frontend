@@ -486,7 +486,7 @@ private calcAgeFromDob(dob: any): number {
 
     console.log("➡️ Navigating to PA All Features with plan (raw):", plan);
     const combined = {
-      // ...plan.fullPlan,
+      ...plan.fullPlan,
       // premiums: [plan.fullPremium],
 
       totalBasePremium: Number(plan.fullPremium.premium) || 0,
@@ -495,7 +495,7 @@ private calcAgeFromDob(dob: any): number {
 
       base: Number(plan.base ?? plan.fullPlan.base ?? 0) || 0,
       addon: Number(plan.addon ?? plan.fullPlan.addon ?? 0) || 0,
-      // coverAmount: plan.coverAmount,
+      coverAmount: plan.coverAmount,
     };
 console.log("➡️ Navigating to PA All Features with plan:", combined);
     this.router.navigate(['personal-accident/all-features'], {

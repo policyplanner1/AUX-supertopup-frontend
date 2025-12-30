@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { forkJoin, from } from 'rxjs';
+import { forkJoin, of, Observable, from } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { db } from '../../firebaseConfig';
-import { addDoc, collection } from 'firebase/firestore';
+import { collection, addDoc } from 'firebase/firestore';
 
 @Injectable({ providedIn: 'root' })
 export class GMCService {
@@ -11,33 +12,37 @@ export class GMCService {
 
   constructor(private http: HttpClient) {}
 
-  /* -----------------------------
-     GMC QUOTE ENDPOINTS (future)
-  ----------------------------- */
-  getGmcPlanEndpoints() {
-    return this.http.get(`${this.baseUrl}/companies/plans?policy=gmc`);
+  getGMCEndpoints(): Observable<any> {
+    const url = `${this.baseUrl}/companies/plans?policy=gmc`;
+    return this.http.get(url);
   }
 
-  /* -----------------------------
-     SAVE GMC ENQUIRY (PA STYLE)
-  ----------------------------- */
-  saveGmcEnquiry(payload: any) {
-    console.log('📤 GMC SERVICE PAYLOAD:', payload);
+  callAllPremiumApis(apiList: string[], payload: any) {
+    const requests = apiList.map(api =>
+      this.http.post(`${api}`, payload).pipe(
+        catchError(err => {
+          console.warn(`⚠️ Skipping failed API: ${api}`, err?.message || err);
+          return of(null);
+        })
+      )
+    );
+    return forkJoin(requests);
+  }
+
+  saveGMCProposal(payload: any) {
+    const apiCall = this.http.post(`${this.baseUrl}/proposals/save`, payload);
 
     const firebasePayload = {
       ...payload,
-      lead_type: 'gmc',
-      plan_type: 'gmc',
-      source: 'sat-web',
+      lead_type: "gmc", // ✅
       createdAt: new Date().toISOString(),
     };
 
-    const firebaseCall = from(
-      addDoc(collection(db, 'AUX_enquiry_leads'), firebasePayload)
-    );
+    const firebaseCall = from(addDoc(collection(db, 'AUX_leads'), firebasePayload));
 
     return forkJoin({
-      firebase: firebaseCall,
+      api: apiCall,
+      firebase: firebaseCall
     });
   }
 }

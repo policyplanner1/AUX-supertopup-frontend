@@ -6,17 +6,14 @@ import { toPng } from "html-to-image";
 import jsPDF from 'jspdf';
 import { toCanvas } from 'html-to-image';
 import { NgZone, ChangeDetectorRef } from '@angular/core';
+import { GMCService } from '../../../services/gmc.service';
 
 // Define the payload type OUTSIDE the class
 type PlanPayload = {
   coverAmount: number;
-  category: number;
   age: number;
-  sage: number | null;
-  c1age: number | null;
-  c2age: number | null;
-  c3age: number | null;
-  c4age: number | null;
+  noOfAdults?: number;
+  noOfChildren?: number;
 };
 
 @Component({
@@ -29,10 +26,10 @@ type PlanPayload = {
 })
 export class GMCQuotesComponent implements OnInit {
 
-    // ✅ SAME AS SUPERTOPUP (PA keys)
-  private readonly ENQUIRY_KEY = 'pa_enquiry';
-  private readonly RESTORE_FLAG = 'pa_enquiry_restore_ok';
-  private readonly PAGE_KEY = 'pa_last_page';
+  // ✅ SAME AS SUPERTOPUP (PA keys)
+  private readonly ENQUIRY_KEY = 'gmc_enquiry';
+  private readonly RESTORE_FLAG = 'gmc_enquiry_restore_ok';
+  private readonly PAGE_KEY = 'gmc_last_page';
 
   results: any[] = [];
   age: number | null = null;
@@ -62,12 +59,12 @@ export class GMCQuotesComponent implements OnInit {
   adultCount: number | null = null;
   childCount: number | null = null;
 
-  constructor(private router: Router, private api: PAService, private zone: NgZone,
-  private cdr: ChangeDetectorRef) { }
+  constructor(private router: Router, private api: GMCService, private zone: NgZone,
+    private cdr: ChangeDetectorRef) { }
 
 
   ngOnInit(): void {
-      // ✅ remember we are on quotes
+    // ✅ remember we are on quotes
     sessionStorage.setItem(this.PAGE_KEY, 'quotes');
 
     // ✅ default sorting (like supertopup)
@@ -86,17 +83,13 @@ export class GMCQuotesComponent implements OnInit {
         const parsed = JSON.parse(savedData);
         const payload = this.buildPayloadFromLocal(parsed);
         this.basePayload = payload;
-        console.log("✅ PA Quotes Payload:", payload);
+        console.log("GMC Quotes Payload:", payload);
 
         const enquiry = parsed?.details ?? {};
-        const members = parsed?.members ?? [];
 
         this.age = payload.age ?? null;
         this.pincode = enquiry.pincode ?? '';
         this.name = enquiry.firstName ?? '';
-
-        // compute family counts (for compare summary strip)
-        this.computeFamilyCounts(members);
 
         this.fetchAllPlans(payload);
         return;
@@ -112,69 +105,43 @@ export class GMCQuotesComponent implements OnInit {
   /* -------------------- build payload from localStorage -------------------- */
 
   private buildPayloadFromLocal(ls: any): PlanPayload {
+
+    console.log("GMC LocalStorage Data:", ls);
     const enquiry = ls?.details ?? [];
-    const members = ls?.members ?? [];
-
-    const computedSelfAge = this.calcAgeFromDob(enquiry?.dob);
-
-    // Extract YOU (primary) age
-    const you = members.find((m: any) => m.id === 'you');
-    const spouse = members.find((m: any) => m.id === 'spouse');
-
-    const selfAge = this.toNum(you?.age, computedSelfAge);
-
-    // Collect child ages (sons + daughters)
-    const childAges: Array<number | null> = [];
-
-    members.forEach((m: any) => {
-      if (m.id?.startsWith('son') || m.id?.startsWith('daughter')) {
-        childAges.push(this.numOrNull(m.age));
-      }
-    });
-
-    // pad or trim to exactly 4 entries
-    while (childAges.length < 4) childAges.push(null);
-    if (childAges.length > 4) childAges.length = 4;
-
+    const coverAmount = this.toNum(enquiry.coverageAmount, 0);
+    const age = this.calcAgeFromDob(enquiry.dateOfBirth);
+    const noOfAdults = this.toNum(enquiry.noOfAdults, 0);
+    const noOfChildren = this.toNum(enquiry.noOfChildren, 0);
     return {
-      coverAmount: this.toNum(enquiry.coverAmount, 0),
-      category: this.toNum(
-      enquiry?.riskCategory ?? enquiry?.activeRiskTab ?? enquiry?.risk_tab ?? 0,
-  0
-),
-
-      age: selfAge,                 // ✅ self age from DOB
-      sage: this.numOrNull(spouse?.age), // Spouse age or null
-
-      c1age: childAges[0],
-      c2age: childAges[1],
-      c3age: childAges[2],
-      c4age: childAges[3],
+      coverAmount,
+      age,
+      noOfAdults,
+      noOfChildren
     };
   }
 
- private computeFamilyCounts(members: any[]): void {
-  if (!Array.isArray(members) || members.length === 0) {
-    // ✅ PA: only self
-    this.adultCount = 1;
-    this.childCount = 0;
-    this.familyCount = 1;
-    return;
+  private computeFamilyCounts(members: any[]): void {
+    if (!Array.isArray(members) || members.length === 0) {
+      // ✅ PA: only self
+      this.adultCount = 1;
+      this.childCount = 0;
+      this.familyCount = 1;
+      return;
+    }
+
+    let adults = 0;
+    let kids = 0;
+
+    members.forEach((m: any) => {
+      const id = (m?.id || '').toString();
+      if (id.startsWith('son') || id.startsWith('daughter') || m?.type === 'child') kids++;
+      else adults++;
+    });
+
+    this.adultCount = adults;
+    this.childCount = kids;
+    this.familyCount = adults + kids;
   }
-
-  let adults = 0;
-  let kids = 0;
-
-  members.forEach((m: any) => {
-    const id = (m?.id || '').toString();
-    if (id.startsWith('son') || id.startsWith('daughter') || m?.type === 'child') kids++;
-    else adults++;
-  });
-
-  this.adultCount = adults;
-  this.childCount = kids;
-  this.familyCount = adults + kids;
-}
 
 
   /* -------------------- Filters handlers -------------------- */
@@ -189,14 +156,14 @@ export class GMCQuotesComponent implements OnInit {
     this.fetchAllPlans(this.basePayload);
   }
 
- onSortChange(event: any) {
-  const value = event.target.value;
+  onSortChange(event: any) {
+    const value = event.target.value;
 
-  if (value === '') this.selectedSort = null;
-  else this.selectedSort = value; // "low" | "high"
+    if (value === '') this.selectedSort = null;
+    else this.selectedSort = value; // "low" | "high"
 
-  if (this.basePayload) this.fetchAllPlans(this.basePayload);
-}
+    if (this.basePayload) this.fetchAllPlans(this.basePayload);
+  }
 
   onInsurerChange(event: any) {
     const value = event.target.value;
@@ -216,7 +183,7 @@ export class GMCQuotesComponent implements OnInit {
   /* -------------------- Fetch + Map all plans -------------------- */
 
   fetchAllPlans(payload: any) {
-    this.api.getHealthPlanEndpoints().subscribe({
+    this.api.getGMCEndpoints().subscribe({
       next: (response) => {
         const apiList = response?.data?.map((item: any) => item.api_type) || [];
 
@@ -236,23 +203,23 @@ export class GMCQuotesComponent implements OnInit {
                 }
 
                 const coverAmountNum = Number(p.coverAmount) || 0;
-                const baseNum = Number(p.base ?? 0) || 0;
-                const addonNum = Number(p.addon ?? 0) || 0;
+                const premiumNumber =
+                  Number(String(p?.premium ?? 0).replace(/,/g, '')) || 0;
 
                 return {
                   uniqueId: crypto.randomUUID(),
 
                   logo: `assets/quote/${p.logoUrl}`,
                   name: p.plan,
-                  tag: p.company,
+                  company: p.company,
                   cover: `₹ ${this.formatIndianCurrency(coverAmountNum)}`,
-                  base: `₹ ${this.formatIndianCurrency(baseNum)}`,
-                  addon: `₹ ${this.formatIndianCurrency(addonNum)}`,
-
+                  premium: `₹ ${this.formatIndianCurrency(premiumNumber)}`,
+                  premiumNumber: premiumNumber,
+                  coverAmountNumber: coverAmountNum,
                   features: Array.isArray(p.features) && p.features.length
                     ? p.features
-                        .map((f: any) => (typeof f === 'string' ? f : f?.includes || ''))
-                        .filter(Boolean)
+                      .map((f: any) => (typeof f === 'string' ? f : f?.includes || ''))
+                      .filter(Boolean)
                     : ['No Key Features Available'],
 
                   brochure: p.brochureUrl || null,
@@ -260,30 +227,30 @@ export class GMCQuotesComponent implements OnInit {
 
                   // Compare helpers
                   planId: p.planId || `${p.plan}`,
-                  coverAmountNumber: coverAmountNum,
-
-                  // ✅ IMPORTANT: use base as "price" for sorting + compare label
-                  priceNumber: baseNum,
-                  baseNumber: baseNum,
-                  addonNumber: addonNum,
 
                   insurerName: p.company,
-                  otherDetails:
-                  typeof p.otherDetails === 'string'
-                  ? JSON.parse(p.otherDetails)
-                  : (p.otherDetails || {}),
+                  // otherDetails:
+                  //   typeof p.otherDetails === 'string'
+                  //     ? JSON.parse(p.otherDetails)
+                  //     : (p.otherDetails || {}),
 
 
                 };
               });
 
+            console.log('🔥 MAPPED GMC Plans:', mappedPlans);
+
             // ✅ same default sorting behavior
             if (!this.selectedSort) this.selectedSort = 'low';
 
             if (this.selectedSort === 'low') {
-              mappedPlans.sort((a: any, b: any) => a.priceNumber - b.priceNumber);
+              mappedPlans.sort(
+                (a: any, b: any) => a.premiumNumber - b.premiumNumber
+              );
             } else if (this.selectedSort === 'high') {
-              mappedPlans.sort((a: any, b: any) => b.priceNumber - a.priceNumber);
+              mappedPlans.sort(
+                (a: any, b: any) => b.premiumNumber - a.premiumNumber
+              );
             }
 
             console.log('🔥 SORTED PA Plans:', mappedPlans);
@@ -309,10 +276,10 @@ export class GMCQuotesComponent implements OnInit {
     const remaining = this.maxCompare - this.compare.length;
     return remaining > 0 ? Array(remaining).fill(0) : [];
   }
-   isSelected(plan: any): boolean {
+  isSelected(plan: any): boolean {
     return this.compare.some((p) => p.key === plan.uniqueId);
   }
-   onCompareToggle(plan: any, event: any) {
+  onCompareToggle(plan: any, event: any) {
     const checked = event.target.checked;
     const key = plan.uniqueId;
 
@@ -323,7 +290,7 @@ export class GMCQuotesComponent implements OnInit {
         event.target.checked = false;
         return;
       }
-    if (!this.isSelected(plan)) {
+      if (!this.isSelected(plan)) {
         this.compare.push({
           key: plan.uniqueId,
           planId: plan.planId,
@@ -338,7 +305,7 @@ export class GMCQuotesComponent implements OnInit {
           base: Number(plan.baseNumber || 0),
           addon: Number(plan.addonNumber || 0),
 
-          otherDetails:plan.otherDetails,
+          otherDetails: plan.otherDetails,
 
           sourcePlan: plan,
         });
@@ -354,8 +321,8 @@ export class GMCQuotesComponent implements OnInit {
   }
 
   getDetailsKeys(): string[] {
-  return Object.keys(this.compare[0]?.otherDetails || {});
-}
+    return Object.keys(this.compare[0]?.otherDetails || {});
+  }
 
 
   removeFromCompare(plan: any) {
@@ -390,46 +357,46 @@ export class GMCQuotesComponent implements OnInit {
 
   // ---- helpers ----
   private parseDobToDate(dob: any): Date | null {
-  if (!dob) return null;
+    if (!dob) return null;
 
-  // supports "DD/MM/YYYY"
-  if (typeof dob === 'string' && dob.includes('/')) {
-    const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(dob.trim());
-    if (!m) return null;
-    const day = Number(m[1]);
-    const month = Number(m[2]);
-    const year = Number(m[3]);
-    const d = new Date(year, month - 1, day);
-    if (d.getFullYear() !== year || d.getMonth() !== month - 1 || d.getDate() !== day) return null;
-    return d;
+    // supports "DD/MM/YYYY"
+    if (typeof dob === 'string' && dob.includes('/')) {
+      const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(dob.trim());
+      if (!m) return null;
+      const day = Number(m[1]);
+      const month = Number(m[2]);
+      const year = Number(m[3]);
+      const d = new Date(year, month - 1, day);
+      if (d.getFullYear() !== year || d.getMonth() !== month - 1 || d.getDate() !== day) return null;
+      return d;
+    }
+
+    // supports "YYYY-MM-DD"
+    if (typeof dob === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dob.trim())) {
+      const [y, m, d] = dob.trim().split('-').map(Number);
+      const dt = new Date(y, m - 1, d);
+      if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d) return null;
+      return dt;
+    }
+
+    // if it ever comes as Date already
+    if (dob instanceof Date && !isNaN(dob.getTime())) return dob;
+
+    return null;
   }
 
-  // supports "YYYY-MM-DD"
-  if (typeof dob === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dob.trim())) {
-    const [y, m, d] = dob.trim().split('-').map(Number);
-    const dt = new Date(y, m - 1, d);
-    if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d) return null;
-    return dt;
+  private calcAgeFromDob(dob: any): number {
+    const dobDate = this.parseDobToDate(dob);
+    if (!dobDate) return 0;
+
+    const today = new Date();
+    let age = today.getFullYear() - dobDate.getFullYear();
+    const m = today.getMonth() - dobDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) age--;
+    return age < 0 ? 0 : age;
   }
 
-  // if it ever comes as Date already
-  if (dob instanceof Date && !isNaN(dob.getTime())) return dob;
-
-  return null;
-}
-
-private calcAgeFromDob(dob: any): number {
-  const dobDate = this.parseDobToDate(dob);
-  if (!dobDate) return 0;
-
-  const today = new Date();
-  let age = today.getFullYear() - dobDate.getFullYear();
-  const m = today.getMonth() - dobDate.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) age--;
-  return age < 0 ? 0 : age;
-}
-
-   private toNum(v: any, d = 0): number {
+  private toNum(v: any, d = 0): number {
     const n = Number(v);
     return Number.isFinite(n) ? n : d;
   }
@@ -440,13 +407,13 @@ private calcAgeFromDob(dob: any): number {
   }
 
 
- formatIndianCurrency(num: number): string {
+  formatIndianCurrency(num: number): string {
     if (num >= 10000000) return (num / 10000000).toFixed(2).replace(/\.00$/, '') + ' Cr';
     if (num >= 100000) return (num / 100000).toFixed(2).replace(/\.00$/, '') + ' Lakh';
     return num.toLocaleString('en-IN');
   }
 
-    // ✅ SAME as supertopup: go back to enquiry step 3
+  // ✅ SAME as supertopup: go back to enquiry step 3
   goBack() {
     localStorage.setItem(this.RESTORE_FLAG, '1');
 
@@ -490,168 +457,168 @@ private calcAgeFromDob(dob: any): number {
 
   /* -------------------- PDF Download (same logic) -------------------- */
 
-async downloadPDF() {
-  if (this.isPdfDownloading) return;
+  async downloadPDF() {
+    if (this.isPdfDownloading) return;
 
-  this.isPdfDownloading = true;
-  this.cdr.detectChanges();
+    this.isPdfDownloading = true;
+    this.cdr.detectChanges();
 
-  const wrapper = document.getElementById("compareWrapper") as HTMLElement | null;
-  if (!wrapper) { this.isPdfDownloading = false; return; }
+    const wrapper = document.getElementById("compareWrapper") as HTMLElement | null;
+    if (!wrapper) { this.isPdfDownloading = false; return; }
 
-  const userStrip = wrapper.querySelector(".cmp-user-strip") as HTMLElement | null;
-  const cmpRootOriginal = wrapper.querySelector(".cmp-pdf-root") as HTMLElement | null;
-  if (!cmpRootOriginal) { this.isPdfDownloading = false; return; }
+    const userStrip = wrapper.querySelector(".cmp-user-strip") as HTMLElement | null;
+    const cmpRootOriginal = wrapper.querySelector(".cmp-pdf-root") as HTMLElement | null;
+    if (!cmpRootOriginal) { this.isPdfDownloading = false; return; }
 
-  const nextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
+    const nextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
 
-  const normalizeStyles = (root: HTMLElement) => {
-    const all = root.querySelectorAll("*") as NodeListOf<HTMLElement>;
-    all.forEach((el) => {
-      el.style.position = "static";
-      el.style.transform = "none";
-      el.style.filter = "none";
-      el.style.zIndex = "auto";
-      el.style.maxHeight = "none";
-      el.style.height = "auto";
-      el.style.minHeight = "0";
-      el.style.overflow = "visible";
-    });
+    const normalizeStyles = (root: HTMLElement) => {
+      const all = root.querySelectorAll("*") as NodeListOf<HTMLElement>;
+      all.forEach((el) => {
+        el.style.position = "static";
+        el.style.transform = "none";
+        el.style.filter = "none";
+        el.style.zIndex = "auto";
+        el.style.maxHeight = "none";
+        el.style.height = "auto";
+        el.style.minHeight = "0";
+        el.style.overflow = "visible";
+      });
 
-    const tableWrap = root.querySelector(".cmp-table-wrapper") as HTMLElement | null;
-    if (tableWrap) {
-      tableWrap.style.overflow = "visible";
-      tableWrap.style.maxHeight = "none";
-      tableWrap.style.height = "auto";
-    }
-  };
-
-  const waitForImages = async (root: HTMLElement) => {
-    const imgs = Array.from(root.querySelectorAll("img")) as HTMLImageElement[];
-    await Promise.all(
-      imgs.map(
-        (img) =>
-          new Promise<void>((resolve) => {
-            if (img.complete && img.naturalWidth > 0) return resolve();
-            img.onload = () => resolve();
-            img.onerror = () => resolve();
-          })
-      )
-    );
-  };
-
-  const makeAbsoluteSrc = (src: string) => {
-    if (!src) return src;
-    if (src.startsWith("data:")) return src;
-    if (src.startsWith("http://") || src.startsWith("https://") || src.startsWith("//")) {
-      return src.startsWith("//") ? window.location.protocol + src : src;
-    }
-    return new URL(src, document.baseURI).toString();
-  };
-
-  const inlineAllImages = async (root: HTMLElement) => {
-    const imgs = Array.from(root.querySelectorAll("img")) as HTMLImageElement[];
-
-    for (const img of imgs) {
-      try {
-        const original = img.getAttribute("src") || "";
-        if (!original || original.startsWith("data:")) continue;
-
-        const abs = makeAbsoluteSrc(original);
-        img.setAttribute("crossorigin", "anonymous");
-        img.src = abs;
-
-        const res = await fetch(abs, { cache: "no-store" });
-        if (!res.ok) continue;
-
-        const blob = await res.blob();
-        const dataUrl: string = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(String(reader.result || ""));
-          reader.readAsDataURL(blob);
-        });
-
-        if (dataUrl.startsWith("data:")) img.src = dataUrl;
-      } catch {
-        // ignore
+      const tableWrap = root.querySelector(".cmp-table-wrapper") as HTMLElement | null;
+      if (tableWrap) {
+        tableWrap.style.overflow = "visible";
+        tableWrap.style.maxHeight = "none";
+        tableWrap.style.height = "auto";
       }
-    }
-  };
+    };
 
-  const exportBox = document.createElement("div");
-  exportBox.style.position = "absolute";
-  exportBox.style.left = "0";
-  exportBox.style.top = "0";
-  exportBox.style.background = "#ffffff";
-  exportBox.style.width = "max-content";
-  exportBox.style.padding = "0";
-  exportBox.style.margin = "0";
-  document.body.appendChild(exportBox);
+    const waitForImages = async (root: HTMLElement) => {
+      const imgs = Array.from(root.querySelectorAll("img")) as HTMLImageElement[];
+      await Promise.all(
+        imgs.map(
+          (img) =>
+            new Promise<void>((resolve) => {
+              if (img.complete && img.naturalWidth > 0) return resolve();
+              img.onload = () => resolve();
+              img.onerror = () => resolve();
+            })
+        )
+      );
+    };
 
-  try {
-    if (userStrip) exportBox.appendChild(userStrip.cloneNode(true));
+    const makeAbsoluteSrc = (src: string) => {
+      if (!src) return src;
+      if (src.startsWith("data:")) return src;
+      if (src.startsWith("http://") || src.startsWith("https://") || src.startsWith("//")) {
+        return src.startsWith("//") ? window.location.protocol + src : src;
+      }
+      return new URL(src, document.baseURI).toString();
+    };
 
-    const clone = cmpRootOriginal.cloneNode(true) as HTMLElement;
-    exportBox.appendChild(clone);
+    const inlineAllImages = async (root: HTMLElement) => {
+      const imgs = Array.from(root.querySelectorAll("img")) as HTMLImageElement[];
 
-    normalizeStyles(exportBox);
+      for (const img of imgs) {
+        try {
+          const original = img.getAttribute("src") || "";
+          if (!original || original.startsWith("data:")) continue;
 
-    await nextFrame();
-    await nextFrame();
+          const abs = makeAbsoluteSrc(original);
+          img.setAttribute("crossorigin", "anonymous");
+          img.src = abs;
 
-    if ((document as any).fonts?.ready) {
-      await (document as any).fonts.ready;
-    }
+          const res = await fetch(abs, { cache: "no-store" });
+          if (!res.ok) continue;
 
-    await inlineAllImages(exportBox);
-    await waitForImages(exportBox);
-    await nextFrame();
+          const blob = await res.blob();
+          const dataUrl: string = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(String(reader.result || ""));
+            reader.readAsDataURL(blob);
+          });
 
-    const canvas = await toCanvas(exportBox, {
-      backgroundColor: "#ffffff",
-      pixelRatio: 3,
-      cacheBust: true,
-    } as any);
+          if (dataUrl.startsWith("data:")) img.src = dataUrl;
+        } catch {
+          // ignore
+        }
+      }
+    };
 
-    const pdf = new jsPDF("l", "mm", "a4");
-    const pdfW = pdf.internal.pageSize.getWidth();
-    const pdfH = pdf.internal.pageSize.getHeight();
+    const exportBox = document.createElement("div");
+    exportBox.style.position = "absolute";
+    exportBox.style.left = "0";
+    exportBox.style.top = "0";
+    exportBox.style.background = "#ffffff";
+    exportBox.style.width = "max-content";
+    exportBox.style.padding = "0";
+    exportBox.style.margin = "0";
+    document.body.appendChild(exportBox);
 
-    const imgW = pdfW;
-    const imgH = (canvas.height * imgW) / canvas.width;
+    try {
+      if (userStrip) exportBox.appendChild(userStrip.cloneNode(true));
 
-    let heightLeft = imgH;
-    let y = 0;
+      const clone = cmpRootOriginal.cloneNode(true) as HTMLElement;
+      exportBox.appendChild(clone);
 
-    const imgData = canvas.toDataURL("image/png");
+      normalizeStyles(exportBox);
 
-    pdf.addImage(imgData, "PNG", 0, y, imgW, imgH);
-    heightLeft -= pdfH;
+      await nextFrame();
+      await nextFrame();
 
-    while (heightLeft > 0) {
-      y -= pdfH;
-      pdf.addPage();
+      if ((document as any).fonts?.ready) {
+        await (document as any).fonts.ready;
+      }
+
+      await inlineAllImages(exportBox);
+      await waitForImages(exportBox);
+      await nextFrame();
+
+      const canvas = await toCanvas(exportBox, {
+        backgroundColor: "#ffffff",
+        pixelRatio: 3,
+        cacheBust: true,
+      } as any);
+
+      const pdf = new jsPDF("l", "mm", "a4");
+      const pdfW = pdf.internal.pageSize.getWidth();
+      const pdfH = pdf.internal.pageSize.getHeight();
+
+      const imgW = pdfW;
+      const imgH = (canvas.height * imgW) / canvas.width;
+
+      let heightLeft = imgH;
+      let y = 0;
+
+      const imgData = canvas.toDataURL("image/png");
+
       pdf.addImage(imgData, "PNG", 0, y, imgW, imgH);
       heightLeft -= pdfH;
+
+      while (heightLeft > 0) {
+        y -= pdfH;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, y, imgW, imgH);
+        heightLeft -= pdfH;
+      }
+
+      pdf.save("pa-comparison.pdf");
+      await new Promise((r) => setTimeout(r, 0));
+    } catch (e) {
+      console.error("PDF error:", e);
+      alert("PDF export failed");
+    } finally {
+      exportBox.remove();
+
+      this.zone.run(() => {
+        this.isPdfDownloading = false;
+        this.cdr.detectChanges();
+      });
     }
-
-    pdf.save("pa-comparison.pdf");
-    await new Promise((r) => setTimeout(r, 0));
-  } catch (e) {
-    console.error("PDF error:", e);
-    alert("PDF export failed");
-  } finally {
-    exportBox.remove();
-
-    this.zone.run(() => {
-      this.isPdfDownloading = false;
-      this.cdr.detectChanges();
-    });
   }
-}
 
   getGridTemplateColumns(): string {
-  return `300px repeat(${this.compare.length || 1}, 1fr)`;
-}
+    return `300px repeat(${this.compare.length || 1}, 1fr)`;
+  }
 
 }

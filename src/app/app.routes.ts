@@ -37,6 +37,7 @@ export const routes: Routes = [
   {
     path:'gmc',
     children: [
+      { path: '', redirectTo: 'enquiry-form', pathMatch: 'full' },
       { path: 'enquiry-form', component: GMCEnquiryFormComponent },
       { path: 'quotes', component: GMCQuotesComponent },
 

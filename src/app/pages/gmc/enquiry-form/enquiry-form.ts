@@ -19,6 +19,7 @@ import { db } from '../../../../firebaseConfig';
   imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
 })
 export class GMCEnquiryFormComponent {
+  today: Date = new Date();
   enquiryForm: FormGroup;
 
   private readonly ENQUIRY_KEY = 'gmc_enquiry';
@@ -44,13 +45,13 @@ export class GMCEnquiryFormComponent {
         ],
       ],
       contactPerson: ['', Validators.required],
-     contactNumber: [
-          '',
-          [
-            Validators.required,
-            Validators.pattern(/^[6-9]\d{9}$/),
-          ],
+      contactNumber: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(/^[6-9]\d{9}$/),
         ],
+      ],
 
       email: [
         '',
@@ -69,41 +70,85 @@ export class GMCEnquiryFormComponent {
         ],
       ],
       city: [
-          '',
-          [
-            Validators.required,
-            Validators.minLength(2),
-            Validators.pattern(/^[A-Z ]+$/),
-          ],
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.pattern(/^[A-Z ]+$/),
         ],
+      ],
 
       coverageAmount: ['', Validators.required],
       demography: ['', Validators.required],
+      dateOfBirth: ['', Validators.required],
+
     });
 
-  this.toUpperCaseControl('companyName');
-  this.toUpperCaseControl('industryType');
-  this.toUpperCaseControl('city');
+    this.toUpperCaseControl('companyName');
+    this.toUpperCaseControl('industryType');
+    this.toUpperCaseControl('city');
   }
 
   allowOnlyLetters(event: KeyboardEvent) {
-  const charCode = event.which || event.keyCode;
-  const char = String.fromCharCode(charCode);
+    const charCode = event.which || event.keyCode;
+    const char = String.fromCharCode(charCode);
 
-  // Allow A–Z, a–z and space
-  if (!/^[a-zA-Z ]$/.test(char)) {
-    event.preventDefault();
+    // Allow A–Z, a–z and space
+    if (!/^[a-zA-Z ]$/.test(char)) {
+      event.preventDefault();
+    }
   }
-}
 
-allowOnlyNumbers(event: KeyboardEvent) {
-  const charCode = event.which || event.keyCode;
+  allowOnlyNumbers(event: KeyboardEvent) {
+    const charCode = event.which || event.keyCode;
 
-  // Allow only digits 0–9
-  if (charCode < 48 || charCode > 57) {
-    event.preventDefault();
+    // Allow only digits 0–9
+    if (charCode < 48 || charCode > 57) {
+      event.preventDefault();
+    }
   }
-}
+
+  private calculateAge(dob: string): number | null {
+    if (!dob) return null;
+
+    const birthDate = new Date(dob);
+    const today = new Date();
+
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+
+    return age;
+  }
+
+  private getDemographyCounts(demography: string): {
+    noOfAdults: number;
+    noOfChildren: number;
+  } {
+    switch (demography) {
+      case 'employee':
+        return { noOfAdults: 1, noOfChildren: 0 };
+
+      case 'employee+spouse':
+        return { noOfAdults: 2, noOfChildren: 0 };
+
+      case 'spouse+2kids':
+        return { noOfAdults: 2, noOfChildren: 2 };
+
+      case 'withParents':
+        return { noOfAdults: 4, noOfChildren: 2 };
+
+      default:
+        return { noOfAdults: 1, noOfChildren: 0 };
+    }
+  }
+
 
   /* ------------------------------------
    🔁 PA-STYLE RESTORE LOGIC
@@ -147,6 +192,10 @@ allowOnlyNumbers(event: KeyboardEvent) {
   ------------------------------------ */
   private buildPayload() {
     const raw = this.enquiryForm.getRawValue();
+    const age = this.calculateAge(raw.dateOfBirth);
+
+    const { noOfAdults, noOfChildren } =
+      this.getDemographyCounts(raw.demography);
 
     return {
       step: 1,
@@ -160,24 +209,28 @@ allowOnlyNumbers(event: KeyboardEvent) {
         city: raw.city,
         coverageAmount: raw.coverageAmount,
         demography: raw.demography,
+        dateOfBirth: raw.dateOfBirth,
+        age: age,
+        noOfAdults: noOfAdults,
+        noOfChildren: noOfChildren,
         termsAccepted: this.termsAcceptedSignal(),
       },
     };
   }
 
   private toUpperCaseControl(controlName: string) {
-  const control = this.enquiryForm.get(controlName);
-  if (!control) return;
+    const control = this.enquiryForm.get(controlName);
+    if (!control) return;
 
-  control.valueChanges.subscribe(value => {
-    if (typeof value === 'string') {
-      const upper = value.toUpperCase();
-      if (value !== upper) {
-        control.setValue(upper, { emitEvent: false });
+    control.valueChanges.subscribe(value => {
+      if (typeof value === 'string') {
+        const upper = value.toUpperCase();
+        if (value !== upper) {
+          control.setValue(upper, { emitEvent: false });
+        }
       }
-    }
-  });
-}
+    });
+  }
 
 
   /* ------------------------------------
@@ -202,6 +255,8 @@ allowOnlyNumbers(event: KeyboardEvent) {
           city: d.city || '',
           coverageAmount: d.coverageAmount || '',
           demography: d.demography || '',
+          dateOfBirth: d.dateOfBirth || '',
+
         },
         { emitEvent: false }
       );
@@ -213,7 +268,7 @@ allowOnlyNumbers(event: KeyboardEvent) {
   }
 
   private readonly EMAIL_REGEX =
-  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
   /* ------------------------------------
    🚀 SUBMIT (SAVE → FIREBASE → QUOTES)
@@ -248,16 +303,19 @@ allowOnlyNumbers(event: KeyboardEvent) {
       city: d.city,
       coverage_amount: d.coverageAmount,
       demography: d.demography,
+      date_of_birth: d.dateOfBirth,
+      age: d.age,
+      no_of_adults: d.noOfAdults,
+      no_of_children: d.noOfChildren,
 
       // identifiers
       lead_type: 'group-medical-care',
       plan_type: 'gmc',
-      source: 'sat-web',
 
       created_at: new Date().toISOString(),
     };
 
-      console.log('🔥 GMC FIREBASE PAYLOAD:', leadDoc);
+    console.log('🔥 GMC FIREBASE PAYLOAD:', leadDoc);
 
     try {
       await addDoc(collection(db, 'AUX_enquiry_leads'), leadDoc);

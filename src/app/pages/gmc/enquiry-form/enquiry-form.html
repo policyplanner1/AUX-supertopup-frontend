@@ -81,6 +81,23 @@
           </p>
         </div>
 
+          <!-- Date of Birth -->
+          <div>
+            <label class="pp-label">
+              Date of Birth <span class="text-red-600">*</span>
+            </label>
+            <input
+              formControlName="dateOfBirth"
+              type="date"
+              class="pp-input"
+              placeholder="Select date of birth"
+              max="{{ today | date: 'yyyy-MM-dd' }}"
+            />
+            <p *ngIf="isInvalid('dateOfBirth')" class="pp-error">
+              Please select a valid date of birth
+            </p>
+          </div>
+
         <!-- Email -->
         <div>
           <label class="pp-label"
@@ -156,6 +173,7 @@
           >
           <select formControlName="coverageAmount" class="pp-select">
             <option value="" disabled>Select coverage amount</option>
+              <option value="500000">5 Lakh</option>
               <option value="1000000">10 Lakh</option>
               <option value="1500000">15 Lakh</option>
               <option value="2000000">20 Lakh</option>
