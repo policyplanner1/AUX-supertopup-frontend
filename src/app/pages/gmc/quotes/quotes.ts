@@ -1,25 +1,25 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { PAService } from '../../../services/pa.service';
 import { toPng } from "html-to-image";
 import jsPDF from 'jspdf';
 import { toCanvas } from 'html-to-image';
 import { NgZone, ChangeDetectorRef } from '@angular/core';
 import { GMCService } from '../../../services/gmc.service';
 
-// Define the payload type OUTSIDE the class
+// ✅ Define the payload type including zone
 type PlanPayload = {
   coverAmount: number;
+  zone: string; // Add zone to payload
   age: number;
   noOfAdults?: number;
   noOfChildren?: number;
+  city?: string; // Optional: add city if needed
 };
 
 @Component({
   selector: 'app-quotes',
   standalone: true,
-
   imports: [CommonModule],
   templateUrl: './quotes.html',
   styleUrl: './quotes.scss',
@@ -35,21 +35,17 @@ export class GMCQuotesComponent implements OnInit {
   age: number | null = null;
   pincode = '';
   name = '';
-
-  // deductible removed — using base/addon instead
+  userZone: string | null = null; // Renamed from 'zone' to avoid conflict with NgZone
+  city: string | null = null; // Add city property
 
   insurerList = signal<string[]>([]);
   selectedInsurer: string | null = null;
-
   selectedSort: string | null = null;
-
   selectedCoverageAmt: number | null = null;
   basePayload: PlanPayload | null = null;
 
-  // Flat plan list used in UI
   plans = signal<any[]>([]);
 
-  // Compare + summary strip
   maxCompare = 3;
   isCompareOpen = false;
   isPdfDownloading = false;
@@ -59,9 +55,12 @@ export class GMCQuotesComponent implements OnInit {
   adultCount: number | null = null;
   childCount: number | null = null;
 
-  constructor(private router: Router, private api: GMCService, private zone: NgZone,
-    private cdr: ChangeDetectorRef) { }
-
+  constructor(
+    private router: Router,
+    private api: GMCService,
+    private ngZone: NgZone, // Renamed parameter to avoid conflict
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
     // ✅ remember we are on quotes
@@ -77,7 +76,6 @@ export class GMCQuotesComponent implements OnInit {
       localStorage.setItem(this.RESTORE_FLAG, '1');
     }
 
-
     if (savedData) {
       try {
         const parsed = JSON.parse(savedData);
@@ -88,14 +86,15 @@ export class GMCQuotesComponent implements OnInit {
         const enquiry = parsed?.details ?? {};
 
         this.age = payload.age ?? null;
-        this.pincode = enquiry.pincode ?? '';
-        this.name = enquiry.firstName ?? '';
+        this.userZone = payload.zone ?? null; // Store zone from payload
+        this.city = enquiry.cust_city ?? null; // Store city from payload
+        this.name = enquiry.companyName ?? ''; // Use company name as name
 
         this.fetchAllPlans(payload);
         return;
       } catch (e) {
         console.warn(
-          'Failed to parse localStorage supertopup_enquiry, falling back.',
+          'Failed to parse localStorage gmc_enquiry, falling back.',
           e
         );
       }
@@ -105,84 +104,28 @@ export class GMCQuotesComponent implements OnInit {
   /* -------------------- build payload from localStorage -------------------- */
 
   private buildPayloadFromLocal(ls: any): PlanPayload {
-
     console.log("GMC LocalStorage Data:", ls);
-    const enquiry = ls?.details ?? [];
-    const coverAmount = this.toNum(enquiry.coverageAmount, 0);
+    const enquiry = ls?.details ?? {};
+    const coverAmount = this.toNum(enquiry.cover_amount, 0);
     const age = this.calcAgeFromDob(enquiry.dateOfBirth);
     const noOfAdults = this.toNum(enquiry.noOfAdults, 0);
     const noOfChildren = this.toNum(enquiry.noOfChildren, 0);
+    const zone = enquiry.zone || '3'; // Get zone or default to '3'
+    const city = enquiry.cust_city || ''; // Get city
+
     return {
       coverAmount,
+      zone, // Include zone in payload
+      city, // Include city in payload
       age,
       noOfAdults,
       noOfChildren
     };
   }
 
-  private computeFamilyCounts(members: any[]): void {
-    if (!Array.isArray(members) || members.length === 0) {
-      // ✅ PA: only self
-      this.adultCount = 1;
-      this.childCount = 0;
-      this.familyCount = 1;
-      return;
-    }
-
-    let adults = 0;
-    let kids = 0;
-
-    members.forEach((m: any) => {
-      const id = (m?.id || '').toString();
-      if (id.startsWith('son') || id.startsWith('daughter') || m?.type === 'child') kids++;
-      else adults++;
-    });
-
-    this.adultCount = adults;
-    this.childCount = kids;
-    this.familyCount = adults + kids;
-  }
-
-
-  /* -------------------- Filters handlers -------------------- */
-
-  onCoverageAmountChange(event: any) {
-    const newValue = Number(event.target.value);
-
-    if (!this.basePayload) return;
-
-    this.basePayload.coverAmount = isNaN(newValue) ? 0 : newValue;
-
-    this.fetchAllPlans(this.basePayload);
-  }
-
-  onSortChange(event: any) {
-    const value = event.target.value;
-
-    if (value === '') this.selectedSort = null;
-    else this.selectedSort = value; // "low" | "high"
-
-    if (this.basePayload) this.fetchAllPlans(this.basePayload);
-  }
-
-  onInsurerChange(event: any) {
-    const value = event.target.value;
-
-    this.selectedInsurer = value === '' ? null : value;
-
-    if (this.basePayload) {
-      this.fetchAllPlans(this.basePayload);
-    }
-  }
-
-  buildPlanKey(plan: any): string {
-    return plan.uniqueId;
-  }
-
-
   /* -------------------- Fetch + Map all plans -------------------- */
 
-  fetchAllPlans(payload: any) {
+  fetchAllPlans(payload: PlanPayload) { // Use PlanPayload type
     this.api.getGMCEndpoints().subscribe({
       next: (response) => {
         const apiList = response?.data?.map((item: any) => item.api_type) || [];
@@ -208,7 +151,6 @@ export class GMCQuotesComponent implements OnInit {
 
                 return {
                   uniqueId: crypto.randomUUID(),
-
                   logo: `assets/quote/${p.logoUrl}`,
                   name: p.plan,
                   company: p.company,
@@ -221,20 +163,10 @@ export class GMCQuotesComponent implements OnInit {
                       .map((f: any) => (typeof f === 'string' ? f : f?.includes || ''))
                       .filter(Boolean)
                     : ['No Key Features Available'],
-
                   brochure: p.brochureUrl || null,
                   onePager: p.onePagerUrl || null,
-
-                  // Compare helpers
                   planId: p.planId || `${p.plan}`,
-
                   insurerName: p.company,
-                  // otherDetails:
-                  //   typeof p.otherDetails === 'string'
-                  //     ? JSON.parse(p.otherDetails)
-                  //     : (p.otherDetails || {}),
-
-
                 };
               });
 
@@ -253,8 +185,7 @@ export class GMCQuotesComponent implements OnInit {
               );
             }
 
-            console.log('🔥 SORTED PA Plans:', mappedPlans);
-
+            console.log('🔥 SORTED GMC Plans:', mappedPlans);
             this.plans.set(mappedPlans);
           },
           error: (err) => console.error('Error calling premium APIs:', err),
@@ -263,8 +194,6 @@ export class GMCQuotesComponent implements OnInit {
       error: (err) => console.error('Error fetching endpoints:', err),
     });
   }
-
-
 
   /* -------------------- Compare logic -------------------- */
   allowAadhaarInput(event: any) {
@@ -276,13 +205,14 @@ export class GMCQuotesComponent implements OnInit {
     const remaining = this.maxCompare - this.compare.length;
     return remaining > 0 ? Array(remaining).fill(0) : [];
   }
+
   isSelected(plan: any): boolean {
     return this.compare.some((p) => p.key === plan.uniqueId);
   }
+
   onCompareToggle(plan: any, event: any) {
     const checked = event.target.checked;
     const key = plan.uniqueId;
-
 
     if (checked) {
       if (this.compare.length >= this.maxCompare) {
@@ -298,15 +228,10 @@ export class GMCQuotesComponent implements OnInit {
           productName: plan.name,
           logo: plan.logo,
           coverAmount: Number(plan.coverAmountNumber || 0),
-
-          // ✅ FIX: monthlyPrice was undefined earlier
           monthlyPrice: Number(plan.priceNumber || plan.baseNumber || 0),
-
           base: Number(plan.baseNumber || 0),
           addon: Number(plan.addonNumber || 0),
-
           otherDetails: plan.otherDetails,
-
           sourcePlan: plan,
         });
         console.log("✅ Added to compare:", plan);
@@ -323,7 +248,6 @@ export class GMCQuotesComponent implements OnInit {
   getDetailsKeys(): string[] {
     return Object.keys(this.compare[0]?.otherDetails || {});
   }
-
 
   removeFromCompare(plan: any) {
     this.compare = this.compare.filter((p) => p.planId !== plan.planId);
@@ -353,9 +277,37 @@ export class GMCQuotesComponent implements OnInit {
     return plan.planId || index;
   }
 
+  /* -------------------- Filters handlers -------------------- */
+
+  onCoverageAmountChange(event: any) {
+    const newValue = Number(event.target.value);
+
+    if (!this.basePayload) return;
+
+    this.basePayload.coverAmount = isNaN(newValue) ? 0 : newValue;
+    this.fetchAllPlans(this.basePayload);
+  }
+
+  onSortChange(event: any) {
+    const value = event.target.value;
+    this.selectedSort = value === '' ? null : value;
+    if (this.basePayload) this.fetchAllPlans(this.basePayload);
+  }
+
+  onInsurerChange(event: any) {
+    const value = event.target.value;
+    this.selectedInsurer = value === '' ? null : value;
+    if (this.basePayload) {
+      this.fetchAllPlans(this.basePayload);
+    }
+  }
+
+  buildPlanKey(plan: any): string {
+    return plan.uniqueId;
+  }
+
   /* -------------------- Helpers -------------------- */
 
-  // ---- helpers ----
   private parseDobToDate(dob: any): Date | null {
     if (!dob) return null;
 
@@ -406,7 +358,6 @@ export class GMCQuotesComponent implements OnInit {
     return Number.isFinite(n) ? n : null;
   }
 
-
   formatIndianCurrency(num: number): string {
     if (num >= 10000000) return (num / 10000000).toFixed(2).replace(/\.00$/, '') + ' Cr';
     if (num >= 100000) return (num / 100000).toFixed(2).replace(/\.00$/, '') + ' Lakh';
@@ -416,7 +367,6 @@ export class GMCQuotesComponent implements OnInit {
   // ✅ SAME as supertopup: go back to enquiry step 3
   goBack() {
     localStorage.setItem(this.RESTORE_FLAG, '1');
-
     this.router.navigate(['/gmc/enquiry-form'], {
       queryParams: { step: 3 },
       queryParamsHandling: 'merge',
@@ -429,18 +379,13 @@ export class GMCQuotesComponent implements OnInit {
     });
   }
 
-  // downloadBrochure(url: string) {
-  //   window.open(url, '_blank');
-  // }
   goToAllFeatures(plan: any) {
     const combined = {
       ...plan.fullPlan,
       premiums: [plan.fullPremium],
-
       totalBasePremium: Number(plan.fullPremium.premium) || 0,
       totalDiscount: Number(plan.fullPremium.discount) || 0,
       totalPayablePremium: Number(plan.fullPremium.premium) || 0,
-
       base: Number(plan.fullPremium.base ?? plan.fullPlan.base ?? 0) || 0,
       addon: Number(plan.fullPremium.addon ?? plan.fullPlan.addon ?? 0) || 0,
       coverAmount: plan.fullPlan.coverAmount,
@@ -451,11 +396,7 @@ export class GMCQuotesComponent implements OnInit {
     });
   }
 
-
-
-
-
-  /* -------------------- PDF Download (same logic) -------------------- */
+  /* -------------------- PDF Download (fixed) -------------------- */
 
   async downloadPDF() {
     if (this.isPdfDownloading) return;
@@ -464,11 +405,17 @@ export class GMCQuotesComponent implements OnInit {
     this.cdr.detectChanges();
 
     const wrapper = document.getElementById("compareWrapper") as HTMLElement | null;
-    if (!wrapper) { this.isPdfDownloading = false; return; }
+    if (!wrapper) {
+      this.isPdfDownloading = false;
+      return;
+    }
 
     const userStrip = wrapper.querySelector(".cmp-user-strip") as HTMLElement | null;
     const cmpRootOriginal = wrapper.querySelector(".cmp-pdf-root") as HTMLElement | null;
-    if (!cmpRootOriginal) { this.isPdfDownloading = false; return; }
+    if (!cmpRootOriginal) {
+      this.isPdfDownloading = false;
+      return;
+    }
 
     const nextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
 
@@ -610,7 +557,7 @@ export class GMCQuotesComponent implements OnInit {
     } finally {
       exportBox.remove();
 
-      this.zone.run(() => {
+      this.ngZone.run(() => { // Fixed: using ngZone instead of zone
         this.isPdfDownloading = false;
         this.cdr.detectChanges();
       });
@@ -620,5 +567,4 @@ export class GMCQuotesComponent implements OnInit {
   getGridTemplateColumns(): string {
     return `300px repeat(${this.compare.length || 1}, 1fr)`;
   }
-
 }

@@ -1,5 +1,5 @@
 <div
-  class="w-full flex justify-center px-3 sm:px-6 py-6 sm:py-10 bg-[#F5FAFC]"
+class="w-full flex justify-center px-3 sm:px-6 py-6 sm:py-10 bg-[#F5FAFC]"
 >
   <div
     class="w-full max-w-5xl bg-white rounded-2xl shadow-lg px-4 sm:px-10 py-6 sm:py-10"
@@ -24,7 +24,7 @@
 </button>
 
     <h2 class="text-center text-xl font-semibold text-[#006D8D] mb-8">
-      Group Medical Care Enquiry
+      Group Mediclaim Enquiry
     </h2>
 
     <form [formGroup]="enquiryForm" (ngSubmit)="submit()" novalidate>
@@ -91,11 +91,12 @@
               type="date"
               class="pp-input"
               placeholder="Select date of birth"
-              max="{{ today | date: 'yyyy-MM-dd' }}"
+              [max]="today | date: 'yyyy-MM-dd'"
+              [attr.max]="today | date: 'yyyy-MM-dd'"
             />
-            <p *ngIf="isInvalid('dateOfBirth')" class="pp-error">
-              Please select a valid date of birth
-            </p>
+             <p *ngIf="isInvalid('dateOfBirth')" class="pp-error">
+                  {{ getDateOfBirthError() }}
+                </p>
           </div>
 
         <!-- Email -->
@@ -149,22 +150,25 @@
           </p>
         </div>
 
-        <!-- City -->
-        <div>
-          <label class="pp-label"
-            >City <span class="text-red-600">*</span></label
-          >
-          <input
-          formControlName="city"
-          type="text"
-          class="pp-input"
-          placeholder="Enter city"
-          (keypress)="allowOnlyLetters($event)"
-        />
+        <!-- City Field -->
+    <div>
+          <label class="pp-label">City <span class="text-red-600">*</span></label>
+          <select formControlName="city" class="pp-select">
+          <option value="" disabled>Select a city</option>
+          <option *ngFor="let city of cities" [value]="city.toUpperCase()">
+            {{ city | titlecase }}
+          </option>
+        </select>
 
-          <p *ngIf="isInvalid('city')" class="pp-error">Enter valid city</p>
+          <p *ngIf="isInvalid('city')" class="pp-error">Please select a valid city</p>
         </div>
 
+    <!-- Zone Field  -->
+    <div>
+          <label class="pp-label">Zone <span class="text-red-600">*</span></label>
+          <input formControlName="zoneLabel" type="text" class="pp-input" placeholder="Zone will auto-select" readonly />
+          <input formControlName="zone" type="hidden" value="3" />
+        </div>
 
         <!-- Coverage Amount -->
         <div>
@@ -252,7 +256,7 @@
           type="submit"
           class="pp-btn-primary"
           (click)= "submit()"
-          [disabled]="!termsAcceptedSignal()"
+          [disabled]="!enquiryForm.valid || !termsAcceptedSignal()"
         >
         Get Quotes
         </button>
