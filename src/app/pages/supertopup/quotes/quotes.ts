@@ -19,7 +19,7 @@ type PlanPayload = {
 
 @Component({
   selector: 'app-quotes',
-  standalone: true, 
+  standalone: true,
 
   imports: [CommonModule],
   templateUrl: './quotes.html',
@@ -67,7 +67,7 @@ export class Quotes implements OnInit {
   ngOnInit(): void {
     sessionStorage.setItem(this.PAGE_KEY, 'quotes');
 
-    this.selectedSort = 'low';
+    this.selectedSort = 'high';
     const savedData = localStorage.getItem(this.ENQUIRY_KEY);
 
     // ✅ IMPORTANT: if enquiry exists, always allow restore
@@ -306,7 +306,7 @@ export class Quotes implements OnInit {
 
             // 4️⃣ Sorting
             if (!this.selectedSort) {
-              this.selectedSort = 'low';
+              this.selectedSort = 'high';
             }
 
             if (this.selectedSort === 'low') {

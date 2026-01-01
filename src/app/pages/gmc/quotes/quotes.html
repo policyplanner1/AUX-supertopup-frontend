@@ -5,7 +5,7 @@
   <div
     class="w-full bg-white rounded-xl px-4 py-3 relative flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
 
-     <!-- LEFT: Back Arrow + Breadcrumbs -->
+  <!-- LEFT: Back Arrow + Breadcrumbs -->
     <div class="flex items-center gap-2 min-w-0">
       <!-- Back Arrow -->
       <button
@@ -15,11 +15,11 @@
         aria-label="Go back"
       >
         <svg xmlns="http://www.w3.org/2000/svg"
-             class="w-5 h-5 text-[#006D8D] group-hover:text-[#004b60] transition"
-             fill="none"
-             viewBox="0 0 24 24"
-             stroke="currentColor"
-             stroke-width="2">
+            class="w-5 h-5 text-[#006D8D] group-hover:text-[#004b60] transition"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6" />
         </svg>
       </button>
@@ -204,7 +204,7 @@
               (click)="goToProposal(p)"
               class="bg-[#007AAA] hover:bg-[#006988] text-white font-semibold py-2 rounded-md shadow text-sm mb-2">
               Buy Now {{ p.premium }}
-            </button>         
+            </button>
 
 
               <a *ngIf="p.brochure" [href]="p.brochure" download target="_blank"

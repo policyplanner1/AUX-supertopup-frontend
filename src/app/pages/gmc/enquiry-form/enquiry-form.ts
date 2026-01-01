@@ -68,14 +68,8 @@ export class GMCEnquiryFormComponent {
         ],
       ],
       companySize: ['', Validators.required],
-      industryType: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.pattern(/^[A-Z .&()-]+$/),
-        ],
-      ],
+      industryType: ['', Validators.required],
+
       city: [
         '',
         [
@@ -92,8 +86,8 @@ export class GMCEnquiryFormComponent {
     });
 
     this.toUpperCaseControl('companyName');
-    this.toUpperCaseControl('industryType');
-    this.toUpperCaseControl('city');
+    this.toUpperCaseControl('city'); // ✅ add this back
+
   }
 
 ngOnInit(): void {
@@ -137,7 +131,20 @@ ngOnInit(): void {
     sessionStorage.removeItem(this.RESTORE_FLAG);
   } else {
     // Clear form fields if not restoring
-    this.enquiryForm.reset();
+      this.enquiryForm.reset({
+        companyName: '',
+        contactPerson: '',
+        contactNumber: '',
+        email: '',
+        companySize: '',
+        industryType: '',   // ✅ important for placeholder
+        city: '',
+        zone: '3',
+        zoneLabel: 'Zone 3',
+        coverageAmount: '',
+        demography: '',
+        dateOfBirth: '',
+      });
   }
 
   // Subscribe to the 'city' field's value changes
@@ -148,7 +155,6 @@ ngOnInit(): void {
 
   // Also validate date of birth on form changes
   this.enquiryForm.get('dateOfBirth')?.valueChanges.subscribe((dob) => {
-    console.log('Date of Birth changed:', dob);
     if (dob) {
       this.validateDateOfBirth(dob);
     }
@@ -211,20 +217,36 @@ ngOnInit(): void {
   }
 
   private updateZoneForCity(city: string) {
-    const zone = this.CITY_ZONE_MAP[city.toLowerCase()];
+  const typed = (city || '').trim().toLowerCase();
 
-    if (zone) {
-      this.enquiryForm.patchValue({
-        zone: zone,
-        zoneLabel: `Zone ${zone}`,
-      });
-    } else {
-      this.enquiryForm.patchValue({
-        zone: '',
-        zoneLabel: 'Zone not available',
-      });
-    }
+  if (!typed) {
+    this.enquiryForm.patchValue(
+      { zone: "3", zoneLabel: "Zone 3" },
+      { emitEvent: false }
+    );
+    return;
   }
+
+  // find matching key from your map (handles Mumbai vs mumbai)
+  const key = Object.keys(this.CITY_ZONE_MAP).find(
+    (k) => k.trim().toLowerCase() === typed
+  );
+
+  const zone = key ? this.CITY_ZONE_MAP[key] : null;
+
+  if (zone) {
+    this.enquiryForm.patchValue(
+      { zone: zone, zoneLabel: `Zone ${zone}` },
+      { emitEvent: false }
+    );
+  } else {
+    this.enquiryForm.patchValue(
+      { zone: "3", zoneLabel: "Zone 3" },
+      { emitEvent: false }
+    );
+  }
+}
+
 
   private toUpperCaseControl(controlName: string) {
     const control = this.enquiryForm.get(controlName);
@@ -234,7 +256,7 @@ ngOnInit(): void {
       if (typeof value === 'string') {
         const upper = value.toUpperCase();
         if (value !== upper) {
-          control.setValue(upper, { emitEvent: false });
+        control.setValue(upper, { emitEvent: true }); // ✅ keep true so zone updates
         }
       }
     });
@@ -375,6 +397,7 @@ ngOnInit(): void {
   }
 
   private buildPayload() {
+
     const raw = this.enquiryForm.getRawValue();
     const age = this.calculateAge(raw.dateOfBirth);
     const { noOfAdults, noOfChildren } = this.getDemographyCounts(raw.demography);
@@ -388,7 +411,7 @@ ngOnInit(): void {
         email: raw.email,
         companySize: raw.companySize,
         industryType: raw.industryType,
-        cust_city: raw.city,
+        cust_city: (raw.city || '').toUpperCase(),
         zone: raw.zone,  // Added zone to payload
         cover_amount: raw.coverageAmount,
         demography: raw.demography,

@@ -81,25 +81,7 @@ class="w-full flex justify-center px-3 sm:px-6 py-6 sm:py-10 bg-[#F5FAFC]"
           </p>
         </div>
 
-          <!-- Date of Birth -->
-          <div>
-            <label class="pp-label">
-              Date of Birth <span class="text-red-600">*</span>
-            </label>
-            <input
-              formControlName="dateOfBirth"
-              type="date"
-              class="pp-input"
-              placeholder="Select date of birth"
-              [max]="today | date: 'yyyy-MM-dd'"
-              [attr.max]="today | date: 'yyyy-MM-dd'"
-            />
-             <p *ngIf="isInvalid('dateOfBirth')" class="pp-error">
-                  {{ getDateOfBirthError() }}
-                </p>
-          </div>
-
-        <!-- Email -->
+      <!-- Email -->
         <div>
           <label class="pp-label"
             >Email ID <span class="text-red-600">*</span></label
@@ -134,36 +116,74 @@ class="w-full flex justify-center px-3 sm:px-6 py-6 sm:py-10 bg-[#F5FAFC]"
           </p>
         </div>
 
-        <!-- Industry Type -->
-        <div>
-          <label class="pp-label"
-            >Type of Industry <span class="text-red-600">*</span></label
-          >
-          <input
-            formControlName="industryType"
-            type="text"
-            class="pp-input"
-            placeholder="e.g. IT, Manufacturing"
-          />
-          <p *ngIf="isInvalid('industryType')" class="pp-error">
-            Enter industry type
-          </p>
-        </div>
-
-        <!-- City Field -->
+         <!-- Date of Birth -->
+          <div>
+            <label class="pp-label">
+              Date of Birth <span class="text-red-600">*</span>
+            </label>
+            <input
+              formControlName="dateOfBirth"
+              type="date"
+              class="pp-input"
+              placeholder="Select date of birth"
+              [max]="today | date: 'yyyy-MM-dd'"
+              [attr.max]="today | date: 'yyyy-MM-dd'"
+            />
+             <p *ngIf="isInvalid('dateOfBirth')" class="pp-error">
+                  {{ getDateOfBirthError() }}
+                </p>
+          </div>
+          
+    <!-- Industry Type -->
     <div>
-          <label class="pp-label">City <span class="text-red-600">*</span></label>
-          <select formControlName="city" class="pp-select">
-          <option value="" disabled>Select a city</option>
-          <option *ngFor="let city of cities" [value]="city.toUpperCase()">
-            {{ city | titlecase }}
-          </option>
-        </select>
+      <label class="pp-label">Type of Industry <span class="text-red-600">*</span></label>
 
-          <p *ngIf="isInvalid('city')" class="pp-error">Please select a valid city</p>
-        </div>
+      <select
+          formControlName="industryType"
+          class="pp-select"
+          [ngClass]="{ 'pp-placeholder': !enquiryForm.get('industryType')?.value }"
+        >
+        <option value="" disabled>Select Type of Industry </option>
+        <option value="IT / Software">IT / Software</option>
+        <option value="BPO / ITES">BPO / ITES</option>
+        <option value="Manufacturing">Manufacturing</option>
+        <option value="Construction / Real Estate">Construction / Real Estate</option>
+        <option value="Retail / E-commerce">Retail / E-commerce</option>
+        <option value="Logistics / Transport">Logistics / Transport</option>
+        <option value="Healthcare / Pharma">Healthcare / Pharma</option>
+        <option value="Education">Education</option>
+        <option value="Finance / Banking / Insurance">Finance / Banking / Insurance</option>
+        <option value="Hospitality / Food">Hospitality / Food</option>
+        <option value="Professional Services">Professional Services</option>
+        <option value="Government / PSU / NGO">Government / PSU / NGO</option>
+        <option value="Other">Other</option>
+      </select>
 
-    <!-- Zone Field  -->
+      <p *ngIf="isInvalid('industryType')" class="pp-error">Select industry type</p>
+    </div>
+
+
+
+  <!-- City Field (writable + dropdown) -->
+    <div>
+    <label class="pp-label">City <span class="text-red-600">*</span></label>
+
+    <input
+      class="pp-input"
+      formControlName="city"
+      list="cityList"
+      placeholder="Select or type city"
+      autocomplete="off"
+    />
+
+    <datalist id="cityList">
+      <option *ngFor="let c of cities" [value]="c"></option>
+    </datalist>
+
+    <p *ngIf="isInvalid('city')" class="pp-error">Please select a valid city</p>
+  </div>
+
+  <!-- Zone Field  -->
     <div>
           <label class="pp-label">Zone <span class="text-red-600">*</span></label>
           <input formControlName="zoneLabel" type="text" class="pp-input" placeholder="Zone will auto-select" readonly />
@@ -172,25 +192,23 @@ class="w-full flex justify-center px-3 sm:px-6 py-6 sm:py-10 bg-[#F5FAFC]"
 
         <!-- Coverage Amount -->
         <div>
-          <label class="pp-label"
-            >Coverage Amount <span class="text-red-600">*</span></label
-          >
+          <label class="pp-label">Coverage Amount <span class="text-red-600">*</span></label>
           <select formControlName="coverageAmount" class="pp-select">
             <option value="" disabled>Select coverage amount</option>
-              <option value="500000">5 Lakh</option>
-              <option value="1000000">10 Lakh</option>
-              <option value="1500000">15 Lakh</option>
-              <option value="2000000">20 Lakh</option>
-              <option value="2500000">25 Lakh</option>
-              <option value="3000000">30 Lakh</option>
-              <option value="3500000">35 Lakh</option>
-              <option value="5000000">50 Lakh</option>
+              <option value="500000">1 Lakh</option>
+              <option value="1000000">2 Lakh</option>
+              <option value="1500000">3 Lakh</option>
+              <option value="2000000">4 Lakh</option>
+              <option value="2500000">5 Lakh</option>
+              <option value="3000000">7.5 Lakh</option>
+              <option value="3500000">10 Lakh</option>
+              <!-- <option value="5000000">50 Lakh</option>
               <option value="7500000">75 Lakh</option>
               <option value="10000000">1 Crore</option>
               <option value="20000000">2 Crore</option>
               <option value="30000000">3 Crore</option>
               <option value="40000000">4 Crore</option>
-              <option value="50000000">5 Crore</option>
+              <option value="50000000">5 Crore</option> -->
           </select>
           <p *ngIf="isInvalid('coverageAmount')" class="pp-error">
             Please select coverage amount
@@ -256,9 +274,8 @@ class="w-full flex justify-center px-3 sm:px-6 py-6 sm:py-10 bg-[#F5FAFC]"
           type="submit"
           class="pp-btn-primary"
           (click)= "submit()"
-          [disabled]="!enquiryForm.valid || !termsAcceptedSignal()"
-        >
-        Get Quotes
+          [disabled]="!enquiryForm.valid || !termsAcceptedSignal()">
+          Get Quotes
         </button>
       </div>
     </form>
