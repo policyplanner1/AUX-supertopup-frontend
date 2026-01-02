@@ -1,6 +1,14 @@
 import { Component, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AbstractControl, ValidationErrors, FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  AbstractControl,
+  ValidationErrors,
+  FormBuilder,
+  FormGroup,
+  Validators,
+  FormsModule,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../../../../firebaseConfig';
@@ -35,49 +43,21 @@ export class GMCEnquiryFormComponent {
     this.termsAcceptedSignal.set((event.target as HTMLInputElement).checked);
   }
 
-  private readonly EMAIL_REGEX =
-    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  private readonly EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-  constructor(
-    private fb: FormBuilder,
-    private router: Router,
-    private route: ActivatedRoute
-  ) {
+  constructor(private fb: FormBuilder, private router: Router, private route: ActivatedRoute) {
     this.enquiryForm = this.fb.group({
       companyName: [
         '',
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.pattern(/^[A-Z0-9 .&()-]+$/),
-        ],
+        [Validators.required, Validators.minLength(2), Validators.pattern(/^[A-Z0-9 .&()-]+$/)],
       ],
       contactPerson: ['', Validators.required],
-      contactNumber: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(/^[6-9]\d{9}$/),
-        ],
-      ],
-      email: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(this.EMAIL_REGEX),
-        ],
-      ],
+      contactNumber: ['', [Validators.required, Validators.pattern(/^[6-9]\d{9}$/)]],
+      email: ['', [Validators.required, Validators.pattern(this.EMAIL_REGEX)]],
       companySize: ['', Validators.required],
       industryType: ['', Validators.required],
 
-      city: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.pattern(/^[A-Z ]+$/),
-        ],
-      ],
+      city: ['', [Validators.required, Validators.minLength(2), Validators.pattern(/^[A-Z ]+$/)]],
       zone: ['3', Validators.required],
       zoneLabel: ['Zone 3'],
       coverageAmount: ['', Validators.required],
@@ -87,57 +67,56 @@ export class GMCEnquiryFormComponent {
 
     this.toUpperCaseControl('companyName');
     this.toUpperCaseControl('city'); // ✅ add this back
-
   }
 
-ngOnInit(): void {
-  // Check if the form data should be restored
-  const restoreFlag = sessionStorage.getItem(this.RESTORE_FLAG);
+  ngOnInit(): void {
+    // Check if the form data should be restored
+    const restoreFlag = sessionStorage.getItem(this.RESTORE_FLAG);
 
-  // If the form is being restored (coming from the quotes page), restore the data
-  if (restoreFlag === '1') {
-    const savedData = localStorage.getItem(this.ENQUIRY_KEY);
+    // If the form is being restored (coming from the quotes page), restore the data
+    if (restoreFlag === '1') {
+      const savedData = localStorage.getItem(this.ENQUIRY_KEY);
 
-    if (savedData) {
-      try {
-        const parsed = JSON.parse(savedData);
+      if (savedData) {
+        try {
+          const parsed = JSON.parse(savedData);
 
-        // Set the form fields with the saved data
-        this.enquiryForm.patchValue({
-          companyName: parsed.details.companyName,
-          contactPerson: parsed.details.contactPerson,
-          contactNumber: parsed.details.cust_mobile,
-          email: parsed.details.email,
-          companySize: parsed.details.companySize,
-          industryType: parsed.details.industryType,
-          city: parsed.details.cust_city,
-          zone: parsed.details.zone,
-          zoneLabel: parsed.details.zoneLabel,
-          coverageAmount: parsed.details.cover_amount,
-          demography: parsed.details.demography,
-          dateOfBirth: parsed.details.dateOfBirth,
-        });
+          // Set the form fields with the saved data
+          this.enquiryForm.patchValue({
+            companyName: parsed.details.companyName,
+            contactPerson: parsed.details.contactPerson,
+            contactNumber: parsed.details.cust_mobile,
+            email: parsed.details.email,
+            companySize: parsed.details.companySize,
+            industryType: parsed.details.industryType,
+            city: parsed.details.cust_city,
+            zone: parsed.details.zone,
+            zoneLabel: parsed.details.zoneLabel,
+            coverageAmount: parsed.details.cover_amount,
+            demography: parsed.details.demography,
+            dateOfBirth: parsed.details.dateOfBirth,
+          });
 
-        // Set the termsAcceptedSignal if it's part of the saved data
-        this.termsAcceptedSignal.set(parsed.details.termsAccepted);
+          // Set the termsAcceptedSignal if it's part of the saved data
+          this.termsAcceptedSignal.set(parsed.details.termsAccepted);
 
-        console.log("Restored form data from localStorage:", parsed);
-      } catch (e) {
-        console.warn('Failed to parse localStorage data', e);
+          console.log('Restored form data from localStorage:', parsed);
+        } catch (e) {
+          console.warn('Failed to parse localStorage data', e);
+        }
       }
-    }
 
-    // Reset the restore flag in sessionStorage after restoration
-    sessionStorage.removeItem(this.RESTORE_FLAG);
-  } else {
-    // Clear form fields if not restoring
+      // Reset the restore flag in sessionStorage after restoration
+      sessionStorage.removeItem(this.RESTORE_FLAG);
+    } else {
+      // Clear form fields if not restoring
       this.enquiryForm.reset({
         companyName: '',
         contactPerson: '',
         contactNumber: '',
         email: '',
         companySize: '',
-        industryType: '',   // ✅ important for placeholder
+        industryType: '', // ✅ important for placeholder
         city: '',
         zone: '3',
         zoneLabel: 'Zone 3',
@@ -145,22 +124,21 @@ ngOnInit(): void {
         demography: '',
         dateOfBirth: '',
       });
-  }
-
-  // Subscribe to the 'city' field's value changes
-  this.enquiryForm.get('city')?.valueChanges.subscribe((city) => {
-    console.log('Selected city:', city);
-    this.updateZoneForCity(city);
-  });
-
-  // Also validate date of birth on form changes
-  this.enquiryForm.get('dateOfBirth')?.valueChanges.subscribe((dob) => {
-    if (dob) {
-      this.validateDateOfBirth(dob);
     }
-  });
-}
 
+    // Subscribe to the 'city' field's value changes
+    this.enquiryForm.get('city')?.valueChanges.subscribe((city) => {
+      console.log('Selected city:', city);
+      this.updateZoneForCity(city);
+    });
+
+    // Also validate date of birth on form changes
+    this.enquiryForm.get('dateOfBirth')?.valueChanges.subscribe((dob) => {
+      if (dob) {
+        this.validateDateOfBirth(dob);
+      }
+    });
+  }
 
   private dateOfBirthValidator(control: AbstractControl): ValidationErrors | null {
     const value = control.value;
@@ -217,36 +195,24 @@ ngOnInit(): void {
   }
 
   private updateZoneForCity(city: string) {
-  const typed = (city || '').trim().toLowerCase();
+    const typed = (city || '').trim().toLowerCase();
 
-  if (!typed) {
-    this.enquiryForm.patchValue(
-      { zone: "3", zoneLabel: "Zone 3" },
-      { emitEvent: false }
-    );
-    return;
+    if (!typed) {
+      this.enquiryForm.patchValue({ zone: '3', zoneLabel: 'Zone 3' }, { emitEvent: false });
+      return;
+    }
+
+    // find matching key from your map (handles Mumbai vs mumbai)
+    const key = Object.keys(this.CITY_ZONE_MAP).find((k) => k.trim().toLowerCase() === typed);
+
+    const zone = key ? this.CITY_ZONE_MAP[key] : null;
+
+    if (zone) {
+      this.enquiryForm.patchValue({ zone: zone, zoneLabel: `Zone ${zone}` }, { emitEvent: false });
+    } else {
+      this.enquiryForm.patchValue({ zone: '3', zoneLabel: 'Zone 3' }, { emitEvent: false });
+    }
   }
-
-  // find matching key from your map (handles Mumbai vs mumbai)
-  const key = Object.keys(this.CITY_ZONE_MAP).find(
-    (k) => k.trim().toLowerCase() === typed
-  );
-
-  const zone = key ? this.CITY_ZONE_MAP[key] : null;
-
-  if (zone) {
-    this.enquiryForm.patchValue(
-      { zone: zone, zoneLabel: `Zone ${zone}` },
-      { emitEvent: false }
-    );
-  } else {
-    this.enquiryForm.patchValue(
-      { zone: "3", zoneLabel: "Zone 3" },
-      { emitEvent: false }
-    );
-  }
-}
-
 
   private toUpperCaseControl(controlName: string) {
     const control = this.enquiryForm.get(controlName);
@@ -256,7 +222,7 @@ ngOnInit(): void {
       if (typeof value === 'string') {
         const upper = value.toUpperCase();
         if (value !== upper) {
-        control.setValue(upper, { emitEvent: true }); // ✅ keep true so zone updates
+          control.setValue(upper, { emitEvent: true }); // ✅ keep true so zone updates
         }
       }
     });
@@ -289,10 +255,7 @@ ngOnInit(): void {
     let age = today.getFullYear() - dobDate.getFullYear();
     const monthDiff = today.getMonth() - dobDate.getMonth();
 
-    if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && today.getDate() < dobDate.getDate())
-    ) {
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dobDate.getDate())) {
       age--;
     }
 
@@ -347,7 +310,7 @@ ngOnInit(): void {
     if (this.enquiryForm.invalid || !this.termsAcceptedSignal()) {
       this.enquiryForm.markAllAsTouched();
 
-      Object.keys(this.enquiryForm.controls).forEach(key => {
+      Object.keys(this.enquiryForm.controls).forEach((key) => {
         const control = this.enquiryForm.get(key);
         if (control?.invalid) {
           console.log(`Field ${key} errors:`, control.errors);
@@ -397,7 +360,6 @@ ngOnInit(): void {
   }
 
   private buildPayload() {
-
     const raw = this.enquiryForm.getRawValue();
     const age = this.calculateAge(raw.dateOfBirth);
     const { noOfAdults, noOfChildren } = this.getDemographyCounts(raw.demography);
@@ -412,7 +374,7 @@ ngOnInit(): void {
         companySize: raw.companySize,
         industryType: raw.industryType,
         cust_city: (raw.city || '').toUpperCase(),
-        zone: raw.zone,  // Added zone to payload
+        zone: raw.zone, // Added zone to payload
         cover_amount: raw.coverageAmount,
         demography: raw.demography,
         dateOfBirth: raw.dateOfBirth,

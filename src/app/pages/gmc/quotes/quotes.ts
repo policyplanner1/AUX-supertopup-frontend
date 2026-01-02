@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { toPng } from "html-to-image";
+import { toPng } from 'html-to-image';
 import jsPDF from 'jspdf';
 import { toCanvas } from 'html-to-image';
 import { NgZone, ChangeDetectorRef } from '@angular/core';
@@ -25,7 +25,6 @@ type PlanPayload = {
   styleUrl: './quotes.scss',
 })
 export class GMCQuotesComponent implements OnInit {
-
   // ✅ SAME AS SUPERTOPUP (PA keys)
   private readonly ENQUIRY_KEY = 'gmc_enquiry';
   private readonly RESTORE_FLAG = 'gmc_enquiry_restore_ok';
@@ -60,7 +59,7 @@ export class GMCQuotesComponent implements OnInit {
     private api: GMCService,
     private ngZone: NgZone, // Renamed parameter to avoid conflict
     private cdr: ChangeDetectorRef
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     // ✅ remember we are on quotes
@@ -81,7 +80,7 @@ export class GMCQuotesComponent implements OnInit {
         const parsed = JSON.parse(savedData);
         const payload = this.buildPayloadFromLocal(parsed);
         this.basePayload = payload;
-        console.log("GMC Quotes Payload:", payload);
+        console.log('GMC Quotes Payload:', payload);
 
         const enquiry = parsed?.details ?? {};
 
@@ -93,10 +92,7 @@ export class GMCQuotesComponent implements OnInit {
         this.fetchAllPlans(payload);
         return;
       } catch (e) {
-        console.warn(
-          'Failed to parse localStorage gmc_enquiry, falling back.',
-          e
-        );
+        console.warn('Failed to parse localStorage gmc_enquiry, falling back.', e);
       }
     }
   }
@@ -104,7 +100,7 @@ export class GMCQuotesComponent implements OnInit {
   /* -------------------- build payload from localStorage -------------------- */
 
   private buildPayloadFromLocal(ls: any): PlanPayload {
-    console.log("GMC LocalStorage Data:", ls);
+    console.log('GMC LocalStorage Data:', ls);
     const enquiry = ls?.details ?? {};
     const coverAmount = this.toNum(enquiry.cover_amount, 0);
     const age = this.calcAgeFromDob(enquiry.dateOfBirth);
@@ -119,13 +115,14 @@ export class GMCQuotesComponent implements OnInit {
       city, // Include city in payload
       age,
       noOfAdults,
-      noOfChildren
+      noOfChildren,
     };
   }
 
   /* -------------------- Fetch + Map all plans -------------------- */
 
-  fetchAllPlans(payload: PlanPayload) { // Use PlanPayload type
+  fetchAllPlans(payload: PlanPayload) {
+    // Use PlanPayload type
     this.api.getGMCEndpoints().subscribe({
       next: (response) => {
         const apiList = response?.data?.map((item: any) => item.api_type) || [];
@@ -146,8 +143,7 @@ export class GMCQuotesComponent implements OnInit {
                 }
 
                 const coverAmountNum = Number(p.coverAmount) || 0;
-                const premiumNumber =
-                  Number(String(p?.premium ?? 0).replace(/,/g, '')) || 0;
+                const premiumNumber = Number(String(p?.premium ?? 0).replace(/,/g, '')) || 0;
 
                 return {
                   uniqueId: crypto.randomUUID(),
@@ -158,11 +154,12 @@ export class GMCQuotesComponent implements OnInit {
                   premium: `₹ ${this.formatIndianCurrency(premiumNumber)}`,
                   premiumNumber: premiumNumber,
                   coverAmountNumber: coverAmountNum,
-                  features: Array.isArray(p.features) && p.features.length
-                    ? p.features
-                      .map((f: any) => (typeof f === 'string' ? f : f?.includes || ''))
-                      .filter(Boolean)
-                    : ['No Key Features Available'],
+                  features:
+                    Array.isArray(p.features) && p.features.length
+                      ? p.features
+                          .map((f: any) => (typeof f === 'string' ? f : f?.includes || ''))
+                          .filter(Boolean)
+                      : ['No Key Features Available'],
                   brochure: p.brochureUrl || null,
                   onePager: p.onePagerUrl || null,
                   planId: p.planId || `${p.plan}`,
@@ -176,13 +173,9 @@ export class GMCQuotesComponent implements OnInit {
             if (!this.selectedSort) this.selectedSort = 'low';
 
             if (this.selectedSort === 'low') {
-              mappedPlans.sort(
-                (a: any, b: any) => a.premiumNumber - b.premiumNumber
-              );
+              mappedPlans.sort((a: any, b: any) => a.premiumNumber - b.premiumNumber);
             } else if (this.selectedSort === 'high') {
-              mappedPlans.sort(
-                (a: any, b: any) => b.premiumNumber - a.premiumNumber
-              );
+              mappedPlans.sort((a: any, b: any) => b.premiumNumber - a.premiumNumber);
             }
 
             console.log('🔥 SORTED GMC Plans:', mappedPlans);
@@ -234,7 +227,7 @@ export class GMCQuotesComponent implements OnInit {
           otherDetails: plan.otherDetails,
           sourcePlan: plan,
         });
-        console.log("✅ Added to compare:", plan);
+        console.log('✅ Added to compare:', plan);
       }
     } else {
       this.compare = this.compare.filter((p) => p.key !== key);
@@ -242,7 +235,7 @@ export class GMCQuotesComponent implements OnInit {
   }
 
   callNow() {
-    window.location.href = "tel:+917798612243"; // replace with your number
+    window.location.href = 'tel:+917798612243'; // replace with your number
   }
 
   getDetailsKeys(): string[] {
@@ -319,7 +312,8 @@ export class GMCQuotesComponent implements OnInit {
       const month = Number(m[2]);
       const year = Number(m[3]);
       const d = new Date(year, month - 1, day);
-      if (d.getFullYear() !== year || d.getMonth() !== month - 1 || d.getDate() !== day) return null;
+      if (d.getFullYear() !== year || d.getMonth() !== month - 1 || d.getDate() !== day)
+        return null;
       return d;
     }
 
@@ -392,7 +386,7 @@ export class GMCQuotesComponent implements OnInit {
     };
 
     this.router.navigate(['personal-accident/all-features'], {
-      state: { selectedPlan: combined }
+      state: { selectedPlan: combined },
     });
   }
 
@@ -404,14 +398,14 @@ export class GMCQuotesComponent implements OnInit {
     this.isPdfDownloading = true;
     this.cdr.detectChanges();
 
-    const wrapper = document.getElementById("compareWrapper") as HTMLElement | null;
+    const wrapper = document.getElementById('compareWrapper') as HTMLElement | null;
     if (!wrapper) {
       this.isPdfDownloading = false;
       return;
     }
 
-    const userStrip = wrapper.querySelector(".cmp-user-strip") as HTMLElement | null;
-    const cmpRootOriginal = wrapper.querySelector(".cmp-pdf-root") as HTMLElement | null;
+    const userStrip = wrapper.querySelector('.cmp-user-strip') as HTMLElement | null;
+    const cmpRootOriginal = wrapper.querySelector('.cmp-pdf-root') as HTMLElement | null;
     if (!cmpRootOriginal) {
       this.isPdfDownloading = false;
       return;
@@ -420,28 +414,28 @@ export class GMCQuotesComponent implements OnInit {
     const nextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
 
     const normalizeStyles = (root: HTMLElement) => {
-      const all = root.querySelectorAll("*") as NodeListOf<HTMLElement>;
+      const all = root.querySelectorAll('*') as NodeListOf<HTMLElement>;
       all.forEach((el) => {
-        el.style.position = "static";
-        el.style.transform = "none";
-        el.style.filter = "none";
-        el.style.zIndex = "auto";
-        el.style.maxHeight = "none";
-        el.style.height = "auto";
-        el.style.minHeight = "0";
-        el.style.overflow = "visible";
+        el.style.position = 'static';
+        el.style.transform = 'none';
+        el.style.filter = 'none';
+        el.style.zIndex = 'auto';
+        el.style.maxHeight = 'none';
+        el.style.height = 'auto';
+        el.style.minHeight = '0';
+        el.style.overflow = 'visible';
       });
 
-      const tableWrap = root.querySelector(".cmp-table-wrapper") as HTMLElement | null;
+      const tableWrap = root.querySelector('.cmp-table-wrapper') as HTMLElement | null;
       if (tableWrap) {
-        tableWrap.style.overflow = "visible";
-        tableWrap.style.maxHeight = "none";
-        tableWrap.style.height = "auto";
+        tableWrap.style.overflow = 'visible';
+        tableWrap.style.maxHeight = 'none';
+        tableWrap.style.height = 'auto';
       }
     };
 
     const waitForImages = async (root: HTMLElement) => {
-      const imgs = Array.from(root.querySelectorAll("img")) as HTMLImageElement[];
+      const imgs = Array.from(root.querySelectorAll('img')) as HTMLImageElement[];
       await Promise.all(
         imgs.map(
           (img) =>
@@ -456,50 +450,50 @@ export class GMCQuotesComponent implements OnInit {
 
     const makeAbsoluteSrc = (src: string) => {
       if (!src) return src;
-      if (src.startsWith("data:")) return src;
-      if (src.startsWith("http://") || src.startsWith("https://") || src.startsWith("//")) {
-        return src.startsWith("//") ? window.location.protocol + src : src;
+      if (src.startsWith('data:')) return src;
+      if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('//')) {
+        return src.startsWith('//') ? window.location.protocol + src : src;
       }
       return new URL(src, document.baseURI).toString();
     };
 
     const inlineAllImages = async (root: HTMLElement) => {
-      const imgs = Array.from(root.querySelectorAll("img")) as HTMLImageElement[];
+      const imgs = Array.from(root.querySelectorAll('img')) as HTMLImageElement[];
 
       for (const img of imgs) {
         try {
-          const original = img.getAttribute("src") || "";
-          if (!original || original.startsWith("data:")) continue;
+          const original = img.getAttribute('src') || '';
+          if (!original || original.startsWith('data:')) continue;
 
           const abs = makeAbsoluteSrc(original);
-          img.setAttribute("crossorigin", "anonymous");
+          img.setAttribute('crossorigin', 'anonymous');
           img.src = abs;
 
-          const res = await fetch(abs, { cache: "no-store" });
+          const res = await fetch(abs, { cache: 'no-store' });
           if (!res.ok) continue;
 
           const blob = await res.blob();
           const dataUrl: string = await new Promise((resolve) => {
             const reader = new FileReader();
-            reader.onloadend = () => resolve(String(reader.result || ""));
+            reader.onloadend = () => resolve(String(reader.result || ''));
             reader.readAsDataURL(blob);
           });
 
-          if (dataUrl.startsWith("data:")) img.src = dataUrl;
+          if (dataUrl.startsWith('data:')) img.src = dataUrl;
         } catch {
           // ignore
         }
       }
     };
 
-    const exportBox = document.createElement("div");
-    exportBox.style.position = "absolute";
-    exportBox.style.left = "0";
-    exportBox.style.top = "0";
-    exportBox.style.background = "#ffffff";
-    exportBox.style.width = "max-content";
-    exportBox.style.padding = "0";
-    exportBox.style.margin = "0";
+    const exportBox = document.createElement('div');
+    exportBox.style.position = 'absolute';
+    exportBox.style.left = '0';
+    exportBox.style.top = '0';
+    exportBox.style.background = '#ffffff';
+    exportBox.style.width = 'max-content';
+    exportBox.style.padding = '0';
+    exportBox.style.margin = '0';
     document.body.appendChild(exportBox);
 
     try {
@@ -522,12 +516,12 @@ export class GMCQuotesComponent implements OnInit {
       await nextFrame();
 
       const canvas = await toCanvas(exportBox, {
-        backgroundColor: "#ffffff",
+        backgroundColor: '#ffffff',
         pixelRatio: 3,
         cacheBust: true,
       } as any);
 
-      const pdf = new jsPDF("l", "mm", "a4");
+      const pdf = new jsPDF('l', 'mm', 'a4');
       const pdfW = pdf.internal.pageSize.getWidth();
       const pdfH = pdf.internal.pageSize.getHeight();
 
@@ -537,27 +531,28 @@ export class GMCQuotesComponent implements OnInit {
       let heightLeft = imgH;
       let y = 0;
 
-      const imgData = canvas.toDataURL("image/png");
+      const imgData = canvas.toDataURL('image/png');
 
-      pdf.addImage(imgData, "PNG", 0, y, imgW, imgH);
+      pdf.addImage(imgData, 'PNG', 0, y, imgW, imgH);
       heightLeft -= pdfH;
 
       while (heightLeft > 0) {
         y -= pdfH;
         pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, y, imgW, imgH);
+        pdf.addImage(imgData, 'PNG', 0, y, imgW, imgH);
         heightLeft -= pdfH;
       }
 
-      pdf.save("pa-comparison.pdf");
+      pdf.save('pa-comparison.pdf');
       await new Promise((r) => setTimeout(r, 0));
     } catch (e) {
-      console.error("PDF error:", e);
-      alert("PDF export failed");
+      console.error('PDF error:', e);
+      alert('PDF export failed');
     } finally {
       exportBox.remove();
 
-      this.ngZone.run(() => { // Fixed: using ngZone instead of zone
+      this.ngZone.run(() => {
+        // Fixed: using ngZone instead of zone
         this.isPdfDownloading = false;
         this.cdr.detectChanges();
       });

@@ -61,8 +61,12 @@ export class Quotes implements OnInit {
   adultCount: number | null = null;
   childCount: number | null = null;
 
-  constructor(private router: Router, private api: SuperTopupService, private zone: NgZone,
-  private cdr: ChangeDetectorRef ) {}
+  constructor(
+    private router: Router,
+    private api: SuperTopupService,
+    private zone: NgZone,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     sessionStorage.setItem(this.PAGE_KEY, 'quotes');
@@ -298,11 +302,10 @@ export class Quotes implements OnInit {
                     fullPlan: p,
                     fullPremium: pm,
                   };
-
                 });
               });
 
-              console.log('mappedPlans', mappedPlans);
+            console.log('mappedPlans', mappedPlans);
 
             // 4️⃣ Sorting
             if (!this.selectedSort) {
@@ -550,186 +553,186 @@ export class Quotes implements OnInit {
 
   /* -------------------- PDF Download (same logic) -------------------- */
 
-async downloadPDF() {
- if (this.isPdfDownloading) return;
+  async downloadPDF() {
+    if (this.isPdfDownloading) return;
 
-  // ✅ turn on loader (and render it)
-  this.isPdfDownloading = true;
-  this.cdr.detectChanges();
+    // ✅ turn on loader (and render it)
+    this.isPdfDownloading = true;
+    this.cdr.detectChanges();
 
-  const wrapper = document.getElementById("compareWrapper") as HTMLElement | null;
-  if (!wrapper) { this.isPdfDownloading = false; return; }
-
-  const userStrip = wrapper.querySelector(".cmp-user-strip") as HTMLElement | null;
-  const cmpRootOriginal = wrapper.querySelector(".cmp-pdf-root") as HTMLElement | null;
-  if (!cmpRootOriginal) return;
-
-  const nextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
-
-  const normalizeStyles = (root: HTMLElement) => {
-    const all = root.querySelectorAll("*") as NodeListOf<HTMLElement>;
-    all.forEach((el) => {
-      el.style.position = "static";
-      el.style.transform = "none";
-      el.style.filter = "none";
-      el.style.zIndex = "auto";
-      el.style.maxHeight = "none";
-      el.style.height = "auto";
-      el.style.minHeight = "0";
-      el.style.overflow = "visible";
-    });
-
-    const tableWrap = root.querySelector(".cmp-table-wrapper") as HTMLElement | null;
-    if (tableWrap) {
-      tableWrap.style.overflow = "visible";
-      tableWrap.style.maxHeight = "none";
-      tableWrap.style.height = "auto";
-    }
-  };
-
-  const waitForImages = async (root: HTMLElement) => {
-    const imgs = Array.from(root.querySelectorAll("img")) as HTMLImageElement[];
-    await Promise.all(
-      imgs.map(
-        (img) =>
-          new Promise<void>((resolve) => {
-            if (img.complete && img.naturalWidth > 0) return resolve();
-            img.onload = () => resolve();
-            img.onerror = () => resolve(); // don't remove; just resolve
-          })
-      )
-    );
-  };
-
- // ✅ resolves correctly whether app is on / or /supertopup/ or any base-href
-const makeAbsoluteSrc = (src: string) => {
-  if (!src) return src;
-  if (src.startsWith("data:")) return src;
-
-  // Already absolute
-  if (src.startsWith("http://") || src.startsWith("https://") || src.startsWith("//")) {
-    return src.startsWith("//") ? window.location.protocol + src : src;
-  }
-
-  // ✅ IMPORTANT: resolve relative to <base href> / current app base
-  // Example: baseURI = https://policyplanner.com/supertopup/
-  // "assets/quote/x.png" => https://policyplanner.com/supertopup/assets/quote/x.png
-  return new URL(src, document.baseURI).toString();
-};
-
-
-
-  // ✅ KEY FIX: inline all <img> as base64 so mobile canvas ALWAYS draws it
-  const inlineAllImages = async (root: HTMLElement) => {
-    const imgs = Array.from(root.querySelectorAll("img")) as HTMLImageElement[];
-
-    for (const img of imgs) {
-      try {
-        const original = img.getAttribute("src") || "";
-        if (!original || original.startsWith("data:")) continue;
-
-       const abs = makeAbsoluteSrc(original);
-       img.setAttribute("crossorigin", "anonymous");
-       img.src = abs;
-
-        const res = await fetch(abs, { cache: "no-store" });
-
-        if (!res.ok) continue;
-
-        const blob = await res.blob();
-        const dataUrl: string = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(String(reader.result || ""));
-          reader.readAsDataURL(blob);
-        });
-
-        if (dataUrl.startsWith("data:")) {
-          img.src = dataUrl;
-        }
-      } catch {
-        // ignore image failures; pdf will still generate
-      }
-    }
-  };
-
-  // ✅ Export container (same as your logic)
-  const exportBox = document.createElement("div");
-  exportBox.style.position = "absolute";
-  exportBox.style.left = "0";
-  exportBox.style.top = "0";
-  exportBox.style.background = "#ffffff";
-  exportBox.style.width = "max-content";
-  exportBox.style.padding = "0";
-  exportBox.style.margin = "0";
-
-  document.body.appendChild(exportBox);
-
-  try {
-    if (userStrip) exportBox.appendChild(userStrip.cloneNode(true));
-
-    const clone = cmpRootOriginal.cloneNode(true) as HTMLElement;
-    exportBox.appendChild(clone);
-
-    normalizeStyles(exportBox);
-
-    await nextFrame();
-    await nextFrame();
-
-    // wait for fonts
-    if ((document as any).fonts?.ready) {
-      await (document as any).fonts.ready;
-    }
-
-    // ✅ NEW: inline images before canvas (fixes mobile logo missing)
-    await inlineAllImages(exportBox);
-
-    await waitForImages(exportBox);
-    await nextFrame();
-
-    const canvas = await toCanvas(exportBox, {
-      backgroundColor: "#ffffff",
-      pixelRatio: 3,
-      cacheBust: true, // ✅ helps on mobile
-    } as any);
-
-    const pdf = new jsPDF("l", "mm", "a4");
-    const pdfW = pdf.internal.pageSize.getWidth();
-    const pdfH = pdf.internal.pageSize.getHeight();
-
-    const imgW = pdfW;
-    const imgH = (canvas.height * imgW) / canvas.width;
-
-    let heightLeft = imgH;
-    let y = 0;
-
-    const imgData = canvas.toDataURL("image/png");
-
-    pdf.addImage(imgData, "PNG", 0, y, imgW, imgH);
-    heightLeft -= pdfH;
-
-    while (heightLeft > 0) {
-      y -= pdfH;
-      pdf.addPage();
-      pdf.addImage(imgData, "PNG", 0, y, imgW, imgH);
-      heightLeft -= pdfH;
-    }
-
-    pdf.save("comparison.pdf");
-    await new Promise(r => setTimeout(r, 0));
-
-  } catch (e) {
-    console.error("PDF error:", e);
-    alert("PDF export failed");
-  } finally {
-    exportBox.remove();
-
-    // ✅ force UI back from "Generating…" even if canvas/pdf blocks
-    this.zone.run(() => {
+    const wrapper = document.getElementById('compareWrapper') as HTMLElement | null;
+    if (!wrapper) {
       this.isPdfDownloading = false;
-      this.cdr.detectChanges();
-    });
+      return;
+    }
+
+    const userStrip = wrapper.querySelector('.cmp-user-strip') as HTMLElement | null;
+    const cmpRootOriginal = wrapper.querySelector('.cmp-pdf-root') as HTMLElement | null;
+    if (!cmpRootOriginal) return;
+
+    const nextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
+
+    const normalizeStyles = (root: HTMLElement) => {
+      const all = root.querySelectorAll('*') as NodeListOf<HTMLElement>;
+      all.forEach((el) => {
+        el.style.position = 'static';
+        el.style.transform = 'none';
+        el.style.filter = 'none';
+        el.style.zIndex = 'auto';
+        el.style.maxHeight = 'none';
+        el.style.height = 'auto';
+        el.style.minHeight = '0';
+        el.style.overflow = 'visible';
+      });
+
+      const tableWrap = root.querySelector('.cmp-table-wrapper') as HTMLElement | null;
+      if (tableWrap) {
+        tableWrap.style.overflow = 'visible';
+        tableWrap.style.maxHeight = 'none';
+        tableWrap.style.height = 'auto';
+      }
+    };
+
+    const waitForImages = async (root: HTMLElement) => {
+      const imgs = Array.from(root.querySelectorAll('img')) as HTMLImageElement[];
+      await Promise.all(
+        imgs.map(
+          (img) =>
+            new Promise<void>((resolve) => {
+              if (img.complete && img.naturalWidth > 0) return resolve();
+              img.onload = () => resolve();
+              img.onerror = () => resolve(); // don't remove; just resolve
+            })
+        )
+      );
+    };
+
+    // ✅ resolves correctly whether app is on / or /supertopup/ or any base-href
+    const makeAbsoluteSrc = (src: string) => {
+      if (!src) return src;
+      if (src.startsWith('data:')) return src;
+
+      // Already absolute
+      if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('//')) {
+        return src.startsWith('//') ? window.location.protocol + src : src;
+      }
+
+      // ✅ IMPORTANT: resolve relative to <base href> / current app base
+      // Example: baseURI = https://policyplanner.com/supertopup/
+      // "assets/quote/x.png" => https://policyplanner.com/supertopup/assets/quote/x.png
+      return new URL(src, document.baseURI).toString();
+    };
+
+    // ✅ KEY FIX: inline all <img> as base64 so mobile canvas ALWAYS draws it
+    const inlineAllImages = async (root: HTMLElement) => {
+      const imgs = Array.from(root.querySelectorAll('img')) as HTMLImageElement[];
+
+      for (const img of imgs) {
+        try {
+          const original = img.getAttribute('src') || '';
+          if (!original || original.startsWith('data:')) continue;
+
+          const abs = makeAbsoluteSrc(original);
+          img.setAttribute('crossorigin', 'anonymous');
+          img.src = abs;
+
+          const res = await fetch(abs, { cache: 'no-store' });
+
+          if (!res.ok) continue;
+
+          const blob = await res.blob();
+          const dataUrl: string = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(String(reader.result || ''));
+            reader.readAsDataURL(blob);
+          });
+
+          if (dataUrl.startsWith('data:')) {
+            img.src = dataUrl;
+          }
+        } catch {
+          // ignore image failures; pdf will still generate
+        }
+      }
+    };
+
+    // ✅ Export container (same as your logic)
+    const exportBox = document.createElement('div');
+    exportBox.style.position = 'absolute';
+    exportBox.style.left = '0';
+    exportBox.style.top = '0';
+    exportBox.style.background = '#ffffff';
+    exportBox.style.width = 'max-content';
+    exportBox.style.padding = '0';
+    exportBox.style.margin = '0';
+
+    document.body.appendChild(exportBox);
+
+    try {
+      if (userStrip) exportBox.appendChild(userStrip.cloneNode(true));
+
+      const clone = cmpRootOriginal.cloneNode(true) as HTMLElement;
+      exportBox.appendChild(clone);
+
+      normalizeStyles(exportBox);
+
+      await nextFrame();
+      await nextFrame();
+
+      // wait for fonts
+      if ((document as any).fonts?.ready) {
+        await (document as any).fonts.ready;
+      }
+
+      // ✅ NEW: inline images before canvas (fixes mobile logo missing)
+      await inlineAllImages(exportBox);
+
+      await waitForImages(exportBox);
+      await nextFrame();
+
+      const canvas = await toCanvas(exportBox, {
+        backgroundColor: '#ffffff',
+        pixelRatio: 3,
+        cacheBust: true, // ✅ helps on mobile
+      } as any);
+
+      const pdf = new jsPDF('l', 'mm', 'a4');
+      const pdfW = pdf.internal.pageSize.getWidth();
+      const pdfH = pdf.internal.pageSize.getHeight();
+
+      const imgW = pdfW;
+      const imgH = (canvas.height * imgW) / canvas.width;
+
+      let heightLeft = imgH;
+      let y = 0;
+
+      const imgData = canvas.toDataURL('image/png');
+
+      pdf.addImage(imgData, 'PNG', 0, y, imgW, imgH);
+      heightLeft -= pdfH;
+
+      while (heightLeft > 0) {
+        y -= pdfH;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, y, imgW, imgH);
+        heightLeft -= pdfH;
+      }
+
+      pdf.save('comparison.pdf');
+      await new Promise((r) => setTimeout(r, 0));
+    } catch (e) {
+      console.error('PDF error:', e);
+      alert('PDF export failed');
+    } finally {
+      exportBox.remove();
+
+      // ✅ force UI back from "Generating…" even if canvas/pdf blocks
+      this.zone.run(() => {
+        this.isPdfDownloading = false;
+        this.cdr.detectChanges();
+      });
+    }
   }
-}
 
   /* -------------------- Grid template for compare table -------------------- */
 

@@ -55,7 +55,13 @@ export class EnquiryForm {
     { key: 'you', label: 'You', iconPath: 'assets/you.svg', selected: true, count: 1 },
     { key: 'spouse', label: 'spouse', iconPath: 'assets/spouse.svg', selected: false, count: 0 },
     { key: 'son', label: 'Son', iconPath: 'assets/son.svg', selected: false, count: 0 },
-    { key: 'daughter', label: 'Daughter', iconPath: 'assets/daughter.svg', selected: false, count: 0 },
+    {
+      key: 'daughter',
+      label: 'Daughter',
+      iconPath: 'assets/daughter.svg',
+      selected: false,
+      count: 0,
+    },
   ];
 
   // ✅ Terms & Conditions checkbox
@@ -92,34 +98,43 @@ export class EnquiryForm {
     private location: Location
   ) {
     this.basicForm = this.fb.group({
-      firstName: ['', [Validators.required, Validators.maxLength(20), Validators.pattern(/^[A-Za-z ]+$/)]],
-      lastName: ['', [Validators.required, Validators.maxLength(20), Validators.pattern(/^[A-Za-z ]+$/)]],
+      firstName: [
+        '',
+        [Validators.required, Validators.maxLength(20), Validators.pattern(/^[A-Za-z ]+$/)],
+      ],
+      lastName: [
+        '',
+        [Validators.required, Validators.maxLength(20), Validators.pattern(/^[A-Za-z ]+$/)],
+      ],
       mobile: ['', [Validators.required, Validators.pattern(/^[6-9]\d{9}$/)]],
       pincode: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]],
-      city: ['', [Validators.required, Validators.minLength(3), Validators.pattern(/^[A-Za-z ]+$/)]],
+      city: [
+        '',
+        [Validators.required, Validators.minLength(3), Validators.pattern(/^[A-Za-z ]+$/)],
+      ],
       coverAmount: ['', Validators.required],
     });
   }
 
-@HostListener('window:popstate', ['$event'])
-onBrowserBack(event: PopStateEvent) {
-  event.preventDefault();
+  @HostListener('window:popstate', ['$event'])
+  onBrowserBack(event: PopStateEvent) {
+    event.preventDefault();
 
-  // Same logic as clicking back icon
-  if (this.step > 1) {
-    this.step--;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Same logic as clicking back icon
+    if (this.step > 1) {
+      this.step--;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Push state back so browser doesn't exit
-    history.pushState(null, '', location.href);
-  } else {
-    // Step 1 → landing page (same as goBack)
-    window.location.href = this.LANDING_URL;
+      // Push state back so browser doesn't exit
+      history.pushState(null, '', location.href);
+    } else {
+      // Step 1 → landing page (same as goBack)
+      window.location.href = this.LANDING_URL;
+    }
   }
-}
 
   ngOnInit(): void {
-  history.pushState(null, '', location.href);
+    history.pushState(null, '', location.href);
 
     // fill ages
     if (this.adultAges.length === 0) {
@@ -171,7 +186,6 @@ onBrowserBack(event: PopStateEvent) {
       this.stopResendTimer();
       this.resendTimerSignal.set(0);
       this.termsAcceptedSignal.set(false);
-
     });
   }
 
@@ -236,7 +250,6 @@ onBrowserBack(event: PopStateEvent) {
       this.updateSelectedAges();
       this.step = 2;
       window.scrollTo({ top: 0, behavior: 'smooth' });
-
     } else if (this.step === 2) {
       const missing = this.getFlatMemberList().some((id) => !this.selectedAges[id]);
       if (missing) {
@@ -245,7 +258,6 @@ onBrowserBack(event: PopStateEvent) {
       }
       this.step = 3;
       window.scrollTo({ top: 0, behavior: 'smooth' });
-
     } else if (this.step === 3) {
       this.basicFormSubmitAttempted = true;
 
@@ -351,7 +363,9 @@ onBrowserBack(event: PopStateEvent) {
     const spouse = this.members.find((m) => m.key === 'spouse')!;
     if (this.gender === 'Male') {
       you.iconPath = this.existsAsset('assets/you.svg') ? 'assets/you.svg' : this.maleIcon;
-      spouse.iconPath = this.existsAsset('assets/spouse.svg') ? 'assets/spouse.svg' : this.femaleIcon;
+      spouse.iconPath = this.existsAsset('assets/spouse.svg')
+        ? 'assets/spouse.svg'
+        : this.femaleIcon;
     } else {
       you.iconPath = this.existsAsset('assets/you.svg') ? 'assets/spouse.svg' : this.femaleIcon;
       spouse.iconPath = this.existsAsset('assets/spouse.svg') ? 'assets/you.svg' : this.maleIcon;
@@ -456,8 +470,11 @@ onBrowserBack(event: PopStateEvent) {
         id,
         age: this.selectedAges[id] || null,
       })),
-      details: { ...this.basicForm.getRawValue(), gender: this.gender,       termsAccepted: this.termsAcceptedSignal(), // ✅ ADD THIS
- },
+      details: {
+        ...this.basicForm.getRawValue(),
+        gender: this.gender,
+        termsAccepted: this.termsAcceptedSignal(), // ✅ ADD THIS
+      },
     };
   }
 
@@ -480,7 +497,8 @@ onBrowserBack(event: PopStateEvent) {
       key === 'ArrowUp' ||
       key === 'ArrowDown' ||
       key === 'Delete'
-    ) return;
+    )
+      return;
 
     if (!/^[A-Za-z ]$/.test(key)) event.preventDefault();
   }
@@ -495,7 +513,8 @@ onBrowserBack(event: PopStateEvent) {
       key === 'ArrowUp' ||
       key === 'ArrowDown' ||
       key === 'Delete'
-    ) return;
+    )
+      return;
 
     if (!/^\d$/.test(key)) event.preventDefault();
   }
@@ -572,7 +591,8 @@ onBrowserBack(event: PopStateEvent) {
         el?.focus();
       }, 50);
     } catch (err: any) {
-      const errorMsg = err?.error?.message || err?.message || 'Failed to send OTP. Please try again.';
+      const errorMsg =
+        err?.error?.message || err?.message || 'Failed to send OTP. Please try again.';
       this.otpErrorSignal.set(errorMsg);
     }
   }
@@ -605,7 +625,7 @@ onBrowserBack(event: PopStateEvent) {
     this.resendTimerSignal.set(this.resendCooldown);
 
     this.resendIntervalId = setInterval(() => {
-      this.resendTimerSignal.update(v => {
+      this.resendTimerSignal.update((v) => {
         const next = v - 1;
         if (next <= 0) {
           this.stopResendTimer();
@@ -698,7 +718,6 @@ onBrowserBack(event: PopStateEvent) {
 
       this.mobileVerifiedSignal.set(true);
       this.closeOtpModal();
-
     } catch (err: any) {
       const errorMsg = err?.error?.message || err?.message || 'Invalid OTP. Please try again.';
       this.otpErrorSignal.set(errorMsg);
@@ -721,7 +740,6 @@ onBrowserBack(event: PopStateEvent) {
         const el = document.getElementById('otp-0') as HTMLInputElement | null;
         el?.focus();
       }, 50);
-
     } catch (err) {
       this.otpErrorSignal.set('Failed to resend OTP');
     }
@@ -732,33 +750,34 @@ onBrowserBack(event: PopStateEvent) {
     this.stopResendTimer();
   }
 
+  onNameInputUpper(controlName: string) {
+    const ctrl = this.basicForm.get(controlName);
+    if (!ctrl) return;
 
-onNameInputUpper(controlName: string) {
-  const ctrl = this.basicForm.get(controlName);
-  if (!ctrl) return;
+    const raw = (ctrl.value || '') as string;
 
-  const raw = ((ctrl.value || '') as string);
+    // keep only letters + space
+    let sanitized = raw.replace(/[^A-Za-z ]/g, '');
 
-  // keep only letters + space
-  let sanitized = raw.replace(/[^A-Za-z ]/g, '');
+    // convert to ALL CAPS
+    sanitized = sanitized.toUpperCase();
 
-  // convert to ALL CAPS
-  sanitized = sanitized.toUpperCase();
+    // optional: avoid multiple spaces
+    sanitized = sanitized.replace(/\s{2,}/g, ' ');
 
-  // optional: avoid multiple spaces
-  sanitized = sanitized.replace(/\s{2,}/g, ' ');
-
-  if (sanitized !== raw) {
-    ctrl.setValue(sanitized, { emitEvent: false });
+    if (sanitized !== raw) {
+      ctrl.setValue(sanitized, { emitEvent: false });
+    }
   }
-}
 
   // -------------------------
   // ✅ Restore/Clear helpers
   // -------------------------
   private isReloadNavigation(): boolean {
     try {
-      const nav = performance.getEntriesByType('navigation')?.[0] as PerformanceNavigationTiming | undefined;
+      const nav = performance.getEntriesByType('navigation')?.[0] as
+        | PerformanceNavigationTiming
+        | undefined;
       return nav?.type === 'reload';
     } catch {
       return false;
@@ -774,7 +793,7 @@ onNameInputUpper(controlName: string) {
     this.gender = 'Male';
 
     // reset members
-    this.members.forEach(m => {
+    this.members.forEach((m) => {
       if (m.key === 'you') {
         m.selected = true;
         m.count = 1;
@@ -820,13 +839,13 @@ onNameInputUpper(controlName: string) {
       const ids: string[] = membersArr.map((m: any) => (m?.id || '').toString());
 
       const spouseSelected = ids.includes('spouse');
-      const sonCount = ids.filter(id => id.startsWith('son')).length;
-      const daughterCount = ids.filter(id => id.startsWith('daughter')).length;
+      const sonCount = ids.filter((id) => id.startsWith('son')).length;
+      const daughterCount = ids.filter((id) => id.startsWith('daughter')).length;
 
-      const you = this.members.find(m => m.key === 'you')!;
-      const spouse = this.members.find(m => m.key === 'spouse')!;
-      const son = this.members.find(m => m.key === 'son')!;
-      const daughter = this.members.find(m => m.key === 'daughter')!;
+      const you = this.members.find((m) => m.key === 'you')!;
+      const spouse = this.members.find((m) => m.key === 'spouse')!;
+      const son = this.members.find((m) => m.key === 'son')!;
+      const daughter = this.members.find((m) => m.key === 'daughter')!;
 
       you.selected = true;
       you.count = 1;
@@ -847,14 +866,17 @@ onNameInputUpper(controlName: string) {
       this.selectedAges = ageMap;
       this.updateSelectedAges();
 
-      this.basicForm.patchValue({
-        firstName: details.firstName || '',
-        lastName: details.lastName || '',
-        mobile: details.mobile || '',
-        pincode: details.pincode || '',
-        city: details.city || '',
-        coverAmount: details.coverAmount || ''
-      }, { emitEvent: false });
+      this.basicForm.patchValue(
+        {
+          firstName: details.firstName || '',
+          lastName: details.lastName || '',
+          mobile: details.mobile || '',
+          pincode: details.pincode || '',
+          city: details.city || '',
+          coverAmount: details.coverAmount || '',
+        },
+        { emitEvent: false }
+      );
 
       this.applyGenderIcons();
 

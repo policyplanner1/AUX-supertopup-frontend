@@ -5,25 +5,16 @@
     <!-- ================= HEADER / STEPPER ================= -->
     <div class="flex items-center mb-6 sm:mb-10">
 
-    <!-- Back button for ALL steps (1,2,3) -->
-    <button
-      type="button"
-      (click)="goBack()"
-      class="flex items-center mr-4 group"
-      aria-label="Go back"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg"
-          class="w-5 h-5 text-[#006D8D] group-hover:text-[#004b60] transition"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6" />
-      </svg>
-    </button>
+      <!-- Back button for ALL steps (1,2,3) -->
+      <button type="button" (click)="goBack()" class="flex items-center mr-4 group" aria-label="Go back">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#006D8D] group-hover:text-[#004b60] transition"
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6" />
+        </svg>
+      </button>
 
 
-    <!-- Stepper (1-2-3) -->
+      <!-- Stepper (1-2-3) -->
       <div class="flex-1 flex justify-center">
         <div class="flex items-center space-x-4 sm:space-x-8">
           <!-- STEP 1 -->
@@ -146,11 +137,7 @@
       </div>
 
       <div class="flex justify-center mt-4 sm:mt-8">
-        <button
-          type="button"
-          (click)="next()"
-          class="nav-btn"
-        >
+        <button type="button" (click)="next()" class="nav-btn">
           Next
         </button>
 
@@ -205,23 +192,15 @@
 
       <!-- Nav buttons -->
       <!-- Nav buttons -->
-<div class="flex justify-center gap-4 sm:gap-6 mt-4 sm:mt-8">
-  <button
-    type="button"
-    (click)="prev()"
-    class="nav-btn"
-  >
-    Previous
-  </button>
+      <div class="flex justify-center gap-4 sm:gap-6 mt-4 sm:mt-8">
+        <button type="button" (click)="prev()" class="nav-btn">
+          Previous
+        </button>
 
-  <button
-    type="button"
-    (click)="next()"
-    class="nav-btn"
-  >
-    Next
-  </button>
-</div>
+        <button type="button" (click)="next()" class="nav-btn">
+          Next
+        </button>
+      </div>
 
     </div>
 
@@ -246,17 +225,10 @@
             <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
               First Name <span class="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              formControlName="firstName"
-              class="w-full border-0 border-b border-gray-400 bg-transparent py-2
+            <input type="text" formControlName="firstName" class="w-full border-0 border-b border-gray-400 bg-transparent py-2
                     text-gray-700 text-sm focus:outline-none focus:border-[#006D8D]"
-              [ngClass]="{ 'invalid-field': isInvalid('firstName') }"
-              placeholder="Enter your first name"
-              (keydown)="allowOnlyLetters($event)"
-              (input)="onNameInputUpper('firstName')"
-              autocomplete="given-name"
-            />
+              [ngClass]="{ 'invalid-field': isInvalid('firstName') }" placeholder="Enter your first name"
+              (keydown)="allowOnlyLetters($event)" (input)="onNameInputUpper('firstName')" autocomplete="given-name" />
 
             <div *ngIf="isInvalid('firstName')" class="form-error">
               <span *ngIf="f['firstName'].errors?.['required']">
@@ -275,17 +247,10 @@
             <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
               Last Name <span class="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              formControlName="lastName"
-              class="w-full border-0 border-b border-gray-400 bg-transparent py-2
+            <input type="text" formControlName="lastName" class="w-full border-0 border-b border-gray-400 bg-transparent py-2
                     text-gray-700 text-sm focus:outline-none focus:border-[#006D8D]"
-              [ngClass]="{ 'invalid-field': isInvalid('lastName') }"
-              placeholder="Enter your last name"
-              (keydown)="allowOnlyLetters($event)"
-              (input)="onNameInputUpper('lastName')"
-              autocomplete="family-name"
-            />
+              [ngClass]="{ 'invalid-field': isInvalid('lastName') }" placeholder="Enter your last name"
+              (keydown)="allowOnlyLetters($event)" (input)="onNameInputUpper('lastName')" autocomplete="family-name" />
 
             <div *ngIf="isInvalid('lastName')" class="form-error">
               <span *ngIf="f['lastName'].errors?.['required']">
@@ -304,18 +269,10 @@
             <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
               Mobile Number <span class="text-red-500">*</span>
             </label>
-            <input
-              type="tel"
-              formControlName="mobile"
-              maxlength="10"
-              class="w-full border-0 border-b border-gray-400 bg-transparent py-2
+            <input type="tel" formControlName="mobile" maxlength="10" class="w-full border-0 border-b border-gray-400 bg-transparent py-2
                     text-gray-700 text-sm focus:outline-none focus:border-[#006D8D]"
-              [ngClass]="{ 'invalid-field': isInvalid('mobile') }"
-              placeholder="Enter 10-digit mobile number"
-              (keypress)="allowOnlyDigits($event)"
-              (input)="onNumberInput('mobile', 10)"
-              autocomplete="tel"
-            />
+              [ngClass]="{ 'invalid-field': isInvalid('mobile') }" placeholder="Enter 10-digit mobile number"
+              (keypress)="allowOnlyDigits($event)" (input)="onNumberInput('mobile', 10)" autocomplete="tel" />
             <div *ngIf="isInvalid('mobile')" class="form-error">
               <span *ngIf="f['mobile'].errors?.['required']">
                 Mobile number is required.
@@ -327,10 +284,10 @@
             <!-- Verify Number Button -->
             <button type="button" (click)="openOtpModal()" class="mt-2 text-xs sm:text-sm px-3 py-1 rounded
                     bg-[#006D8D] text-white hover:bg-[#005B75] font-medium"
-            [disabled]="isInvalid('mobile') || mobileVerifiedSignal()">
-            {{ mobileVerifiedSignal() ? '✓ Verified' : 'Verify Number' }}
-          </button>
-           <span *ngIf="mobileVerifiedSignal()" class="text-xs text-green-600 ml-2">Mobile verified</span>
+              [disabled]="isInvalid('mobile') || mobileVerifiedSignal()">
+              {{ mobileVerifiedSignal() ? '✓ Verified' : 'Verify Number' }}
+            </button>
+            <span *ngIf="mobileVerifiedSignal()" class="text-xs text-green-600 ml-2">Mobile verified</span>
           </div>
 
           <div>
@@ -410,13 +367,8 @@
       </form>
       <!-- ================= TERMS & CONDITIONS ================= -->
       <div class="flex items-start justify-center gap-2 mt-6">
-      <input
-          type="checkbox"
-          id="terms"
-          class="mt-1 accent-[#006D8D]"
-          [checked]="termsAcceptedSignal()"
-          (change)="termsAcceptedSignal.set($any($event.target).checked)"
-        />
+        <input type="checkbox" id="terms" class="mt-1 accent-[#006D8D]" [checked]="termsAcceptedSignal()"
+          (change)="termsAcceptedSignal.set($any($event.target).checked)" />
 
 
         <label for="terms" class="text-xs sm:text-sm text-gray-600 leading-relaxed cursor-pointer">
@@ -433,24 +385,16 @@
 
       <!-- Buttons -->
       <div class="flex justify-center gap-4 sm:gap-6 mt-4">
-      <button
-        type="button"
-        (click)="prev()"
-        class="nav-btn"
-      >
-        Previous
-      </button>
+        <button type="button" (click)="prev()" class="nav-btn">
+          Previous
+        </button>
 
-      <button
-        type="button"
-        (click)="next()"
-        class="nav-btn"
-        [disabled]="!mobileVerifiedSignal() || !termsAcceptedSignal()"
-      >
-        Submit
-          </button>
-        </div>
-  </div>
+        <button type="button" (click)="next()" class="nav-btn"
+          [disabled]="!mobileVerifiedSignal() || !termsAcceptedSignal()">
+          Submit
+        </button>
+      </div>
+    </div>
 
     <!-- OTP Modal (4-digit) -->
     <div *ngIf="otpModalOpenSignal()" class="fixed inset-0 z-40 flex items-center justify-center">
@@ -468,14 +412,18 @@
         </div>
 
         <div class="flex justify-center gap-2 mb-3" (paste)="onOtpPaste($event)">
-          <input id="otp-0" [value]="otpDigitsSignal()[0]" type="text" maxlength="1" inputmode="numeric" class="w-12 h-12 text-center rounded-lg border border-gray-200"
-                (input)="onOtpInput(0, $event)" (keydown)="onOtpKeydown(0, $event)" />
-          <input id="otp-1" [value]="otpDigitsSignal()[1]" type="text" maxlength="1" inputmode="numeric" class="w-12 h-12 text-center rounded-lg border border-gray-200"
-                (input)="onOtpInput(1, $event)" (keydown)="onOtpKeydown(1, $event)" />
-          <input id="otp-2" [value]="otpDigitsSignal()[2]" type="text" maxlength="1" inputmode="numeric" class="w-12 h-12 text-center rounded-lg border border-gray-200"
-                (input)="onOtpInput(2, $event)" (keydown)="onOtpKeydown(2, $event)" />
-          <input id="otp-3" [value]="otpDigitsSignal()[3]" type="text" maxlength="1" inputmode="numeric" class="w-12 h-12 text-center rounded-lg border border-gray-200"
-                (input)="onOtpInput(3, $event)" (keydown)="onOtpKeydown(3, $event)" />
+          <input id="otp-0" [value]="otpDigitsSignal()[0]" type="text" maxlength="1" inputmode="numeric"
+            class="w-12 h-12 text-center rounded-lg border border-gray-200" (input)="onOtpInput(0, $event)"
+            (keydown)="onOtpKeydown(0, $event)" />
+          <input id="otp-1" [value]="otpDigitsSignal()[1]" type="text" maxlength="1" inputmode="numeric"
+            class="w-12 h-12 text-center rounded-lg border border-gray-200" (input)="onOtpInput(1, $event)"
+            (keydown)="onOtpKeydown(1, $event)" />
+          <input id="otp-2" [value]="otpDigitsSignal()[2]" type="text" maxlength="1" inputmode="numeric"
+            class="w-12 h-12 text-center rounded-lg border border-gray-200" (input)="onOtpInput(2, $event)"
+            (keydown)="onOtpKeydown(2, $event)" />
+          <input id="otp-3" [value]="otpDigitsSignal()[3]" type="text" maxlength="1" inputmode="numeric"
+            class="w-12 h-12 text-center rounded-lg border border-gray-200" (input)="onOtpInput(3, $event)"
+            (keydown)="onOtpKeydown(3, $event)" />
         </div>
 
         <div *ngIf="otpErrorSignal()" class="text-xs text-red-600 text-center mb-2">
@@ -484,12 +432,12 @@
 
         <div class="flex items-center justify-between gap-3">
           <button (click)="submitOtp()" class="flex-1 px-4 py-2 rounded-md bg-[#006D8D] text-white text-sm font-medium"
-                  [disabled]="otpValueSignal().length !== 4">
+            [disabled]="otpValueSignal().length !== 4">
             Verify
           </button>
 
           <button (click)="resendOtp()" class="flex-1 px-4 py-2 rounded-md border text-sm font-medium"
-                  [disabled]="resendTimerSignal() > 0">
+            [disabled]="resendTimerSignal() > 0">
             <span *ngIf="resendTimerSignal() === 0">Resend</span>
             <span *ngIf="resendTimerSignal() > 0">Resend ({{ resendTimerSignal() }}s)</span>
           </button>

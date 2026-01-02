@@ -1,27 +1,12 @@
-<div
-class="w-full flex justify-center px-3 sm:px-6 py-6 sm:py-10 bg-[#F5FAFC]"
->
-  <div
-    class="w-full max-w-5xl bg-white rounded-2xl shadow-lg px-4 sm:px-10 py-6 sm:py-10"
-  >
-  <!-- Back Arrow -->
-<button
-  type="button"
-  (click)="goBack()"
-  class="flex items-center mb-4 group"
-  aria-label="Go back"
->
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    class="w-5 h-5 text-[#006D8D] group-hover:text-[#004b60] transition"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    stroke-width="2"
-  >
-    <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6" />
-  </svg>
-</button>
+<div class="w-full flex justify-center px-3 sm:px-6 py-6 sm:py-10 bg-[#F5FAFC]">
+  <div class="w-full max-w-5xl bg-white rounded-2xl shadow-lg px-4 sm:px-10 py-6 sm:py-10">
+    <!-- Back Arrow -->
+    <button type="button" (click)="goBack()" class="flex items-center mb-4 group" aria-label="Go back">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#006D8D] group-hover:text-[#004b60] transition"
+        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6" />
+      </svg>
+    </button>
 
     <h2 class="text-center text-xl font-semibold text-[#006D8D] mb-8">
       Group Mediclaim Enquiry
@@ -31,15 +16,8 @@ class="w-full flex justify-center px-3 sm:px-6 py-6 sm:py-10 bg-[#F5FAFC]"
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <!-- Company Name -->
         <div>
-          <label class="pp-label"
-            >Company Name <span class="text-red-600">*</span></label
-          >
-          <input
-            formControlName="companyName"
-            type="text"
-            class="pp-input"
-            placeholder="Enter company name"
-          />
+          <label class="pp-label">Company Name <span class="text-red-600">*</span></label>
+          <input formControlName="companyName" type="text" class="pp-input" placeholder="Enter company name" />
           <p *ngIf="isInvalid('companyName')" class="pp-error">
             Enter valid company name
           </p>
@@ -47,9 +25,7 @@ class="w-full flex justify-center px-3 sm:px-6 py-6 sm:py-10 bg-[#F5FAFC]"
 
         <!-- Contact Person -->
         <div>
-          <label class="pp-label"
-            >Contact Person <span class="text-red-600">*</span></label
-          >
+          <label class="pp-label">Contact Person <span class="text-red-600">*</span></label>
           <select formControlName="contactPerson" class="pp-select">
             <option value="" disabled>Select contact role</option>
             <option value="HR">HR</option>
@@ -64,45 +40,28 @@ class="w-full flex justify-center px-3 sm:px-6 py-6 sm:py-10 bg-[#F5FAFC]"
 
         <!-- Contact Number -->
         <div>
-          <label class="pp-label"
-            >Contact Number <span class="text-red-600">*</span></label
-          >
-          <input
-          formControlName="contactNumber"
-          type="text"
-          class="pp-input"
-          maxlength="10"
-          placeholder="Enter contact number"
-          (keypress)="allowOnlyNumbers($event)"
-        />
+          <label class="pp-label">Contact Number <span class="text-red-600">*</span></label>
+          <input formControlName="contactNumber" type="text" class="pp-input" maxlength="10"
+            placeholder="Enter contact number" (keypress)="allowOnlyNumbers($event)" />
 
           <p *ngIf="isInvalid('contactNumber')" class="pp-error">
             Enter valid 10-digit number
           </p>
         </div>
 
-      <!-- Email -->
+        <!-- Email -->
         <div>
-          <label class="pp-label"
-            >Email ID <span class="text-red-600">*</span></label
-          >
-          <input
-            formControlName="email"
-            type="email"
-            class="pp-input"
-            placeholder="Enter email address"
-          />
-        <p *ngIf="isInvalid('email')" class="pp-error">
-          Enter valid email (example: name@company.com)
-        </p>
+          <label class="pp-label">Email ID <span class="text-red-600">*</span></label>
+          <input formControlName="email" type="email" class="pp-input" placeholder="Enter email address" />
+          <p *ngIf="isInvalid('email')" class="pp-error">
+            Enter valid email (example: name@company.com)
+          </p>
 
-      </div>
+        </div>
 
         <!-- Company Size -->
         <div>
-          <label class="pp-label"
-            >Company Size <span class="text-red-600">*</span></label
-          >
+          <label class="pp-label">Company Size <span class="text-red-600">*</span></label>
           <select formControlName="companySize" class="pp-select">
             <option value="" disabled>Select size</option>
             <option value="1-50">1–50 employees</option>
@@ -116,77 +75,64 @@ class="w-full flex justify-center px-3 sm:px-6 py-6 sm:py-10 bg-[#F5FAFC]"
           </p>
         </div>
 
-         <!-- Date of Birth -->
-          <div>
-            <label class="pp-label">
-              Date of Birth <span class="text-red-600">*</span>
-            </label>
-            <input
-              formControlName="dateOfBirth"
-              type="date"
-              class="pp-input"
-              placeholder="Select date of birth"
-              [max]="today | date: 'yyyy-MM-dd'"
-              [attr.max]="today | date: 'yyyy-MM-dd'"
-            />
-             <p *ngIf="isInvalid('dateOfBirth')" class="pp-error">
-                  {{ getDateOfBirthError() }}
-                </p>
-          </div>
-          
-    <!-- Industry Type -->
-    <div>
-      <label class="pp-label">Type of Industry <span class="text-red-600">*</span></label>
+        <!-- Date of Birth -->
+        <div>
+          <label class="pp-label">
+            Date of Birth <span class="text-red-600">*</span>
+          </label>
+          <input formControlName="dateOfBirth" type="date" class="pp-input" placeholder="Select date of birth"
+            [max]="today | date: 'yyyy-MM-dd'" [attr.max]="today | date: 'yyyy-MM-dd'" />
+          <p *ngIf="isInvalid('dateOfBirth')" class="pp-error">
+            {{ getDateOfBirthError() }}
+          </p>
+        </div>
 
-      <select
-          formControlName="industryType"
-          class="pp-select"
-          [ngClass]="{ 'pp-placeholder': !enquiryForm.get('industryType')?.value }"
-        >
-        <option value="" disabled>Select Type of Industry </option>
-        <option value="IT / Software">IT / Software</option>
-        <option value="BPO / ITES">BPO / ITES</option>
-        <option value="Manufacturing">Manufacturing</option>
-        <option value="Construction / Real Estate">Construction / Real Estate</option>
-        <option value="Retail / E-commerce">Retail / E-commerce</option>
-        <option value="Logistics / Transport">Logistics / Transport</option>
-        <option value="Healthcare / Pharma">Healthcare / Pharma</option>
-        <option value="Education">Education</option>
-        <option value="Finance / Banking / Insurance">Finance / Banking / Insurance</option>
-        <option value="Hospitality / Food">Hospitality / Food</option>
-        <option value="Professional Services">Professional Services</option>
-        <option value="Government / PSU / NGO">Government / PSU / NGO</option>
-        <option value="Other">Other</option>
-      </select>
+        <!-- Industry Type -->
+        <div>
+          <label class="pp-label">Type of Industry <span class="text-red-600">*</span></label>
 
-      <p *ngIf="isInvalid('industryType')" class="pp-error">Select industry type</p>
-    </div>
+          <select formControlName="industryType" class="pp-select"
+            [ngClass]="{ 'pp-placeholder': !enquiryForm.get('industryType')?.value }">
+            <option value="" disabled>Select Type of Industry </option>
+            <option value="IT / Software">IT / Software</option>
+            <option value="BPO / ITES">BPO / ITES</option>
+            <option value="Manufacturing">Manufacturing</option>
+            <option value="Construction / Real Estate">Construction / Real Estate</option>
+            <option value="Retail / E-commerce">Retail / E-commerce</option>
+            <option value="Logistics / Transport">Logistics / Transport</option>
+            <option value="Healthcare / Pharma">Healthcare / Pharma</option>
+            <option value="Education">Education</option>
+            <option value="Finance / Banking / Insurance">Finance / Banking / Insurance</option>
+            <option value="Hospitality / Food">Hospitality / Food</option>
+            <option value="Professional Services">Professional Services</option>
+            <option value="Government / PSU / NGO">Government / PSU / NGO</option>
+            <option value="Other">Other</option>
+          </select>
+
+          <p *ngIf="isInvalid('industryType')" class="pp-error">Select industry type</p>
+        </div>
 
 
 
-  <!-- City Field (writable + dropdown) -->
-    <div>
-    <label class="pp-label">City <span class="text-red-600">*</span></label>
+        <!-- City Field (writable + dropdown) -->
+        <div>
+          <label class="pp-label">City <span class="text-red-600">*</span></label>
 
-    <input
-      class="pp-input"
-      formControlName="city"
-      list="cityList"
-      placeholder="Select or type city"
-      autocomplete="off"
-    />
+          <input class="pp-input" formControlName="city" list="cityList" placeholder="Select or type city"
+            autocomplete="off" />
 
-    <datalist id="cityList">
-      <option *ngFor="let c of cities" [value]="c"></option>
-    </datalist>
+          <datalist id="cityList">
+            <option *ngFor="let c of cities" [value]="c"></option>
+          </datalist>
 
-    <p *ngIf="isInvalid('city')" class="pp-error">Please select a valid city</p>
-  </div>
+          <p *ngIf="isInvalid('city')" class="pp-error">Please select a valid city</p>
+        </div>
 
-  <!-- Zone Field  -->
-    <div>
+        <!-- Zone Field  -->
+        <div>
           <label class="pp-label">Zone <span class="text-red-600">*</span></label>
-          <input formControlName="zoneLabel" type="text" class="pp-input" placeholder="Zone will auto-select" readonly />
+          <input formControlName="zoneLabel" type="text" class="pp-input" placeholder="Zone will auto-select"
+            readonly />
           <input formControlName="zone" type="hidden" value="3" />
         </div>
 
@@ -195,14 +141,14 @@ class="w-full flex justify-center px-3 sm:px-6 py-6 sm:py-10 bg-[#F5FAFC]"
           <label class="pp-label">Coverage Amount <span class="text-red-600">*</span></label>
           <select formControlName="coverageAmount" class="pp-select">
             <option value="" disabled>Select coverage amount</option>
-              <option value="500000">1 Lakh</option>
-              <option value="1000000">2 Lakh</option>
-              <option value="1500000">3 Lakh</option>
-              <option value="2000000">4 Lakh</option>
-              <option value="2500000">5 Lakh</option>
-              <option value="3000000">7.5 Lakh</option>
-              <option value="3500000">10 Lakh</option>
-              <!-- <option value="5000000">50 Lakh</option>
+            <option value="500000">1 Lakh</option>
+            <option value="1000000">2 Lakh</option>
+            <option value="1500000">3 Lakh</option>
+            <option value="2000000">4 Lakh</option>
+            <option value="2500000">5 Lakh</option>
+            <option value="3000000">7.5 Lakh</option>
+            <option value="3500000">10 Lakh</option>
+            <!-- <option value="5000000">50 Lakh</option>
               <option value="7500000">75 Lakh</option>
               <option value="10000000">1 Crore</option>
               <option value="20000000">2 Crore</option>
@@ -217,19 +163,13 @@ class="w-full flex justify-center px-3 sm:px-6 py-6 sm:py-10 bg-[#F5FAFC]"
 
         <!-- Demography -->
         <div>
-          <label class="pp-label"
-            >Demography <span class="text-red-600">*</span></label
-          >
+          <label class="pp-label">Demography <span class="text-red-600">*</span></label>
           <select formControlName="demography" class="pp-select">
             <option value="" disabled>Select demography</option>
             <option value="employee">Only Employee</option>
             <option value="employee+spouse">Employee + Spouse</option>
-            <option value="spouse+2kids"
-              >Employee + Spouse + 2 Kids</option
-            >
-            <option value="withParents"
-              >Employee + Spouse + 2 Kids + Parents</option
-            >
+            <option value="spouse+2kids">Employee + Spouse + 2 Kids</option>
+            <option value="withParents">Employee + Spouse + 2 Kids + Parents</option>
           </select>
           <p *ngIf="isInvalid('demography')" class="pp-error">
             Please select demography
@@ -241,39 +181,20 @@ class="w-full flex justify-center px-3 sm:px-6 py-6 sm:py-10 bg-[#F5FAFC]"
 
       <!-- Terms and Submit -->
       <div class="flex items-start gap-2 mt-8">
-        <input
-          type="checkbox"
-          id="terms"
-          class="mt-1 accent-[#006D8D]"
-          [checked]="termsAcceptedSignal()"
-          (change)="termsAcceptedSignal.set($any($event.target).checked)"
-        />
-        <label
-          for="terms"
-          class="text-xs sm:text-sm text-gray-600 leading-relaxed cursor-pointer"
-        >
+        <input type="checkbox" id="terms" class="mt-1 accent-[#006D8D]" [checked]="termsAcceptedSignal()"
+          (change)="termsAcceptedSignal.set($any($event.target).checked)" />
+        <label for="terms" class="text-xs sm:text-sm text-gray-600 leading-relaxed cursor-pointer">
           I agree to the
-          <a
-            href="https://policyplanner.com/#/terms"
-            target="_blank"
-            class="text-[#006D8D] underline"
-            >Terms & Conditions</a
-          >
+          <a href="https://policyplanner.com/#/terms" target="_blank" class="text-[#006D8D] underline">Terms &
+            Conditions</a>
           and
-          <a
-            href="https://policyplanner.com/#/privacy"
-            target="_blank"
-            class="text-[#006D8D] underline"
-            >Privacy Policy</a
-          >.
+          <a href="https://policyplanner.com/#/privacy" target="_blank" class="text-[#006D8D] underline">Privacy
+            Policy</a>.
         </label>
       </div>
 
       <div class="flex justify-end mt-6">
-        <button
-          type="submit"
-          class="pp-btn-primary"
-          (click)= "submit()"
+        <button type="submit" class="pp-btn-primary" (click)="submit()"
           [disabled]="!enquiryForm.valid || !termsAcceptedSignal()">
           Get Quotes
         </button>
