@@ -11,6 +11,8 @@ import { PAProposalForm } from './pages/personal-accident-cover/proposal-form/pr
 import { PAallFeatures } from './pages/personal-accident-cover/all-features/all-features';
 import { GMCEnquiryFormComponent } from './pages/gmc/enquiry-form/enquiry-form';
 import { GMCQuotesComponent } from './pages/gmc/quotes/quotes';
+import { HospiCashEnquiryFormComponent } from './pages/hospi-cash/enquiry-form/enquiry-form';
+import { HospiCashQuotesComponent } from './pages/hospi-cash/quotes/quotes';
 
 export const routes: Routes = [
   {
@@ -40,6 +42,15 @@ export const routes: Routes = [
       { path: '', redirectTo: 'enquiry-form', pathMatch: 'full' },
       { path: 'enquiry-form', component: GMCEnquiryFormComponent },
       { path: 'quotes', component: GMCQuotesComponent },
+
+    ]
+  },
+  {
+    path:'hospicash',
+    children: [
+      { path: '', redirectTo: 'enquiry-form', pathMatch: 'full' },
+      { path: 'enquiry-form', component: HospiCashEnquiryFormComponent },
+      { path: 'quotes', component: HospiCashQuotesComponent },
 
     ]
   },

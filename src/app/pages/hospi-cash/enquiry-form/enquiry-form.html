@@ -1,0 +1,439 @@
+<!-- OUTER BG -->
+<div class="w-full flex justify-center px-3 sm:px-6 py-6 sm:py-10 bg-[#F5FAFC]">
+  <!-- WHITE CARD SHELL -->
+  <div class="w-full max-w-5xl bg-white rounded-2xl shadow-lg px-4 sm:px-10 py-6 sm:py-10">
+
+    <!-- ================= HEADER / STEPPER ================= -->
+    <div class="flex items-center mb-6 sm:mb-10">
+      <!-- Back button for ALL steps (1,2,3) -->
+      <button type="button" (click)="goBack()" class="flex items-center mr-4 group" aria-label="Go back">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[#006D8D] group-hover:text-[#004b60] transition"
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6" />
+        </svg>
+      </button>
+
+      <!-- Stepper (1-2-3) -->
+      <div class="flex-1 flex justify-center">
+        <div class="flex items-center space-x-4 sm:space-x-8">
+          <!-- STEP 1 -->
+          <div class="flex flex-col items-center">
+            <div class="flex items-center justify-center rounded-full text-xs font-semibold w-8 h-8 sm:w-7 sm:h-7"
+              [ngClass]="step === 1 ? 'bg-[#006D8D] text-white' : 'bg-[#E4EDF1] text-[#006D8D]'">
+              1
+            </div>
+            <span class="mt-1 text-[11px] text-gray-600 hidden md:block whitespace-nowrap">
+              Select Members
+            </span>
+          </div>
+
+          <div class="h-px w-8 sm:w-12 bg-gray-300"></div>
+
+          <!-- STEP 2 -->
+          <div class="flex flex-col items-center">
+            <div class="flex items-center justify-center rounded-full text-xs font-semibold w-8 h-8 sm:w-7 sm:h-7"
+              [ngClass]="step === 2 ? 'bg-[#006D8D] text-white' : 'bg-[#E4EDF1] text-[#006D8D]'">
+              2
+            </div>
+            <span class="mt-1 text-[11px] text-gray-600 hidden md:block whitespace-nowrap">
+              Select Age of Members
+            </span>
+          </div>
+
+          <div class="h-px w-8 sm:w-12 bg-gray-300"></div>
+
+          <!-- STEP 3 -->
+          <div class="flex flex-col items-center">
+            <div class="flex items-center justify-center rounded-full text-xs font-semibold w-8 h-8 sm:w-7 sm:h-7"
+              [ngClass]="step === 3 ? 'bg-[#006D8D] text-white' : 'bg-[#E4EDF1] text-[#006D8D]'">
+              3
+            </div>
+            <span class="mt-1 text-[11px] text-gray-600 hidden md:block whitespace-nowrap">
+              Basic Details
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================= STEP 1 ======================= -->
+    <div *ngIf="step === 1" class="space-y-6 sm:space-y-8">
+      <h2 class="text-center text-base sm:text-xl font-medium text-gray-700">
+        Select your gender
+      </h2>
+
+      <!-- Gender Toggle -->
+      <div class="mx-auto w-full max-w-[260px] h-9 sm:h-10 rounded-full border border-[#006D8D] flex overflow-hidden">
+        <button type="button" (click)="setGender('Male')" class="flex-1 text-sm sm:text-base font-medium transition"
+          [ngClass]="gender === 'Male' ? 'bg-[#006D8D] text-white' : 'bg-white text-[#006D8D]'">
+          Male
+        </button>
+        <button type="button" (click)="setGender('Female')" class="flex-1 text-sm sm:text-base font-medium transition"
+          [ngClass]="gender === 'Female' ? 'bg-[#006D8D] text-white' : 'bg-white text-[#006D8D]'">
+          Female
+        </button>
+      </div>
+
+      <h3 class="text-center text-sm sm:text-xl font-semibold text-gray-700">
+        Select members you want to insure
+      </h3>
+
+      <div class="w-full max-w-md sm:max-w-3xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 justify-items-center">
+        <ng-container *ngFor="let m of members">
+          <div (click)="toggleMember(m.key)" class="relative flex flex-col items-center
+              w-full max-w-[140px] sm:max-w-[170px]
+              h-[160px] sm:h-[210px]
+              rounded-[18px] border bg-white cursor-pointer
+              shadow-card transition-transform duration-200 hover:-translate-y-1"
+            [ngClass]="isMemberSelected(m) ? 'gradient-border' : 'border-[#E6EEF5]'">
+
+            <img [src]="m.iconPath" class="mt-5 sm:mt-6 w-14 h-14 sm:w-16 sm:h-16 object-contain" />
+
+            <p class="mt-3 sm:mt-4 text-xs sm:text-sm font-semibold text-gray-700">
+              {{ m.label }}
+            </p>
+
+            <!-- child counter pinned at bottom for Son / Daughter -->
+            <div *ngIf="m.key === 'son' || m.key === 'daughter'"
+              class="mt-auto mb-3 sm:mb-4 pt-2 flex items-center justify-center gap-5">
+              <button (click)="decrementChild(m.key); $event.stopPropagation()"
+                class="w-6 h-6 sm:w-7 sm:h-7 rounded-full border border-[#00A2C4]
+                    flex items-center justify-center text-[#00A2C4] text-sm"
+                [disabled]="m.count === 0">
+                –
+              </button>
+
+              <span class="text-xs sm:text-sm font-semibold text-gray-700 min-w-[1.5rem] text-center">
+                {{ m.count }}
+              </span>
+
+              <button (click)="incrementChild(m.key); $event.stopPropagation()"
+                class="w-6 h-6 sm:w-7 sm:h-7 rounded-full border border-[#00A2C4]
+                    flex items-center justify-center text-[#00A2C4] text-sm"
+                [disabled]="getTotalChildren() >= maxChildren">
+                +
+              </button>
+            </div>
+
+          </div>
+        </ng-container>
+      </div>
+
+      <div class="flex justify-center mt-4 sm:mt-8">
+        <button type="button" (click)="next()" class="nav-btn">Next</button>
+      </div>
+    </div>
+
+    <!-- ======================= STEP 2 ======================= -->
+    <div *ngIf="step === 2" class="space-y-6 sm:space-y-10">
+      <h2 class="text-center text-base sm:text-2xl font-medium text-gray-700 tracking-wide">
+        Tell us the age of your family members
+      </h2>
+
+      <div class="flex flex-wrap justify-center gap-6 sm:gap-10 mt-2 sm:mt-4">
+        <ng-container *ngFor="let id of getFlatMemberList()">
+          <div class="w-[180px] sm:w-[220px] bg-white rounded-xl border border-[#E5EFF4]
+              shadow-card flex flex-col items-center text-center pt-6 sm:pt-8 pb-5 sm:pb-6">
+            <img [src]="getIconForId(id)" class="w-16 h-16 sm:w-20 sm:h-20 object-contain" />
+
+            <p class="mt-3 sm:mt-4 text-sm sm:text-base font-medium text-gray-700">
+              {{ getAgeTitle(id) }}
+            </p>
+
+            <div class="mt-5 sm:mt-6 w-full px-6 sm:px-8">
+              <div class="age-dropdown">
+                <div class="age-dropdown__control" (click)="toggleAgeDropdown(id); $event.stopPropagation()">
+                  <span class="age-dropdown__value">
+                    {{ selectedAges[id] ? getAgeLabelForId(id, selectedAges[id]) : 'Select Age' }}
+                  </span>
+                  <span class="age-dropdown__arrow">▾</span>
+                </div>
+
+                <div class="age-dropdown__menu" *ngIf="openAgeDropdownId === id" (click)="$event.stopPropagation()">
+                  <div class="age-dropdown__option age-dropdown__option--placeholder" (click)="selectAge(id, null)">
+                    Select Age
+                  </div>
+
+                  <div class="age-dropdown__option" *ngFor="let opt of getAgeOptionsForId(id)"
+                    (click)="selectAge(id, opt.value)">
+                    {{ opt.label }}
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </ng-container>
+      </div>
+
+      <div class="flex justify-center gap-4 sm:gap-6 mt-4 sm:mt-8">
+        <button type="button" (click)="prev()" class="nav-btn">Previous</button>
+        <button type="button" (click)="next()" class="nav-btn">Next</button>
+      </div>
+    </div>
+
+    <!-- ======================= STEP 3 ======================= -->
+    <div *ngIf="step === 3" class="space-y-8 sm:space-y-12">
+      <h2 class="text-center text-base sm:text-2xl font-medium text-gray-700 tracking-wide">
+        Tell us more about yourself
+      </h2>
+
+      <div *ngIf="basicFormSubmitAttempted && basicForm.invalid"
+        class="mt-2 mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-2 flex items-center gap-2
+               text-xs sm:text-sm text-red-700 justify-center">
+        <span class="inline-flex w-4 h-4 rounded-full bg-red-500 text-white text-[10px] items-center justify-center font-bold">!</span>
+        <span>Please check the highlighted fields and fill your basic details correctly.</span>
+      </div>
+
+      <form [formGroup]="basicForm" class="max-w-5xl mx-auto space-y-8 sm:space-y-12" novalidate>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-x-10 sm:gap-x-16 gap-y-6">
+
+          <div>
+            <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
+              First Name <span class="text-red-500">*</span>
+            </label>
+            <input type="text" formControlName="firstName"
+              class="w-full border-0 border-b border-gray-400 bg-transparent py-2 text-gray-700 text-sm
+                     focus:outline-none focus:border-[#006D8D]"
+              [ngClass]="{ 'invalid-field': isInvalid('firstName') }"
+              placeholder="Enter your first name"
+              (keydown)="allowOnlyLetters($event)"
+              (input)="onNameInputUpper('firstName')" />
+            <div *ngIf="isInvalid('firstName')" class="form-error">
+              <span *ngIf="f['firstName']?.errors?.['required']">First name is required.</span>
+              <span *ngIf="f['firstName']?.errors?.['pattern']">Only alphabets and spaces are allowed.</span>
+              <span *ngIf="f['firstName']?.errors?.['maxlength']">Maximum 20 characters allowed.</span>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
+              Last Name <span class="text-red-500">*</span>
+            </label>
+            <input type="text" formControlName="lastName"
+              class="w-full border-0 border-b border-gray-400 bg-transparent py-2 text-gray-700 text-sm
+                     focus:outline-none focus:border-[#006D8D]"
+              [ngClass]="{ 'invalid-field': isInvalid('lastName') }"
+              placeholder="Enter your last name"
+              (keydown)="allowOnlyLetters($event)"
+              (input)="onNameInputUpper('lastName')" />
+            <div *ngIf="isInvalid('lastName')" class="form-error">
+              <span *ngIf="f['lastName']?.errors?.['required']">Last name is required.</span>
+              <span *ngIf="f['lastName']?.errors?.['pattern']">Only alphabets and spaces are allowed.</span>
+              <span *ngIf="f['lastName']?.errors?.['maxlength']">Maximum 20 characters allowed.</span>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
+              Mobile Number <span class="text-red-500">*</span>
+            </label>
+            <input type="tel" formControlName="mobile" maxlength="10"
+              class="w-full border-0 border-b border-gray-400 bg-transparent py-2 text-gray-700 text-sm
+                     focus:outline-none focus:border-[#006D8D]"
+              [ngClass]="{ 'invalid-field': isInvalid('mobile') }"
+              placeholder="Enter 10-digit mobile number"
+              (keypress)="allowOnlyDigits($event)"
+              (input)="onNumberInput('mobile', 10)" />
+            <div *ngIf="isInvalid('mobile')" class="form-error">
+              <span *ngIf="f['mobile']?.errors?.['required']">Mobile number is required.</span>
+              <span *ngIf="f['mobile']?.errors?.['pattern']">Enter a valid 10-digit mobile number.</span>
+            </div>
+
+            <button type="button" (click)="openOtpModal()"
+              class="mt-2 text-xs sm:text-sm px-3 py-1 rounded bg-[#006D8D] text-white hover:bg-[#005B75] font-medium"
+              [disabled]="isInvalid('mobile') || mobileVerifiedSignal()">
+              {{ mobileVerifiedSignal() ? '✓ Verified' : 'Verify Number' }}
+            </button>
+
+            <span *ngIf="mobileVerifiedSignal()" class="text-xs text-green-600 ml-2">Mobile verified</span>
+          </div>
+
+          <div>
+            <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
+              Pincode <span class="text-red-500">*</span>
+            </label>
+            <input type="tel" formControlName="pincode" maxlength="6"
+              class="w-full border-0 border-b border-gray-400 bg-transparent py-2 text-gray-700 text-sm
+                     focus:outline-none focus:border-[#006D8D]"
+              [ngClass]="{ 'invalid-field': isInvalid('pincode') }"
+              placeholder="Enter 6-digit pincode"
+              (keypress)="allowOnlyDigits($event)"
+              (input)="onNumberInput('pincode', 6)" />
+            <div *ngIf="isInvalid('pincode')" class="form-error">
+              <span *ngIf="f['pincode']?.errors?.['required']">Pincode is required.</span>
+              <span *ngIf="f['pincode']?.errors?.['pattern']">Enter a valid 6-digit pincode.</span>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
+              City <span class="text-red-500">*</span>
+            </label>
+            <input type="text" formControlName="city"
+              class="w-full border-0 border-b border-gray-400 bg-transparent py-2 text-gray-700 text-sm
+                     focus:outline-none focus:border-[#006D8D]"
+              [ngClass]="{ 'invalid-field': isInvalid('city') }"
+              placeholder="Enter your city"
+              (keypress)="allowOnlyLetters($event)"
+              (input)="onNameInput('city')" />
+            <div *ngIf="isInvalid('city')" class="form-error">
+              <span *ngIf="f['city']?.errors?.['required']">City is required.</span>
+              <span *ngIf="f['city']?.errors?.['minlength']">City name should be at least 3 characters.</span>
+              <span *ngIf="f['city']?.errors?.['pattern']">Only alphabets and spaces are allowed.</span>
+            </div>
+          </div>
+
+          <!-- ROOM RENT -->
+<div>
+  <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
+    Room Rent <span class="text-red-500">*</span>
+  </label>
+
+  <div class="relative w-full">
+    <select
+      formControlName="roomRent"
+      class="w-full p-2 border-0 border-b border-gray-400 bg-transparent py-2 text-gray-700 text-sm
+             focus:outline-none focus:border-[#006D8D] appearance-none"
+      [ngClass]="{ 'invalid-field': isInvalid('roomRent') }"
+    >
+      <option value="">Select room rent</option>
+    <option *ngFor="let r of roomRentOptions" [value]="r.value">
+      {{ r.label }}
+    </option>
+
+    </select>
+
+    <span
+      class="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-[#006D8D] text-[10px] sm:text-xs"
+    >
+      ▾
+    </span>
+  </div>
+
+  <div *ngIf="isInvalid('roomRent')" class="form-error">
+    <span>Room rent is required.</span>
+  </div>
+</div>
+
+<!-- NO. OF DAYS -->
+<div>
+  <label class="block text-[#006D8D] text-xs sm:text-sm font-semibold mb-1">
+    No. of Days <span class="text-red-500">*</span>
+  </label>
+
+  <div class="relative w-full">
+    <select
+      formControlName="noOfDays"
+      class="w-full p-2 border-0 border-b border-gray-400 bg-transparent py-2 text-gray-700 text-sm
+            focus:outline-none focus:border-[#006D8D] appearance-none"
+      [ngClass]="{ 'invalid-field': isInvalid('noOfDays') }"
+    >
+      <option value="">Select duration</option>
+      <option value="10">10 Days</option>
+      <option value="15">15 Days</option>
+      <option value="20">20 Days</option>
+      <option value="30">30 Days</option>
+      <option value="60">60 Days</option>
+      <option value="90">90 Days</option>
+      <option value="180">180 Days</option>
+    </select>
+
+    <span
+      class="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-[#006D8D] text-[10px] sm:text-xs"
+    >
+      ▾
+    </span>
+  </div>
+
+  <div *ngIf="isInvalid('noOfDays')" class="form-error">
+    <span>No. of Days is required.</span>
+  </div>
+</div>
+
+
+        </div>
+      </form>
+
+      <!-- ================= TERMS & CONDITIONS ================= -->
+      <div class="flex items-start justify-center gap-2 mt-6">
+        <input type="checkbox" id="terms" class="mt-1 accent-[#006D8D]"
+          [checked]="termsAcceptedSignal()"
+          (change)="termsAcceptedSignal.set($any($event.target).checked)" />
+
+        <label for="terms" class="text-xs sm:text-sm text-gray-600 leading-relaxed cursor-pointer">
+          I agree to the
+          <a href="https://policyplanner.com/#/terms" target="_blank" class="text-[#006D8D] underline">
+            Terms & Conditions
+          </a>
+          and
+          <a href="https://policyplanner.com/#/privacy" target="_blank" class="text-[#006D8D] underline">
+            Privacy Policy
+          </a>.
+        </label>
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex justify-center gap-4 sm:gap-6 mt-4">
+        <button type="button" (click)="prev()" class="nav-btn">Previous</button>
+        <button type="button" (click)="next()" class="nav-btn"
+          [disabled]="!mobileVerifiedSignal() || !termsAcceptedSignal()">
+          Submit
+        </button>
+      </div>
+    </div>
+
+    <!-- OTP Modal -->
+    <div *ngIf="otpModalOpenSignal()" class="fixed inset-0 z-40 flex items-center justify-center">
+      <div class="absolute inset-0 bg-black/40"></div>
+
+      <div class="relative bg-white rounded-xl shadow-lg w-[92%] max-w-sm p-5 z-50">
+        <div class="flex justify-between items-start mb-3">
+          <div>
+            <h3 class="text-base font-semibold text-gray-700">Verify Mobile</h3>
+            <p class="text-xs text-gray-500 mt-1">Enter the 4-digit OTP sent to your mobile</p>
+          </div>
+          <button (click)="closeOtpModal()" class="text-gray-400 hover:text-gray-600">✕</button>
+        </div>
+
+        <div class="flex justify-center gap-2 mb-3" (paste)="onOtpPaste($event)">
+          <input id="otp-0" [value]="otpDigitsSignal()[0]" type="text" maxlength="1" inputmode="numeric"
+            class="w-12 h-12 text-center rounded-lg border border-gray-200"
+            (input)="onOtpInput(0, $event)" (keydown)="onOtpKeydown(0, $event)" />
+          <input id="otp-1" [value]="otpDigitsSignal()[1]" type="text" maxlength="1" inputmode="numeric"
+            class="w-12 h-12 text-center rounded-lg border border-gray-200"
+            (input)="onOtpInput(1, $event)" (keydown)="onOtpKeydown(1, $event)" />
+          <input id="otp-2" [value]="otpDigitsSignal()[2]" type="text" maxlength="1" inputmode="numeric"
+            class="w-12 h-12 text-center rounded-lg border border-gray-200"
+            (input)="onOtpInput(2, $event)" (keydown)="onOtpKeydown(2, $event)" />
+          <input id="otp-3" [value]="otpDigitsSignal()[3]" type="text" maxlength="1" inputmode="numeric"
+            class="w-12 h-12 text-center rounded-lg border border-gray-200"
+            (input)="onOtpInput(3, $event)" (keydown)="onOtpKeydown(3, $event)" />
+        </div>
+
+        <div *ngIf="otpErrorSignal()" class="text-xs text-red-600 text-center mb-2">
+          {{ otpErrorSignal() }}
+        </div>
+
+        <div class="flex items-center justify-between gap-3">
+          <button (click)="submitOtp()" class="flex-1 px-4 py-2 rounded-md bg-[#006D8D] text-white text-sm font-medium"
+            [disabled]="otpValueSignal().length !== 4">
+            Verify
+          </button>
+
+          <button (click)="resendOtp()" class="flex-1 px-4 py-2 rounded-md border text-sm font-medium"
+            [disabled]="resendTimerSignal() > 0">
+            <span *ngIf="resendTimerSignal() === 0">Resend</span>
+            <span *ngIf="resendTimerSignal() > 0">Resend ({{ resendTimerSignal() }}s)</span>
+          </button>
+        </div>
+
+        <p class="mt-3 text-xs text-gray-500 text-center">
+          Didn't receive OTP? Check your mobile number or try again after the cooldown.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>

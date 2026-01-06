@@ -1,9 +1,9 @@
 <!-- MAIN QUOTES CONTAINER -->
-<div class="main-quotes-wrapper w-full max-w-7xl mx-auto px-4 sm:px-6 py-6">
+<div class="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6">
 
   <!-- Top Bar -->
-  <div class="w-full bg-white rounded-xl px-3 sm:px-4 py-2.5 sm:py-3
-          flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3">
+  <div
+    class="w-full bg-white rounded-xl px-4 py-3 relative flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
 
     <!-- LEFT: Back Arrow + Breadcrumbs -->
     <div class="flex items-center gap-2 min-w-0">
@@ -18,7 +18,7 @@
       <!-- Breadcrumbs -->
       <div class="text-[13px] sm:text-sm text-gray-500 flex flex-wrap items-center gap-0.5 sm:gap-1 md:gap-2 min-w-0">
         <span class="truncate max-w-[220px] xs:max-w-[260px] sm:max-w-none">
-          super-top-up Insurance
+          Group Medical Coverage
         </span>
         <span>›</span>
         <span>Personal Details</span>
@@ -28,6 +28,7 @@
         </span>
       </div>
     </div>
+
 
     <!-- Right Side Contact -->
     <div class="flex items-center gap-2 text-gray-600 font-semibold">
@@ -39,47 +40,37 @@
       <span>+91 7798612243</span>
     </div>
 
-    <!-- <div class="absolute bottom-0 left-0 right-0 h-[1px] bg-gray-200 -mx-4 sm:-mx-6"></div> -->
+    <div class="absolute bottom-0 left-0 right-0 h-[1px] bg-gray-200 -mx-4 sm:-mx-6"></div>
   </div>
 
   <!-- Quick Filters -->
   <div class="w-full bg-white rounded-xl px-4 py-4 flex flex-wrap gap-3 relative">
 
-    <span class="flex items-center justify-center font-semibold text-gray-700 whitespace-nowrap w-full sm:w-auto">
+    <span class="font-semibold text-gray-700 whitespace-nowrap w-full sm:w-auto">
       Quick Filters
     </span>
 
     <!-- Filter Buttons -->
-    <div class="dropdown filter-btn w-full sm:w-auto">
-      <select (change)="onCoverageAmountChange($event)" class="w-full sm:w-auto bg-transparent outline-none">
-        <option value="">Coverage Amt</option>
-        <!-- <option value="300000">3 Lakh</option> -->
-        <option value="500000">5 Lakh</option>
-        <!-- <option value="600000">6 Lakh</option> -->
-        <!-- <option value="700000">7 Lakh</option> -->
-        <!-- <option value="800000">8 Lakh</option> -->
-        <option value="1000000">10 Lakh</option>
-        <!-- <option value="1100000">11 Lakh</option> -->
-        <!-- <option value="1200000">12 Lakh</option> -->
-        <option value="1500000">15 Lakh</option>
-        <!-- <option value="1600000">16 Lakh</option> -->
-        <option value="2000000">20 Lakh</option>
-        <option value="2500000">25 Lakh</option>
-        <option value="5000000">50 Lakh</option>
-        <option value="10000000">1 Crore</option>
-        <option value="30000000">3 Crore</option>
-      </select>
-    </div>
+   <div class="dropdown filter-btn w-full sm:w-auto">
+  <select (change)="onCoverageAmountChange($event)" class="w-full sm:w-auto bg-transparent outline-none">
+    <option value="">Room Rent</option>
 
-    <!-- Deductible Dropdown -->
-    <div class="dropdown filter-btn w-full sm:w-auto">
-      <select (change)="onDeductibleChange($event)" class="w-full sm:w-auto bg-transparent outline-none">
-        <option value="">All Deductibles</option>
-        <option *ngFor="let d of deductibleList()" [value]="d">
-          {{ formatIndianCurrency(d) }}
-        </option>
-      </select>
-    </div>
+    <option value="500">₹500</option>
+    <option value="750">₹750</option>
+    <option value="1000">₹1000</option>
+    <option value="1500">₹1500</option>
+    <option value="2000">₹2000</option>
+    <option value="2500">₹2500</option>
+    <option value="3000">₹3000</option>
+    <option value="3500">₹3500</option>
+    <option value="4000">₹4000</option>
+    <option value="4500">₹4500</option>
+    <option value="5000">₹5000</option>
+    <option value="7500">₹7500</option>
+  </select>
+</div>
+
+
 
     <!-- Insurer Dropdown -->
     <div class="dropdown filter-btn w-full sm:w-auto">
@@ -101,21 +92,22 @@
       </select>
     </div>
 
+
     <!-- Right Side User Info -->
-    <div
+    <!-- <div
       class="w-full sm:ml-auto sm:w-auto flex items-center bg-[#F8FDFF] border border-[#E8F3FF] rounded-full px-5 py-2 shadow-sm gap-3">
       <div class="flex items-center text-gray-700 text-sm">
         Self: <span class="font-semibold ml-1">{{ age }} years</span>
         <span class="mx-2 text-gray-400">|</span>
         Pincode: <span class="font-semibold ml-1">{{ pincode }}</span>
       </div>
-    </div>
+    </div> -->
 
     <div class="absolute bottom-0 left-0 right-0 h-[3px] bg-yellow-400 -mx-4 sm:-mx-6"></div>
   </div>
 
   <!-- Quote Count -->
-  <p class="mt-6 text-gray-600 md:text-lg text-sm">
+  <p class="mt-6 text-gray-600 text-lg">
     Here are <span class="text-[#006D8D] font-semibold">{{plans().length}} plans</span> made just for you, {{name}}
     <img class="w-10 h-10 inline-block" src="assets/heading-arrow.gif" alt="gif">
   </p>
@@ -145,14 +137,14 @@
 
             <!-- LEFT SECTION -->
             <div class="w-full md:w-[32%] p-3 md:p-6">
-              <img [src]="p.logo" class="h-20 mb-3" />
+              <img [src]="p.logo" class="h-18 mb-3" />
               <h3 class="text-lg font-semibold text-gray-800">{{ p.name }}</h3>
 
               <div class="mt-2 md:mt-3">
                 <span
                   class="inline-flex items-center gap-1 px-3 py-1 bg-orange-100 text-orange-600 text-sm rounded-full">
                   <img src="assets/quote/circleOrange.svg" alt="">
-                  {{ p.tag }}
+                  {{ p.company }}
                 </span>
               </div>
             </div>
@@ -168,7 +160,7 @@
                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   </span>
-                  {{ (f?.length > 50) ? (f | slice:0:50) + '...' : f }}
+                  {{ f }}
                 </li>
               </ul>
 
@@ -177,46 +169,41 @@
                 View All Features
               </button>
 
-
             </div>
 
             <!-- RIGHT SECTION -->
             <div
-              class="quote-card-cta w-full md:w-[30%] bg-gradient-to-b from-[#E8F7FF] to-white p-3 md:p-6 flex flex-col justify-between">
+              class="w-full md:w-[30%] bg-gradient-to-b from-[#E8F7FF] to-white p-3 md:p-6 flex flex-col justify-between">
 
-
-              <div class="flex justify-between mb-0 gap-0 !leading-tight">
-
-
+              <div class="flex justify-center items-center mb-3 md:mb-4">
                 <div>
-                  <p class="text-gray-600 text-xs flex items-center gap-1">
-                    Cover Amt <span class="text-gray-400 text-[12px]">ⓘ</span>
-                  </p>
-                  <p class="font-semibold mt-1">{{ p.cover }}</p>
+                <p class="text-gray-600 text-xs flex items-center gap-1">
+                Room Rent <span class="text-gray-400 text-[12px]">ⓘ</span>
+              </p>
+              <p class="font-semibold mt-1">{{ p.cover }}</p>
+
+
                 </div>
 
-                <div>
-                  <p class="text-gray-600 text-xs flex items-center gap-1">
-                    Deductible Amt <span class="text-gray-400 text-[12px]">ⓘ</span>
-                  </p>
-                  <p class="font-semibold mt-1">{{ p.deductible }}</p>
-                </div>
+
+
               </div>
 
               <button (click)="goToProposal(p)"
-                class="bg-[#007AAA] hover:bg-[#006988] text-white font-semibold py-2 rounded-md shadow text-sm">
-                Buy Now {{ p.price }}
+                class="bg-[#007AAA] hover:bg-[#006988] text-white font-semibold py-2 rounded-md shadow text-sm mb-2">
+                Buy Now {{ p.premium }}
               </button>
+
 
               <a *ngIf="p.brochure" [href]="p.brochure" download target="_blank"
                 class="mt-3 md:mt-4 text-sm text-[#006D8D] flex items-center justify-center gap-1">
                 Download Brochure
                 <img class="w-4 h-4" src="assets/quote/download.svg" alt="" />
               </a>
-              <a *ngIf="p.onePager" [href]="p.onePager" download target="_blank"
-                class="mt-0.5 md:mt-1 text-sm text-[#006D8D] flex items-center justify-center gap-1">
 
-                Download One Pager
+              <a *ngIf="p.onePager" [href]="p.onePager" download target="_blank"
+                class="mt-3 md:mt-4 text-sm text-[#006D8D] flex items-center justify-center gap-1">
+                One Pager
                 <img class="w-4 h-4" src="assets/quote/download.svg" alt="" />
               </a>
 
@@ -311,14 +298,14 @@
       <div
         class="flex items-center gap-2 px-4 py-3 border-2 border-slate-200 rounded-xl bg-white flex-shrink-0 min-w-[180px] hover:border-[#0b5cff] hover:shadow"
         *ngFor="let p of compare; trackBy: trackByPlanId">
-        <img [src]="p.logo" [alt]="p.insurerName" class="w-15 h-10 object-contain rounded-md" />
+        <img [src]="p.logo" [alt]="p.insurerName" class="h-15 object-contain rounded-md" />
         <div class="flex-1 min-w-0">
           <p class="text-sm font-semibold text-slate-900 truncate">{{ p.insurerName }}</p>
           <p class="text-xs text-slate-500 truncate">{{ p.productName }}</p>
         </div>
         <button type="button"
           class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-100 rounded"
-          (click)="removeFromCompare2(p)">
+          (click)="removeFromCompare(p)">
           ✕
         </button>
       </div>
@@ -326,7 +313,7 @@
       <!-- Empty slots -->
       <div
         class="flex items-center justify-center px-4 py-3 border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 flex-shrink-0 min-w-[120px] text-sm font-medium text-slate-400"
-        *ngFor="let n of emptySlots()">
+        *ngFor="let n of emptySlots">
         Add Plan
       </div>
     </div>
@@ -350,9 +337,7 @@
 <!-- ===========================
      FULL-SCREEN COMPARISON
 =========================== -->
-<div *ngIf="isCompareOpen" id="compareWrapper"
-  class="compare-screen fixed inset-0 z-[1400] flex flex-col bg-white overflow-hidden">
-  <!-- HEADER -->
+<div *ngIf="isCompareOpen" id="compareWrapper" class="fixed inset-0 z-[1400] flex flex-col bg-white overflow-hidden">
   <div class="cmp-screen__header flex items-center bg-white border-b border-slate-200 px-4 py-3 flex-shrink-0">
     <button type="button" (click)="closeCompare()" class="flex items-center mr-1 flex-shrink-0 group"
       aria-label="Go back">
@@ -361,6 +346,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6" />
       </svg>
     </button>
+
 
     <div class="flex-1 text-center font-bold text-[16px] text-[#222]">
       Compare Plans
@@ -426,6 +412,7 @@
               ✕
             </button>
 
+            <!-- ✅ Same logo+names layout like SuperTopup -->
             <div class="cmp-logo-name-row flex items-start gap-3 w-full pr-8 min-w-0">
               <div class="cmp-logo-wrapper">
                 <img [src]="p.logo" [alt]="p.insurerName" class="cmp-company-logo" />
@@ -441,19 +428,23 @@
               </div>
             </div>
 
-            <!-- ✅ Cover + Deductible in one compact row -->
+            <!-- ✅ PA metrics: Cover + Base + Addon in one compact grid -->
             <div class="cmp-metrics">
               <div class="cmp-metric">
-                <div class="cmp-metric-label">Cover Amount</div>
-                <div class="cmp-metric-value">
-                  ₹ {{ formatIndianCurrency(p.coverAmount) }}
-                </div>
+               <div class="cmp-metric-label">Room Rent</div>
+            <div class="cmp-metric-value">₹ {{ formatIndianCurrency(p.coverAmount) }}</div>
+
               </div>
 
               <div class="cmp-metric">
-                <div class="cmp-metric-label">Deductible Amount</div>
+                <div class="cmp-metric-label">Base Premium</div>
+                <div class="cmp-metric-value">₹ {{ formatIndianCurrency(p.base) }}</div>
+              </div>
+
+              <div class="cmp-metric">
+                <div class="cmp-metric-label">Add-on Premium</div>
                 <div class="cmp-metric-value">
-                  ₹ {{ formatIndianCurrency(p.deductible) }}
+                  {{ p.addon > 0 ? ('₹ ' + formatIndianCurrency(p.addon)) : '—' }}
                 </div>
               </div>
             </div>
@@ -464,6 +455,7 @@
               Buy now for ₹{{ p.monthlyPrice | number : '1.0-0' : 'en-IN' }}
             </button>
           </div>
+
         </div>
 
         <!-- BODY ROWS -->
@@ -487,8 +479,7 @@
             </div>
           </div>
         </div>
-
-      </div> <!-- /cmp-table-wrapper -->
-    </div> <!-- /cmp-pdf-area -->
-  </div> <!-- /cmp-pdf-root -->
+      </div>
+    </div>
+  </div>
 </div>

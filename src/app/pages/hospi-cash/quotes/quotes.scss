@@ -1,0 +1,359 @@
+/* =========================
+   FILTER BUTTONS
+========================= */
+.filter-btn {
+  padding: 0.4rem 1rem;
+  background: #fff;
+  border: 1px solid #e5e7eb; /* gray-200 */
+  border-radius: 9999px;
+  color: #4b5563; /* gray-700 */
+  font-size: 0.875rem; /* text-sm */
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* shadow-sm */
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.filter-btn:hover {
+  background: #f9fafb; /* gray-50 */
+}
+
+/* hide scrollbar for compare chips strip */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* =========================
+   EXPORT MODE: PDF ONLY
+========================= */
+#compareWrapper {
+  color-scheme: light;
+}
+
+#compareWrapper * {
+  --tw-shadow: none;
+  --tw-shadow-color: rgb(0 0 0 / 0.1);
+  --tw-bg-opacity: 1;
+  --tw-text-opacity: 1;
+  --tw-border-opacity: 1;
+}
+
+.export-pdf {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: visible !important;
+}
+
+/* When capturing for PDF – full width/height, no header, no scroll */
+#compareWrapper.export-pdf {
+  position: static !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+}
+
+/* Hide top header inside PDF */
+#compareWrapper.export-pdf .cmp-screen__header {
+  display: none !important;
+}
+
+/* Make the scrolling area fully visible while exporting */
+#compareWrapper.export-pdf .cmp-table-wrapper {
+  overflow: visible !important;
+  max-height: none !important;
+  height: auto !important;
+}
+
+/* Slightly tighter top strip in PDF */
+#compareWrapper.export-pdf .cmp-user-strip {
+  padding: 4px 12px !important;
+}
+
+/* =========================
+   COMPARE HEADER – DESKTOP
+========================= */
+.cmp-logo-wrapper {
+  width: 96px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cmp-company-logo {
+  width: 96px;
+  height: 56px;
+  object-fit: contain;
+  display: block;
+  /* helps white logos (like Bajaj) become visible */
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.18));
+}
+
+.cmp-company-name {
+  font-weight: 700;
+  font-size: 15px;
+  color: #222;
+  line-height: 1.2;
+  margin-bottom: 3px;
+  word-break: break-word;
+}
+
+.cmp-product-name {
+  font-size: 13px;
+  color: #667085;
+  line-height: 1.2;
+}
+
+/* Cover/Deductible row (desktop default) */
+.cmp-metrics {
+  width: 100%;
+  margin-top: 6px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.cmp-metric {
+  text-align: center;
+  padding: 6px 6px;
+  border-top: 1px dashed #eef2f5;
+}
+
+.cmp-metric-label {
+  font-size: 12px;
+  color: #667085;
+  line-height: 1.1;
+  margin-bottom: 3px;
+}
+
+.cmp-metric-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #222;
+  line-height: 1.1;
+}
+
+
+/* =========================
+   MOBILE: FULL TABLE SCROLL (INCLUDING LEFT COLUMN)
+========================= */
+@media (max-width: 768px) {
+
+  /* Single horizontal scroll container */
+  .cmp-table-wrapper {
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* Make header + body the SAME scrolling width */
+  .cmp-top,
+  .cmp-row {
+    display: flex !important;
+    width: max-content !important;   /* 🔥 KEY */
+  }
+
+  /* REMOVE grid behaviour on mobile */
+  .cmp-top,
+  .cmp-row {
+    grid-template-columns: none !important;
+  }
+
+  /* Left feature column scrolls WITH table */
+  .cmp-features-col,
+  .cmp-feature-col {
+    position: relative !important;   /* 🔥 remove sticky */
+    left: auto !important;
+    z-index: auto !important;
+
+    min-width: 165px !important;
+    max-width: 165px !important;
+    flex-shrink: 0 !important;
+
+    background: #f8fafc !important;
+    border-right: 1px solid #d7e1ea !important;
+  }
+
+  /* Plan columns */
+  .cmp-plan-col,
+  .cmp-data-col {
+    min-width: 260px !important;
+    max-width: 260px !important;
+    flex-shrink: 0 !important;
+    white-space: normal !important;
+  }
+
+  .cmp-metrics {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;   /* 2 columns */
+    gap: 10px !important;
+    margin-top: 6px !important;
+  }
+
+  /* Make Add-on go full width & center */
+  .cmp-metric:nth-child(3) {
+    grid-column: 1 / -1;              /* 🔥 full row */
+    text-align: center !important;
+  }
+
+  .cmp-metric {
+    padding: 8px 6px !important;
+    border-top: 1px dashed #eef2f5 !important;
+  }
+
+  .cmp-metric-label {
+    font-size: 12px !important;
+  }
+
+  .cmp-metric-value {
+    font-size: 15px !important;
+    margin-top: 2px !important;
+  }
+}
+
+
+/* =========================
+   BOTTOM COMPARE BAR – MOBILE RESPONSIVE
+   (Swipe chips + full width buttons)
+========================= */
+@media (max-width: 768px) {
+  /* main bar padding smaller */
+  .fixed.left-0.right-0.bottom-0 {
+    padding: 10px 0 !important;
+  }
+
+  /* container becomes column */
+  .fixed.left-0.right-0.bottom-0 .max-w-7xl {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  /* chips strip: horizontal scroll */
+  .fixed.left-0.right-0.bottom-0 .no-scrollbar {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    white-space: nowrap !important;
+    padding-bottom: 6px !important;
+  }
+
+  /* each chip slightly smaller but readable */
+  .fixed.left-0.right-0.bottom-0 .no-scrollbar > div {
+    min-width: 210px !important;
+    padding: 10px 12px !important;
+  }
+
+  /* actions: full width */
+  .fixed.left-0.right-0.bottom-0 .flex.items-center.gap-3.flex-shrink-0 {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+
+  .fixed.left-0.right-0.bottom-0 .flex.items-center.gap-3.flex-shrink-0 button {
+    flex: 1 !important;
+    height: 44px !important;
+    font-size: 14px !important;
+  }
+}
+/* =========================
+   COMPARE HEADER TOP – MOBILE STACK (ONE BY ONE)
+========================= */
+@media (max-width: 768px) {
+  .cmp-screen__header {
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    padding: 10px 12px !important;
+  }
+
+  /* Back to list */
+  .cmp-screen__header > button {
+    order: 1 !important;
+    width: 100% !important;
+    text-align: left !important;
+    font-size: 14px !important;
+    padding: 0 !important;
+  }
+
+  /* Title */
+  .cmp-screen__header > div.flex-1 {
+    order: 2 !important;
+    width: 100% !important;
+    flex: none !important;
+    text-align: left !important; /* or center if you want */
+    font-size: 15px !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+  }
+
+  /* Download button container */
+  .cmp-screen__header > div.ml-auto {
+    order: 3 !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+    justify-content: flex-start !important;
+  }
+
+  /* Download button full width */
+  .cmp-download-btn {
+    width: 100% !important;
+    min-width: 100% !important;
+    height: 42px !important;
+    justify-content: center !important;
+  }
+}
+@media (max-width: 768px) {
+
+  .cmp-logo-name-row {
+    min-height: 76px !important; /* KEY FIX */
+    align-items: flex-start !important;
+  }
+
+  /* Ensure text wrapping doesn’t push height */
+  .cmp-company-name {
+    line-height: 1.15 !important;
+    max-height: 34px;
+    overflow: hidden;
+  }
+
+  .cmp-product-name {
+    line-height: 1.1 !important;
+    max-height: 28px;
+    overflow: hidden;
+  }
+
+  /* Make metrics start at SAME vertical point */
+  .cmp-metrics {
+    margin-top: 6px !important;
+  }
+}
+
+/* =========================
+   DESKTOP FIX: Center Add-on Premium
+========================= */
+@media (min-width: 769px) {
+  .cmp-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* Add-on Premium centered below */
+  .cmp-metric:nth-child(3) {
+    grid-column: 1 / -1;   /* span both columns */
+    justify-self: center; /* TRUE center */
+    text-align: center;
+    width: fit-content;   /* prevents full-width stretch */
+    min-width: 160px;     /* keeps visual balance */
+  }
+}
