@@ -41,8 +41,6 @@ private readonly PAGE_KEY = 'hospicash_last_page';
   selectedInsurer: string | null = null;
   selectedSort: string | null = null;
   selectedCoverageAmt: number | null = null;
-  selectedNoOfDays: number | null = null;
-
   basePayload: PlanPayload | null = null;
 
   plans = signal<any[]>([]);
@@ -83,8 +81,6 @@ private readonly PAGE_KEY = 'hospicash_last_page';
         const payload = this.buildPayloadFromLocal(parsed);
         this.basePayload = payload;
         console.log('GMC Quotes Payload:', payload);
-        this.selectedCoverageAmt = payload.coverAmount; // ✅ add this line
-        this.selectedNoOfDays = payload.noOfDays;
 
 
         this.age = payload.age ?? null;
@@ -127,83 +123,76 @@ private buildPayloadFromLocal(ls: any): PlanPayload {
 
   /* -------------------- Fetch + Map all plans -------------------- */
 
- fetchAllPlans(payload: PlanPayload) {
-  this.api.getHospiCashEndpoints().subscribe({
-    next: (response) => {
-      const apiList = response?.data?.map((item: any) => item.api_type) || [];
+  fetchAllPlans(payload: PlanPayload) {
+    // Use PlanPayload type
+    this.api.getHospiCashEndpoints().subscribe({
 
-      // ✅ Convert to API expected keys
-      const apiPayload: any = {
-        room_rent: payload.coverAmount,   // ✅ important
-        no_of_days: payload.noOfDays,     // ✅ important
-        age: payload.age,
-        noOfAdults: payload.noOfAdults,
-        noOfChildren: payload.noOfChildren,
-      };
+      next: (response) => {
+        const apiList = response?.data?.map((item: any) => item.api_type) || [];
 
-      this.api.callAllPremiumApis(apiList, apiPayload).subscribe({
-        next: (resArray) => {
-          const insurerNames: string[] = [];
-          resArray.forEach((res: any) => {
-            if (res?.company) insurerNames.push(res.company.trim());
-          });
-          this.insurerList.set(Array.from(new Set(insurerNames)).sort());
-
-          const mappedPlans = resArray
-            .filter((res: any) => res && res.plan)
-            .flatMap((p: any) => {
-              if (this.selectedInsurer !== null) {
-                if (p.company !== this.selectedInsurer) return [];
-              }
-
-              const premiumNumber =
-                Number(String(p?.premium ?? 0).replace(/,/g, '')) || 0;
-
-              // ✅ Use selected payload value (response often doesn't include coverAmount)
-              const coverAmountNum =
-                Number(p.coverAmount ?? p.cover_amount ?? p.room_rent ?? payload.coverAmount) || 0;
-
-              return {
-                uniqueId: crypto.randomUUID(),
-                logo: `assets/quote/${p.logoUrl}`,
-                name: p.plan,
-                company: p.company,
-
-                cover: `₹ ${this.formatIndianCurrency(coverAmountNum)}`,
-                premium: `₹ ${this.formatIndianCurrency(premiumNumber)}`,
-                premiumNumber,
-                coverAmountNumber: coverAmountNum,
-
-                features:
-                  Array.isArray(p.features) && p.features.length
-                    ? p.features
-                        .map((f: any) => (typeof f === 'string' ? f : f?.includes || ''))
-                        .filter(Boolean)
-                    : ['No Key Features Available'],
-
-                brochure: p.brochureUrl || null,
-                onePager: p.onePagerUrl || null,
-                planId: p.planId || `${p.plan}`,
-                insurerName: p.company,
-              };
+        this.api.callAllPremiumApis(apiList, payload).subscribe({
+          next: (resArray) => {
+            const insurerNames: string[] = [];
+            resArray.forEach((res: any) => {
+              if (res?.company) insurerNames.push(res.company.trim());
             });
+            this.insurerList.set(Array.from(new Set(insurerNames)).sort());
+            console.log('HC Premium API results:', resArray);
 
-          if (!this.selectedSort) this.selectedSort = 'low';
+            const mappedPlans = resArray
+              .filter((res: any) => res && res.plan)
+              .flatMap((p: any) => {
+                if (this.selectedInsurer !== null) {
+                  if (p.company !== this.selectedInsurer) return [];
+                }
 
-          if (this.selectedSort === 'low') {
-            mappedPlans.sort((a: any, b: any) => a.premiumNumber - b.premiumNumber);
-          } else if (this.selectedSort === 'high') {
-            mappedPlans.sort((a: any, b: any) => b.premiumNumber - a.premiumNumber);
-          }
+                const coverAmountNum = Number(p.coverAmount) || 0;
+                const premiumNumber = Number(String(p?.premium ?? 0).replace(/,/g, '')) || 0;
 
-          this.plans.set(mappedPlans);
-        },
-        error: (err) => console.error('Error calling premium APIs:', err),
-      });
-    },
-    error: (err) => console.error('Error fetching endpoints:', err),
-  });
-}
+                return {
+                  uniqueId: crypto.randomUUID(),
+                  logo: `assets/quote/${p.logoUrl}`,
+                  name: p.plan,
+                  company: p.company,
+                  cover: `₹ ${this.formatIndianCurrency(coverAmountNum)}`,
+                  premium: `₹ ${this.formatIndianCurrency(premiumNumber)}`,
+                  premiumNumber: premiumNumber,
+                  coverAmountNumber: coverAmountNum,
+                  features:
+                    Array.isArray(p.features) && p.features.length
+                      ? p.features
+                          .map((f: any) => (typeof f === 'string' ? f : f?.includes || ''))
+                          .filter(Boolean)
+                      : ['No Key Features Available'],
+                  brochure: p.brochureUrl || null,
+                  onePager: p.onePagerUrl || null,
+                  planId: p.planId || `${p.plan}`,
+                  insurerName: p.company,
+                };
+              });
+
+console.log("HC endpoints full response:", response);
+console.log("HC apiList:", response?.data?.map((x:any) => x.api_type));
+
+            // ✅ same default sorting behavior
+            if (!this.selectedSort) this.selectedSort = 'low';
+
+            if (this.selectedSort === 'low') {
+              mappedPlans.sort((a: any, b: any) => a.premiumNumber - b.premiumNumber);
+            } else if (this.selectedSort === 'high') {
+              mappedPlans.sort((a: any, b: any) => b.premiumNumber - a.premiumNumber);
+            }
+
+            console.log('🔥 SORTED GMC Plans:', mappedPlans);
+            this.plans.set(mappedPlans);
+          },
+          error: (err) => console.error('Error calling premium APIs:', err),
+        });
+      },
+      error: (err) => console.error('Error fetching endpoints:', err),
+    });
+
+  }
 
   /* -------------------- Compare logic -------------------- */
   allowAadhaarInput(event: any) {
@@ -288,74 +277,15 @@ private buildPayloadFromLocal(ls: any): PlanPayload {
   }
 
   /* -------------------- Filters handlers -------------------- */
-onDaysChange(event: any) {
-  const raw = event?.target?.value;
-  if (!this.basePayload) return;
 
-  if (raw === '' || raw == null) {
-    event.target.value = String(this.selectedNoOfDays ?? '');
-    return;
+  onCoverageAmountChange(event: any) {
+    const newValue = Number(event.target.value);
+
+    if (!this.basePayload) return;
+
+    this.basePayload.coverAmount = isNaN(newValue) ? 0 : newValue;
+    this.fetchAllPlans(this.basePayload);
   }
-
-  const newDays = Number(raw);
-  if (!Number.isFinite(newDays) || newDays <= 0) {
-    event.target.value = String(this.selectedNoOfDays ?? '');
-    return;
-  }
-
-  this.selectedNoOfDays = newDays;
-  this.basePayload.noOfDays = newDays;
-
-  // persist to enquiry localStorage (so refresh/back keeps same)
-  try {
-    const savedRaw = localStorage.getItem(this.ENQUIRY_KEY);
-    const saved = savedRaw ? JSON.parse(savedRaw) : {};
-    saved.no_of_days = newDays;              // ✅ same key used in enquiry
-    localStorage.setItem(this.ENQUIRY_KEY, JSON.stringify(saved));
-  } catch (e) {
-    console.warn('Unable to persist no_of_days to localStorage', e);
-  }
-
-  this.fetchAllPlans(this.basePayload);
-}
-
-onCoverageAmountChange(event: any) {
-  const raw = event?.target?.value;
-  if (!this.basePayload) return;
-
-  // If blank selected -> revert dropdown to previous selection
-  if (raw === '' || raw == null) {
-    event.target.value = String(this.selectedCoverageAmt ?? '');
-    return;
-  }
-
-  const newValue = Number(raw);
-  if (!Number.isFinite(newValue)) {
-    event.target.value = String(this.selectedCoverageAmt ?? '');
-    return;
-  }
-
-  // ✅ 1) update dropdown state
-  this.selectedCoverageAmt = newValue;
-
-  // ✅ 2) update payload used for API
-  this.basePayload.coverAmount = newValue;
-
-  // ✅ 3) persist to enquiry localStorage (so refresh/back keeps same)
-  try {
-    const savedRaw = localStorage.getItem(this.ENQUIRY_KEY);
-    const saved = savedRaw ? JSON.parse(savedRaw) : {};
-    // enquiry key in your local storage is room_rent
-    saved.room_rent = newValue;
-    localStorage.setItem(this.ENQUIRY_KEY, JSON.stringify(saved));
-  } catch (e) {
-    console.warn('Unable to persist coverAmount to localStorage', e);
-  }
-
-  // ✅ 4) refetch plans
-  this.fetchAllPlans(this.basePayload);
-}
-
 
   onSortChange(event: any) {
     const value = event.target.value;
