@@ -76,7 +76,7 @@ export class Quotes implements OnInit {
 
     // ✅ IMPORTANT: if enquiry exists, always allow restore
     if (savedData) {
-        sessionStorage.setItem(this.RESTORE_FLAG, '1'); // ✅ not localStorage
+      localStorage.setItem(this.RESTORE_FLAG, '1');
     }
     if (savedData) {
       try {
@@ -225,15 +225,8 @@ export class Quotes implements OnInit {
       next: (response) => {
         const apiList = response?.data?.map((item: any) => item.api_type) || [];
 
-// ✅ BACKEND expects coverAmount, UI uses roomRent
-      const backendPayload: any = {
-        ...payload,
-        coverAmount: payload.roomRent,
-      };
-      delete backendPayload.roomRent;
-
-      this.api.callAllPremiumApis(apiList, backendPayload).subscribe({
-                next: (resArray) => {
+        this.api.callAllPremiumApis(apiList, payload).subscribe({
+          next: (resArray) => {
             // 1️⃣ Extract insurer names
             const insurerNames: string[] = [];
             resArray.forEach((res: any) => {
@@ -524,15 +517,14 @@ export class Quotes implements OnInit {
   // downloadBrochure(url: string) {
   //   window.open(url, '_blank');
   // }
-  // ✅ SAME as supertopup: go back to enquiry step 3
-goBack() {
-  sessionStorage.setItem(this.RESTORE_FLAG, '1'); // ✅ use sessionStorage
-  this.router.navigate(['/hospicash/enquiry-form'], {
-    queryParams: { step: 3 },
-    queryParamsHandling: 'merge',
-  });
-}
+  goBack() {
+    localStorage.setItem(this.RESTORE_FLAG, '1');
 
+    this.router.navigate(['/supertopup/enquiry-form'], {
+      queryParams: { step: 3 },
+      queryParamsHandling: 'merge',
+    });
+  }
 
   goToAllFeatures(plan: any) {
     const combined = {
