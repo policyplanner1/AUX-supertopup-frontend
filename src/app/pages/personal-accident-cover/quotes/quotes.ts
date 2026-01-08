@@ -219,33 +219,58 @@ export class PAQuotesComponent implements OnInit {
                   if (p.company !== this.selectedInsurer) return [];
                 }
 
-                console.log('Processing plan:', p);
                 const coverAmountNum = Number(p.coverAmount) || 0;
 
-                const baseNum = Number(p.base ?? 0) || 0;
-                const addonNum = Number(p.addon ?? 0) || 0;
+                // Normalize premiums
+                const premiums = (p.premiums || []).map((pr: any) => ({
+                  type: pr.type,
+                  value: Number(pr.value) || 0,
+                  displayValue: `₹ ${this.formatIndianCurrency(Number(pr.value) || 0)}`
+                }));
+
+                // Extract basic
+                const baseNum = premiums.find((pr: any) => pr.type.toLowerCase() === 'basic')?.value || 0;
+
+                // addon amount
+                const addonNum = premiums.find((pr: any) => pr.type.toLowerCase() === 'addon')?.value || 0;
+
+                // Remove basic and keep only add-ons
+                const addonPremiums = premiums.filter(
+                  (pr: any) => pr.type.toLowerCase() !== 'basic'
+                );
+
                 return {
                   uniqueId: crypto.randomUUID(),
+
                   // UI fields
                   logo: `assets/quote/${p.logoUrl}`,
                   name: p.plan,
                   tag: p.company,
                   cover: `₹ ${this.formatIndianCurrency(coverAmountNum)}`,
+
                   base: `₹ ${this.formatIndianCurrency(baseNum)}`,
                   addon: `₹ ${this.formatIndianCurrency(addonNum)}`,
-                  features: ['No Key Features Available'],
+
+                  addonPremiums,
+
+                  features: p.features?.length
+                    ? p.features
+                    : ['No Key Features Available'],
+
                   brochure: p.brochureUrl || null,
 
                   // Compare
-                  planId: p.planId || `${p.planName}`,
+                  planId: p.planId || p.plan,
                   coverAmountNumber: coverAmountNum,
                   baseNumber: baseNum,
                   addonNumber: addonNum,
                   insurerName: p.company,
                   otherDetails: p,
                 };
-
               });
+
+
+            console.log('Mapped Plans:', mappedPlans);
 
             // 4️⃣ Sorting
             if (this.selectedSort === 'low') {
