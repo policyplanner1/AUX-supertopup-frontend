@@ -53,6 +53,7 @@ private readonly PAGE_KEY = 'hospicash_last_page';
   familyCount: number | null = null;
   adultCount: number | null = null;
   childCount: number | null = null;
+  selectedNoOfDays: number | null = null;
 
   constructor(
     private router: Router,
@@ -82,8 +83,18 @@ private readonly PAGE_KEY = 'hospicash_last_page';
         this.basePayload = payload;
         console.log('GMC Quotes Payload:', payload);
 
+        this.selectedCoverageAmt = payload.coverAmount ?? null;
+        this.selectedNoOfDays = payload.noOfDays ?? null;
 
         this.age = payload.age ?? null;
+        this.pincode =
+         parsed?.cust_Pincode ??   
+            parsed?.cust_pincode ??
+            parsed?.pincode ??
+            parsed?.pin_code ??
+            parsed?.pinCode ??
+            '';
+
         this.city = parsed?.cust_city ?? null;
         this.name = (parsed?.cust_fname || '') + ' ' + (parsed?.cust_lname || '');
 
@@ -277,15 +288,28 @@ console.log("HC apiList:", response?.data?.map((x:any) => x.api_type));
   }
 
   /* -------------------- Filters handlers -------------------- */
+  onDaysChange(event: any) {
+  const newValue = Number(event.target.value);
 
-  onCoverageAmountChange(event: any) {
-    const newValue = Number(event.target.value);
+  if (!this.basePayload) return;
 
-    if (!this.basePayload) return;
+  this.basePayload.noOfDays = isNaN(newValue) ? 0 : newValue;
+  this.selectedNoOfDays = this.basePayload.noOfDays;
 
-    this.basePayload.coverAmount = isNaN(newValue) ? 0 : newValue;
-    this.fetchAllPlans(this.basePayload);
-  }
+  this.fetchAllPlans(this.basePayload);
+}
+
+ onCoverageAmountChange(event: any) {
+  const newValue = Number(event.target.value);
+
+  if (!this.basePayload) return;
+
+  this.basePayload.coverAmount = isNaN(newValue) ? 0 : newValue;
+  this.selectedCoverageAmt = this.basePayload.coverAmount;
+
+  this.fetchAllPlans(this.basePayload);
+}
+
 
   onSortChange(event: any) {
     const value = event.target.value;

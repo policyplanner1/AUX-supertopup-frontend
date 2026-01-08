@@ -18,7 +18,7 @@
       <!-- Breadcrumbs -->
       <div class="text-[13px] sm:text-sm text-gray-500 flex flex-wrap items-center gap-0.5 sm:gap-1 md:gap-2 min-w-0">
         <span class="truncate max-w-[220px] xs:max-w-[260px] sm:max-w-none">
-          Group Medical Coverage
+          Hospicash Insurance Plan
         </span>
         <span>›</span>
         <span>Personal Details</span>
@@ -51,8 +51,13 @@
     </span>
 
     <!-- Filter Buttons -->
-   <div class="dropdown filter-btn w-full sm:w-auto">
-  <select (change)="onCoverageAmountChange($event)" class="w-full sm:w-auto bg-transparent outline-none">
+<div class="dropdown filter-btn w-full sm:w-auto">
+ <select
+  (change)="onCoverageAmountChange($event)"
+  class="w-full sm:w-auto bg-transparent outline-none"
+  [value]="selectedCoverageAmt !== null ? selectedCoverageAmt.toString() : ''"
+>
+
     <option value="">Room Rent</option>
 
     <option value="500">₹500</option>
@@ -70,6 +75,24 @@
   </select>
 </div>
 
+<!-- ✅ No. of Days Dropdown -->
+<div class="dropdown filter-btn w-full sm:w-auto">
+  <select
+  (change)="onDaysChange($event)"
+  class="w-full sm:w-auto bg-transparent outline-none"
+  [value]="selectedNoOfDays !== null ? selectedNoOfDays.toString() : ''"
+>
+
+    <option value="">No. of Days</option>
+    <option value="10">10 days</option>
+    <option value="15">15 days</option>
+    <option value="20">20 days</option>
+    <option value="30">30 days</option>
+    <option value="60">60 days</option>
+    <option value="90">90 days</option>
+    <option value="180">180 days</option>
+  </select>
+</div>
 
 
     <!-- Insurer Dropdown -->
@@ -91,6 +114,16 @@
         <option value="high">Price: High to Low</option>
       </select>
     </div>
+
+    <!-- ✅ Age + Pincode pill (RIGHT SIDE like screenshot) -->
+  <div
+    class="w-full sm:ml-auto sm:w-auto flex items-center bg-[#F8FDFF] border border-[#E8F3FF] rounded-full px-5 py-2 shadow-sm gap-3">
+    <div class="flex items-center text-gray-700 text-sm">
+      Self: <span class="font-semibold ml-1">{{ age }} years</span>
+      <span class="mx-2 text-gray-400">|</span>
+      Pincode: <span class="font-semibold ml-1">{{ pincode }}</span>
+    </div>
+  </div>
 
 
     <!-- Right Side User Info -->
